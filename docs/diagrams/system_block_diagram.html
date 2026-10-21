@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDSCO Dossier Builder - Non-Linear System Block Diagram (SBD)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0b0f19;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      user-select: none;
+    }
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+    .title-group h1 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #f8fafc;
+    }
+    .title-group p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn:hover {
+      background: #334155;
+      border-color: #475569;
+    }
+    .btn:active {
+      background: #0f172a;
+    }
+    .zoom-level {
+      font-size: 12px;
+      color: #94a3b8;
+      min-width: 48px;
+      text-align: center;
+    }
+    #viewport-container {
+      width: 100vw;
+      height: 100vh;
+      cursor: grab;
+      position: relative;
+    }
+    #viewport-container:active {
+      cursor: grabbing;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .block-header {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .block-sub {
+      font-size: 10px;
+      font-weight: 500;
+      opacity: 0.75;
+    }
+    .node-text {
+      font-size: 11px;
+      font-weight: 500;
+      fill: #f8fafc;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .node-subtext {
+      font-size: 9px;
+      fill: #94a3b8;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .footer-help {
+      position: absolute;
+      bottom: 16px;
+      left: 24px;
+      font-size: 12px;
+      color: #64748b;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid #1e293b;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-group">
+      <h1>CDSCO Medical Device Dossier Builder &mdash; System Block Diagram (SBD)</h1>
+      <p>End-to-End Orchestrator Network with Right-Hand Co-Pilot &amp; Portal Lodgment &bull; Scroll to zoom &bull; Drag to pan</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btn-zoom-out" title="Zoom Out">&minus; Zoom Out</button>
+      <span class="zoom-level" id="zoom-text">100%</span>
+      <button class="btn" id="btn-zoom-in" title="Zoom In">+ Zoom In</button>
+      <button class="btn" id="btn-reset" title="Reset View">Reset</button>
+    </div>
+  </header>
+
+  <div id="viewport-container">
+    <svg id="svg-canvas" viewBox="0 0 1680 750" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Arrowhead markers -->
+        <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+        </marker>
+        <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+        </marker>
+        <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#22c55e" />
+        </marker>
+        <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#14b8a6" />
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+        </marker>
+        <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#f43f5e" />
+        </marker>
+        <marker id="arrow-emerald" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+        </marker>
+        <marker id="arrow-indigo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1" />
+        </marker>
+        <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#06b6d4" />
+        </marker>
+
+        <!-- Drop Shadow Filter -->
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.45" />
+        </filter>
+      </defs>
+
+      <g id="transform-group">
+        <!-- =================================================================== -->
+        <!-- CONNECTION LINES & BUSES                                            -->
+        <!-- =================================================================== -->
+
+        <!-- 0. User -> Client Workspace -->
+        <path d="M 115 340 L 145 340" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow-blue)" />
+
+        <!-- 1. Client Workspace <-> Gateway (Bi-directional REST & Events) -->
+        <path d="M 410 120 L 440 120" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow-blue)" />
+        <path d="M 440 140 L 410 140" stroke="#c084fc" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-purple)" />
+
+        <!-- 2. Gateway -> Central Submission & Workspace Manager -->
+        <path d="M 565 220 L 565 250" stroke="#c084fc" stroke-width="2.5" marker-end="url(#arrow-purple)" />
+
+        <!-- 3. Central Workspace Manager <-> Rules Engine (Bi-directional blueprint & predicates) -->
+        <path d="M 565 470 L 565 500" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber)" />
+        <path d="M 545 500 L 545 470" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-amber)" />
+
+        <!-- 4. Central Workspace Manager -> Path 5A: Evidence Ingestion & Vault -->
+        <path d="M 690 300 L 705 300 L 705 140 L 720 140" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrow-green)" />
+
+        <!-- 5. Central Workspace Manager -> Path 5B: Statutory Form Generator -->
+        <path d="M 690 360 L 720 360" stroke="#14b8a6" stroke-width="2.5" marker-end="url(#arrow-teal)" />
+
+        <!-- 6. Rules Engine -> Path 5B Form Generator (Injects conditional predicates) -->
+        <path d="M 690 550 L 705 550 L 705 410 L 720 410" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-amber)" />
+
+        <!-- 7. Rules Engine -> Dossier Assembly (Provides Fourth Schedule Chapter Order) -->
+        <path d="M 690 600 L 720 600" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber)" />
+
+        <!-- 8. Path 5A Ingestion & Path 5B Generator -> Persistence & Storage Manager (Writes files & links) -->
+        <path d="M 975 140 L 1005 140" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrow-green)" />
+        <path d="M 975 360 L 1005 360" stroke="#14b8a6" stroke-width="2.5" marker-end="url(#arrow-teal)" />
+
+        <!-- 9. Dossier Assembly -> Persistence & Storage (Fetches chapter PDFs & writes compiled dossier) -->
+        <path d="M 975 560 L 990 560 L 990 390 L 1005 390" stroke="#06b6d4" stroke-width="2.5" marker-end="url(#arrow-cyan)" />
+
+        <!-- 10. Persistence & Storage -> Continuous Validation (Continuous audit of slots, dates, & files) -->
+        <path d="M 1137 470 L 1137 500" stroke="#f43f5e" stroke-width="2.5" marker-end="url(#arrow-rose)" />
+
+        <!-- 11. Continuous Validation -> Client Workspace (Pushes Real-Time Issue Badges & Fix Buttons) -->
+        <path d="M 1005 660 L 410 660" stroke="#f43f5e" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-rose)" />
+
+        <!-- 12. Persistence & Storage -> 8. SUGAM Co-Pilot (Direct Horizontal Feed of verified files & form payloads) -->
+        <path d="M 1270 160 L 1300 160" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrow-indigo)" />
+
+        <!-- 13. Dossier Assembly -> 8. SUGAM Co-Pilot (Delivers <=10MB Master Dossier) -->
+        <path d="M 975 620 L 990 620 L 990 480 L 1285 480 L 1285 220 L 1300 220" stroke="#06b6d4" stroke-width="2.5" marker-end="url(#arrow-cyan)" />
+
+        <!-- 14. Continuous Validation -> 8. SUGAM Co-Pilot (Gatekeeper: Unlocks ONLY when 0 blockers) -->
+        <path d="M 1270 580 L 1285 580 L 1285 270 L 1300 270" stroke="#f43f5e" stroke-width="2.5" marker-end="url(#arrow-rose)" />
+
+        <!-- 15. 8. SUGAM Co-Pilot -> 10. Target CDSCO Portal (Direct Vertical Feed for live portal filing) -->
+        <path d="M 1437 360 L 1437 390" stroke="#10b981" stroke-width="3" marker-end="url(#arrow-emerald)" />
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 0: REGULATORY USER (COLUMN 0)                                 -->
+        <!-- =================================================================== -->
+        <g transform="translate(25, 260)" filter="url(#glow)">
+          <rect width="90" height="160" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+          <circle cx="45" cy="45" r="18" fill="#38bdf8" fill-opacity="0.2" stroke="#38bdf8" stroke-width="2" />
+          <path d="M 45 68 L 45 110 M 25 85 L 65 85 M 45 110 L 30 140 M 45 110 L 60 140" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" />
+          <text x="45" y="152" font-size="11" font-weight="700" fill="#e0f2fe" text-anchor="middle">REGULATORY</text>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 1: CLIENT WORKSPACE SUBSYSTEM (COLUMN 1)                      -->
+        <!-- =================================================================== -->
+        <g transform="translate(145, 55)" filter="url(#glow)">
+          <rect width="265" height="650" rx="14" fill="#0c172e" stroke="#38bdf8" stroke-width="2" />
+          <rect width="265" height="50" rx="14" fill="#0369a1" fill-opacity="0.25" />
+          <text x="132" y="23" class="block-header" fill="#38bdf8" text-anchor="middle">1. CLIENT WORKSPACE (UI)</text>
+          <text x="132" y="39" class="block-sub" fill="#bae6fd" text-anchor="middle">Next.js 14 &bull; React 18 &bull; TypeScript</text>
+
+          <g transform="translate(15, 62)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Slot Navigator &amp; Tree</text>
+            <text x="117" y="38" class="node-subtext">36-48 Decomposed Portal Slots</text>
+          </g>
+          <g transform="translate(15, 126)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Entity Workspace Controller</text>
+            <text x="117" y="38" class="node-subtext">8-Point Regulatory Guidance Card</text>
+          </g>
+          <g transform="translate(15, 190)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Dual Fulfillment Switcher</text>
+            <text x="117" y="38" class="node-subtext">Option A (Upload) vs Option B (Gen)</text>
+          </g>
+          <g transform="translate(15, 254)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Dynamic Form Renderer</text>
+            <text x="117" y="38" class="node-subtext">React Hook Form + Zod Schemas</text>
+          </g>
+          <g transform="translate(15, 318)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Evidence Vault &amp; Dropzone</text>
+            <text x="117" y="38" class="node-subtext">Chunked Upload &amp; PDF.js Viewer</text>
+          </g>
+          <g transform="translate(15, 382)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Assembly Console UI</text>
+            <text x="117" y="38" class="node-subtext">Chapter Order &amp; 10MB Gauge</text>
+          </g>
+          <g transform="translate(15, 446)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">Validation Drawer (1-Click Fix)</text>
+            <text x="117" y="38" class="node-subtext">Blockers / Errors Diagnostics</text>
+          </g>
+          <g transform="translate(15, 510)">
+            <rect width="235" height="56" rx="8" fill="#1e293b" stroke="#334155" />
+            <text x="117" y="22" class="node-text">SUGAM Co-Pilot Modal</text>
+            <text x="117" y="38" class="node-subtext">Split-Screen Portal Companion</text>
+          </g>
+          <g transform="translate(15, 576)">
+            <rect width="235" height="58" rx="8" fill="#0f172a" stroke="#0284c7" />
+            <text x="117" y="22" font-size="11.5" font-weight="600" fill="#7dd3fc" text-anchor="middle">Client State &amp; Cache</text>
+            <text x="117" y="38" class="node-subtext">TanStack Query v5 + Zustand Store</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 2: GATEWAY & AUTH CONTROLLER (COLUMN 2, TOP)                  -->
+        <!-- =================================================================== -->
+        <g transform="translate(440, 55)" filter="url(#glow)">
+          <rect width="250" height="165" rx="14" fill="#1b122e" stroke="#c084fc" stroke-width="2" />
+          <rect width="250" height="42" rx="14" fill="#7e22ce" fill-opacity="0.25" />
+          <text x="125" y="20" class="block-header" fill="#c084fc" text-anchor="middle">2. GATEWAY &amp; AUTH</text>
+          <text x="125" y="34" class="block-sub" fill="#e9d5ff" text-anchor="middle">FastAPI Ingress &bull; Session &bull; Security</text>
+
+          <g transform="translate(12, 50)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="16" class="node-text">CORS &amp; Bearer JWT Authentication</text>
+          </g>
+          <g transform="translate(12, 88)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="16" class="node-text">Pydantic v2 Contract Validation</text>
+          </g>
+          <g transform="translate(12, 126)">
+            <rect width="226" height="30" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="15" class="node-text">SSE Streamer &amp; Job Status Poller</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 3: SUBMISSION & WORKSPACE MANAGER (COLUMN 2, MIDDLE)          -->
+        <!-- =================================================================== -->
+        <g transform="translate(440, 250)" filter="url(#glow)">
+          <rect width="250" height="220" rx="14" fill="#171e38" stroke="#818cf8" stroke-width="2.5" />
+          <rect width="250" height="46" rx="14" fill="#4338ca" fill-opacity="0.35" />
+          <text x="125" y="20" class="block-header" fill="#a5b4fc" text-anchor="middle">3. SUBMISSION WORKSPACE MGR</text>
+          <text x="125" y="34" class="block-sub" fill="#e0e7ff" text-anchor="middle">Central Application Orchestrator</text>
+
+          <g transform="translate(12, 56)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#6366f1" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#c7d2fe" text-anchor="middle">Submission Master State Controller</text>
+          </g>
+          <g transform="translate(12, 94)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#6366f1" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#c7d2fe" text-anchor="middle">Filing Modality (Fresh/Endorsement)</text>
+          </g>
+          <g transform="translate(12, 132)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#6366f1" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#c7d2fe" text-anchor="middle">36 to 48 Slot Entity Registry</text>
+          </g>
+          <g transform="translate(12, 170)">
+            <rect width="226" height="38" rx="5" fill="#312e81" stroke="#a5b4fc" />
+            <text x="113" y="14" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">Active Slot Delegation Coordinator</text>
+            <text x="113" y="26" font-size="9" fill="#c7d2fe" text-anchor="middle">Branches to 5A (Upload) or 5B (Generate)</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 4: RULES & STATUTORY LOGIC ENGINE (COLUMN 2, BOTTOM)          -->
+        <!-- =================================================================== -->
+        <g transform="translate(440, 500)" filter="url(#glow)">
+          <rect width="250" height="205" rx="14" fill="#241505" stroke="#f59e0b" stroke-width="2" />
+          <rect width="250" height="44" rx="14" fill="#b45309" fill-opacity="0.25" />
+          <text x="125" y="20" class="block-header" fill="#f59e0b" text-anchor="middle">4. RULES &amp; STATUTORY ENGINE</text>
+          <text x="125" y="34" class="block-sub" fill="#fde68a" text-anchor="middle">Declarative Regulatory Brain</text>
+
+          <g transform="translate(12, 52)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#fef3c7" text-anchor="middle">App Definition Schema Parser</text>
+          </g>
+          <g transform="translate(12, 90)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#fef3c7" text-anchor="middle">Context Evaluator (Class, Sterile)</text>
+          </g>
+          <g transform="translate(12, 128)">
+            <rect width="226" height="32" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="113" y="16" font-size="11" font-weight="600" fill="#fef3c7" text-anchor="middle">Slot Matrix Filter (Fresh/Endorse)</text>
+          </g>
+          <g transform="translate(12, 166)">
+            <rect width="226" height="28" rx="4" fill="#1e293b" stroke="#b45309" />
+            <text x="113" y="14" font-size="10" font-weight="600" fill="#fde68a" text-anchor="middle">Fourth Schedule DMF/PMF Sequencer</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 5A: EVIDENCE INGESTION & VAULT ENGINE (COLUMN 3, TOP)         -->
+        <!-- =================================================================== -->
+        <g transform="translate(720, 55)" filter="url(#glow)">
+          <rect width="255" height="185" rx="14" fill="#092415" stroke="#22c55e" stroke-width="2" />
+          <rect width="255" height="42" rx="14" fill="#15803d" fill-opacity="0.25" />
+          <text x="127" y="19" class="block-header" fill="#22c55e" text-anchor="middle">5A. EVIDENCE INGESTION &amp; VAULT</text>
+          <text x="127" y="33" class="block-sub" fill="#bbf7d0" text-anchor="middle">Path A: External Upload Processing</text>
+
+          <g transform="translate(12, 48)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#f0fdf4" text-anchor="middle">Chunked Multi-Part File Receiver</text>
+          </g>
+          <g transform="translate(12, 82)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#f0fdf4" text-anchor="middle">SHA-256 Cryptographic Hash Auditor</text>
+          </g>
+          <g transform="translate(12, 116)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#f0fdf4" text-anchor="middle">PyMuPDF Page &amp; Text Inspector</text>
+          </g>
+          <g transform="translate(12, 150)">
+            <rect width="231" height="24" rx="4" fill="#14532d" stroke="#22c55e" />
+            <text x="115" y="12" font-size="10" font-weight="600" fill="#dcfce7" text-anchor="middle">Many-to-Many Evidence Linker</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 5B: STATUTORY FORM GENERATOR (COLUMN 3, MIDDLE)               -->
+        <!-- =================================================================== -->
+        <g transform="translate(720, 270)" filter="url(#glow)">
+          <rect width="255" height="200" rx="14" fill="#042321" stroke="#14b8a6" stroke-width="2" />
+          <rect width="255" height="42" rx="14" fill="#0f766e" fill-opacity="0.25" />
+          <text x="127" y="19" class="block-header" fill="#14b8a6" text-anchor="middle">5B. STATUTORY FORM GENERATOR</text>
+          <text x="127" y="33" class="block-sub" fill="#ccfbf1" text-anchor="middle">Path B: Engine 1 Pro-Formas</text>
+
+          <g transform="translate(12, 50)">
+            <rect width="231" height="30" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="15" font-size="10.5" fill="#f0fdfa" text-anchor="middle">Dynamic Questionnaire JSONB Parser</text>
+          </g>
+          <g transform="translate(12, 86)">
+            <rect width="231" height="30" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="15" font-size="10.5" fill="#f0fdfa" text-anchor="middle">Jinja2 Statutory HTML Templates</text>
+          </g>
+          <g transform="translate(12, 122)">
+            <rect width="231" height="30" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="15" font-size="10.5" fill="#f0fdfa" text-anchor="middle">WeasyPrint CSS-to-PDF Print Engine</text>
+          </g>
+          <g transform="translate(12, 158)">
+            <rect width="231" height="28" rx="4" fill="#134e4a" stroke="#14b8a6" />
+            <text x="115" y="14" font-size="10" font-weight="600" fill="#99f6e4" text-anchor="middle">docxtpl Word Pro-Forma Stamp-Paper</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 6: DOSSIER ASSEMBLY PIPELINE (COLUMN 3, BOTTOM)               -->
+        <!-- =================================================================== -->
+        <g transform="translate(720, 500)" filter="url(#glow)">
+          <rect width="255" height="205" rx="14" fill="#082329" stroke="#06b6d4" stroke-width="2" />
+          <rect width="255" height="44" rx="14" fill="#0e7490" fill-opacity="0.25" />
+          <text x="127" y="20" class="block-header" fill="#06b6d4" text-anchor="middle">6. DOSSIER ASSEMBLY (ENGINE 2)</text>
+          <text x="127" y="34" class="block-sub" fill="#cffafe" text-anchor="middle">PyMuPDF &bull; Bates &bull; pikepdf 10MB</text>
+
+          <g transform="translate(12, 52)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#ecfeff" text-anchor="middle">Chapter Sequence Traversal</text>
+          </g>
+          <g transform="translate(12, 86)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#ecfeff" text-anchor="middle">Dynamic TOC &amp; Bookmark Injector</text>
+          </g>
+          <g transform="translate(12, 120)">
+            <rect width="231" height="28" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="115" y="14" font-size="10.5" fill="#ecfeff" text-anchor="middle">Continuous Bates Margin Stamper</text>
+          </g>
+          <g transform="translate(12, 154)">
+            <rect width="231" height="40" rx="5" fill="#164e63" stroke="#06b6d4" />
+            <text x="115" y="13" font-size="10.5" font-weight="700" fill="#a5f3fc" text-anchor="middle">pikepdf 150 DPI Downsampler</text>
+            <text x="115" y="27" font-size="9" fill="#cffafe" text-anchor="middle">Enforces Strict 10MB CDSCO Ceiling</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 7: PERSISTENCE & STORAGE MANAGER (COLUMN 4, TOP)              -->
+        <!-- =================================================================== -->
+        <g transform="translate(1005, 55)" filter="url(#glow)">
+          <rect width="265" height="415" rx="14" fill="#11162e" stroke="#6366f1" stroke-width="2" />
+          <rect width="265" height="48" rx="14" fill="#4338ca" fill-opacity="0.25" />
+          <text x="132" y="21" class="block-header" fill="#818cf8" text-anchor="middle">7. PERSISTENCE &amp; STORAGE</text>
+          <text x="132" y="36" class="block-sub" fill="#c7d2fe" text-anchor="middle">PostgreSQL 15+ Core &bull; S3 Object Store</text>
+
+          <g transform="translate(12, 58)">
+            <rect width="241" height="36" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" class="node-text">PostgreSQL Relational Core</text>
+            <text x="120" y="26" class="node-subtext">submissions, entities, links, docs</text>
+          </g>
+          <g transform="translate(12, 102)">
+            <rect width="241" height="36" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" class="node-text">GIN-Indexed JSONB Schemas</text>
+            <text x="120" y="26" class="node-subtext">form_values payloads &amp; context</text>
+          </g>
+          <g transform="translate(12, 146)">
+            <rect width="241" height="36" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" class="node-text">Abstract StorageProvider Interface</text>
+            <text x="120" y="26" class="node-subtext">LocalStorageProvider / S3StorageProvider</text>
+          </g>
+          <g transform="translate(12, 192)">
+            <rect width="241" height="210" rx="8" fill="#0f172a" stroke="#4f46e5" />
+            <text x="120" y="20" font-size="11" font-weight="700" fill="#a5b4fc" text-anchor="middle">Physical Directory Hierarchy</text>
+            <text x="18" y="44" font-family="monospace" font-size="10.5" fill="#94a3b8">storage/submissions/{id}/</text>
+            <text x="32" y="68" font-family="monospace" font-size="10" fill="#4ade80">&bull; raw/ (Vendor Certificates)</text>
+            <text x="32" y="92" font-family="monospace" font-size="10" fill="#2dd4bf">&bull; generated/ (Engine 1 PDFs)</text>
+            <text x="32" y="116" font-family="monospace" font-size="10" fill="#22d3ee">&bull; assembled/ (DMF &le; 10MB)</text>
+            <text x="32" y="140" font-family="monospace" font-size="10" fill="#34d399">&bull; export/ (SUGAM ZIPs)</text>
+            <rect x="12" y="162" width="217" height="32" rx="4" fill="#1e1b4b" stroke="#6366f1" />
+            <text x="120" y="180" font-size="10" font-weight="600" fill="#c7d2fe" text-anchor="middle">Immutable SHA-256 Checksums</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 9: CONTINUOUS VALIDATION ENGINE (COLUMN 4, BOTTOM)            -->
+        <!-- =================================================================== -->
+        <g transform="translate(1005, 500)" filter="url(#glow)">
+          <rect width="265" height="205" rx="14" fill="#290d16" stroke="#f43f5e" stroke-width="2" />
+          <rect width="265" height="44" rx="14" fill="#be123c" fill-opacity="0.25" />
+          <text x="132" y="20" class="block-header" fill="#f43f5e" text-anchor="middle">9. CONTINUOUS VALIDATION</text>
+          <text x="132" y="34" class="block-sub" fill="#fecdd3" text-anchor="middle">Multi-Tier Pre-Submission Auditor</text>
+
+          <g transform="translate(12, 52)">
+            <rect width="241" height="26" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" font-size="10" fill="#ffe4e6" text-anchor="middle">Tier 1: Mandatory Slot Completeness</text>
+          </g>
+          <g transform="translate(12, 84)">
+            <rect width="241" height="26" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" font-size="10" fill="#ffe4e6" text-anchor="middle">Tier 2: Expiry &amp; Date Auditor</text>
+          </g>
+          <g transform="translate(12, 116)">
+            <rect width="241" height="26" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" font-size="10" fill="#ffe4e6" text-anchor="middle">Tier 3: Fourth Schedule Verifier</text>
+          </g>
+          <g transform="translate(12, 148)">
+            <rect width="241" height="26" rx="5" fill="#1e293b" stroke="#334155" />
+            <text x="120" y="13" font-size="10" fill="#ffe4e6" text-anchor="middle">Tier 4: 10MB Portal Ceiling Auditor</text>
+          </g>
+          <g transform="translate(12, 178)">
+            <rect width="241" height="20" rx="4" fill="#881337" stroke="#f43f5e" />
+            <text x="120" y="10" font-size="9" font-weight="700" fill="#fecdd3" text-anchor="middle">Gating Rules: Unlocks when 0 Blockers</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 8: SUGAM FILING CO-PILOT & EXPORT MANAGER (COLUMN 5, TOP)     -->
+        <!-- =================================================================== -->
+        <g transform="translate(1300, 55)" filter="url(#glow)">
+          <rect width="275" height="305" rx="14" fill="#06241a" stroke="#10b981" stroke-width="2" />
+          <rect width="275" height="48" rx="14" fill="#047857" fill-opacity="0.25" />
+          <text x="137" y="21" class="block-header" fill="#10b981" text-anchor="middle">8. SUGAM FILING CO-PILOT</text>
+          <text x="137" y="36" class="block-sub" fill="#a7f3d0" text-anchor="middle">Live Portal Filing &bull; Numbered ZIP Exporter</text>
+
+          <g transform="translate(12, 58)">
+            <rect width="251" height="52" rx="6" fill="#1e293b" stroke="#334155" />
+            <text x="125" y="20" class="node-text">1-Click Clipboard Serializer</text>
+            <text x="125" y="36" class="node-subtext">Maps data to CDSCO Tabs 1 to 5</text>
+          </g>
+          <g transform="translate(12, 118)">
+            <rect width="251" height="52" rx="6" fill="#1e293b" stroke="#334155" />
+            <text x="125" y="20" class="node-text">Verified Attachment Dispatcher</text>
+            <text x="125" y="36" class="node-subtext">Delivers pre-checked files &le; 10MB</text>
+          </g>
+          <g transform="translate(12, 178)">
+            <rect width="251" height="52" rx="6" fill="#1e293b" stroke="#334155" />
+            <text x="125" y="20" class="node-text">Numbered Folder ZIP Exporter</text>
+            <text x="125" y="36" class="node-subtext">Structured export with manifest.json</text>
+          </g>
+          <g transform="translate(12, 238)">
+            <rect width="251" height="52" rx="6" fill="#1e293b" stroke="#047857" />
+            <text x="125" y="20" font-size="11" font-weight="600" fill="#a7f3d0" text-anchor="middle">Portal Upload Checklist Tracker</text>
+            <text x="125" y="36" class="node-subtext">Marks uploaded slots during live session</text>
+          </g>
+        </g>
+
+        <!-- =================================================================== -->
+        <!-- BLOCK 10: TARGET CDSCO PORTAL & ARCHIVE (COLUMN 5, BOTTOM)          -->
+        <!-- =================================================================== -->
+        <g transform="translate(1300, 390)" filter="url(#glow)">
+          <rect width="275" height="315" rx="14" fill="#2d1708" stroke="#f97316" stroke-width="2" />
+          <rect width="275" height="48" rx="14" fill="#c2410c" fill-opacity="0.25" />
+          <text x="137" y="21" class="block-header" fill="#fb923c" text-anchor="middle">10. TARGET DESTINATION</text>
+          <text x="137" y="36" class="block-sub" fill="#fed7aa" text-anchor="middle">Official Government Portal &amp; Archival Records</text>
+
+          <g transform="translate(12, 58)">
+            <rect width="251" height="54" rx="6" fill="#1e293b" stroke="#ea580c" />
+            <text x="125" y="20" font-size="12" font-weight="700" fill="#fdba74" text-anchor="middle">CDSCO Online System</text>
+            <text x="125" y="36" font-size="10" fill="#ffedd5" text-anchor="middle">cdscomdonline.gov.in (SUGAM)</text>
+          </g>
+          <g transform="translate(12, 120)">
+            <rect width="251" height="54" rx="6" fill="#1e293b" stroke="#334155" />
+            <text x="125" y="20" class="node-text">36 to 48 Discrete Upload Slots</text>
+            <text x="125" y="36" class="node-subtext">Direct matching of generated PDFs</text>
+          </g>
+          <g transform="translate(12, 182)">
+            <rect width="251" height="54" rx="6" fill="#1e293b" stroke="#334155" />
+            <text x="125" y="20" class="node-text">Official Application Lodgment</text>
+            <text x="125" y="36" class="node-subtext">Generates statutory tracking number</text>
+          </g>
+          <g transform="translate(12, 244)">
+            <rect width="251" height="56" rx="6" fill="#431407" stroke="#ea580c" />
+            <text x="125" y="20" font-size="11" font-weight="700" fill="#fdba74" text-anchor="middle">Offline Master Regulatory Archive</text>
+            <text x="125" y="36" font-size="9.5" fill="#fed7aa" text-anchor="middle">Complete numbered ZIP with audit trail</text>
+          </g>
+        </g>
+
+      </g>
+    </svg>
+  </div>
+
+  <div class="footer-help">
+    Use mouse wheel to zoom &bull; Click &amp; drag to pan &bull; Zero dependencies (Works offline)
+  </div>
+
+  <script>
+    const container = document.getElementById('viewport-container');
+    const svg = document.getElementById('svg-canvas');
+    const transformGroup = document.getElementById('transform-group');
+    const zoomText = document.getElementById('zoom-text');
+
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+
+    function updateTransform() {
+      transformGroup.setAttribute('transform', `translate(${translateX}, ${translateY}) scale(${scale})`);
+      zoomText.textContent = Math.round(scale * 100) + '%';
+    }
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      scale = Math.min(scale * 1.2, 3.5);
+      updateTransform();
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      scale = Math.max(scale / 1.2, 0.3);
+      updateTransform();
+    });
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      updateTransform();
+    });
+
+    container.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      const newScale = Math.min(Math.max(scale * zoomFactor, 0.3), 3.5);
+
+      const rect = svg.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      translateX = mouseX - (mouseX - translateX) * (newScale / scale);
+      translateY = mouseY - (mouseY - translateY) * (newScale / scale);
+      scale = newScale;
+
+      updateTransform();
+    }, { passive: false });
+
+    container.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      isPanning = true;
+      startX = e.clientX - translateX;
+      startY = e.clientY - translateY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isPanning) return;
+      translateX = e.clientX - startX;
+      translateY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => {
+      isPanning = false;
+    });
+  </script>
+</body>
+</html>

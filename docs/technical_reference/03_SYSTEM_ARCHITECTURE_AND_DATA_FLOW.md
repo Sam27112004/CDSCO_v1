@@ -26,7 +26,62 @@ The architecture directly addresses five critical regulatory and engineering con
 
 ## 2. Global System Topology and Component Interconnections
 
-The system is structured as a decoupled, 3-tier architecture. To ensure complete visual clarity and immediate readability across all development tools and text editors, all architectural diagrams are provided as formatted structural schematics.
+To satisfy both executive conceptual understanding and granular engineering implementation, the system architecture is presented in two complementary views:
+1. **Non-Linear System Block Diagram (Section 2.1):** An interconnected subsystem manager network diagram showing multi-directional cross-component data flows, event triggers, and persistent loops (an interactive zoomable visual edition is available in [system_block_diagram.html](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/diagrams/system_block_diagram.html)).
+2. **Detailed Component Topology and Interconnections (Section 2.2):** An exhaustive engineering schematic mapping all internal subsystems, transport routers, compilation pipelines, database engines, and storage directories.
+
+---
+
+### 2.1 Non-Linear System Block Diagram (Subsystem Manager Network)
+
+> [!TIP]
+> **Interactive Visual Diagram:** For an interactive visual canvas with mouse-wheel zoom and click-and-drag panning, open [system_block_diagram.html](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/diagrams/system_block_diagram.html) in your web browser.
+
+```text
+=====================================================================================================================================================
+                                                NON-LINEAR SYSTEM BLOCK DIAGRAM (SBD) - 5-COLUMN TOPOLOGY
+=====================================================================================================================================================
+
+[COL 1: PRESENTATION]        [COL 2: INGRESS & ORCHESTRATION]   [COL 3: FULFILLMENT & ASSEMBLY]    [COL 4: PERSISTENCE & AUDIT]   [COL 5: CO-PILOT & PORTAL]
+
++--------------------------+  +-------------------------------+  +-------------------------------+  +---------------------------+  +---------------------------+
+| 1. CLIENT WORKSPACE (UI) |  | 2. GATEWAY & AUTH CONTROLLER  |  | 5A. EVIDENCE INGESTION & VAULT|  | 7. PERSISTENCE & STORAGE  |  | 8. SUGAM FILING CO-PILOT  |
+| (Next.js 14 / React 18)  |  | (FastAPI Ingress & Session)   |  | [Chunked Multi-Part Receiver] |  | (PostgreSQL 15+ Core & S3)|  | & EXPORT MANAGER          |
+|                          |  |                               |  | [SHA-256 Hash Auditor]        |  |                           |  |                           |
+| [Slot Navigator 36-48]   |<================================>|  | [PyMuPDF Page Inspector]      |  | [Relational Core: Records]|==>| [1-Click Clipboard Copy]  |
+| [Entity 8-Pt Guidance]   |  |                               |  +-------------------------------+  | [JSONB Dynamic Payloads]  |  | [Verified Attachment DL]  |
+| [Dual Fulfillment Switch]|  |                               |                 |                   | [Storage: raw/, gen/, asm]|  | [Numbered Folder ZIP Exp] |
+| [Dynamic Form Renderer]  |  +-------------------------------+                 | Writes Documents  +---------------------------+  | [Portal Upload Tracker]   |
+| [Evidence Vault Dropzone]|                  | Authenticated                   v & Links                         |                +---------------------------+
+| [Assembly Console UI]    |                  v Requests         +-------------------------------+                | Continuous                   |
+| [Validation Drawer]      |  +-------------------------------+  | 5B. STATUTORY FORM GENERATOR  |                | Audit                        | Live Portal
+| [SUGAM Co-Pilot Modal]   |  | 3. SUBMISSION WORKSPACE MGR   |  | (ENGINE 1 PIPELINE)           |                | Queries                      | Lodgment
++--------------------------+  | (Central Orchestrator)        |  |                               |                v                              v
+             |                |                               |  | [Dynamic Questionnaire Parser]|  +---------------------------+  +---------------------------+
+             | Selects Active | [Submission Master State]     |  | [Jinja2 Pro-Forma Templating] |  | 9. CONTINUOUS VALIDATION  |  | 10. TARGET DESTINATION    |
+             | Slot Entity    | [Filing Modality (Fresh/End.)]|  | [WeasyPrint CSS-to-PDF Comp.] |  | (Pre-Submission Auditor)  |  | (Government & Archive)    |
+             v                | [36-48 Slot Entity Registry]  |  | [docxtpl Word (.docx) Filler] |  |                           |  |                           |
++--------------------------+  | [Active Delegation Coord.]    |  +-------------------------------+  | [Tier 1: Mandatory Slots] |  | [CDSCO Online Portal]     |
+| 4. RULES & STATUTORY     |  +-------------------------------+                 |                   | [Tier 2: Expiry & Dates]  |  |  (cdscomdonline.gov.in)   |
+|    LOGIC ENGINE          |       |                    |                       | Writes Documents  | [Tier 3: Fourth Schedule] |  | [36 to 48 Upload Slots]   |
+| (Declarative Brain)      |<------+ Resolves           | Dispatches            v & Links           | [Tier 4: 10MB Portal Limit|  | [Statutory Tracking Code] |
+|                          |=======> Active Slots       | Fulfillment           |                   +---------------------------+  | [Offline Archival ZIP]    |
+| [App Definition Parser]  |                            v                       |                                 |                +---------------------------+
+| [Context Evaluator]      |  +-------------------------------+                 |                                 | Gating: Unlocks ONLY
+| [DMF/PMF Chapter Order]  |  | 6. DOSSIER ASSEMBLY PIPELINE  |<----------------+                                 | when 0 Blockers
++--------------------------+  | (PyMuPDF & 10MB Downsampler)  |                                                   |
+             |                |                               |                                                   |
+             +--------------->| [Chapter Sequence Traversal]  |===================================================> (Delivers Master Dossier <= 10MB)
+               Provides Order | [Dynamic TOC & Bookmarks Gen] |  Delivers Compiled Master Dossier
+                              | [PyMuPDF Continuous Stitcher] |
+                              | [Bates Margin Stamper ("DMF-")]
+                              | [pikepdf 150 DPI Downsampler] |
+                              +-------------------------------+
+```
+
+---
+
+### 2.2 Detailed Component Topology and Interconnections
 
 ```text
 ========================================================================================================================
