@@ -152,10 +152,24 @@ erDiagram
         timestamptz created_at "Created Timestamp"
     }
 
+    BACKGROUND_JOBS {
+        uuid id PK
+        uuid submission_id FK
+        varchar job_type "DOSSIER_ASSEMBLY | PDF_COMPRESSION | BULK_EXPORT"
+        varchar status "PENDING | PROCESSING | COMPLETED | FAILED"
+        integer progress_percent "Progress (0-100)"
+        varchar artifact_path "Result Storage Path"
+        jsonb metadata "Compression Stats, Page Counts, Timings"
+        text error_message "Diagnostic Error String"
+        timestamptz created_at "Created Timestamp"
+        timestamptz completed_at "Completed Timestamp"
+    }
+
     SUBMISSIONS ||--o{ SUBMISSION_ENTITIES : tracks
     SUBMISSIONS ||--o{ EVIDENCE_DOCUMENTS : owns
     SUBMISSIONS ||--o{ EVIDENCE_LINKS : maintains
     SUBMISSIONS ||--o{ VALIDATION_ISSUES : flags
+    SUBMISSIONS ||--o{ BACKGROUND_JOBS : triggers
     APPLICATION_DEFINITIONS ||--o{ SUBMISSIONS : instantiates
     PROFILES ||--o{ SUBMISSIONS : references
     EVIDENCE_DOCUMENTS ||--o{ EVIDENCE_LINKS : linked_via
@@ -178,7 +192,18 @@ CREATE TABLE application_definitions (
 );
 CREATE INDEX idx_app_def_schema ON application_definitions USING GIN (schema_payload);
 
--- 2. Master Submissions Record
+-- 2. Organization and Entity Profiles (Applicant, Foreign Manufacturer, Manufacturing Sites)
+CREATE TABLE profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    profile_type VARCHAR(50) NOT NULL, -- APPLICANT, MANUFACTURER, SITE
+    name VARCHAR(255) NOT NULL,
+    data_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_profiles_type ON profiles (profile_type);
+
+-- 3. Master Submissions Record
 CREATE TABLE submissions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     application_definition_id UUID NOT NULL REFERENCES application_definitions(id),
@@ -196,7 +221,7 @@ CREATE TABLE submissions (
 );
 CREATE INDEX idx_submissions_status ON submissions (status);
 
--- 3. Discrete Portal Slot & Requirement States (36-48 slots tracked per submission)
+-- 4. Discrete Portal Slot & Requirement States (36-48 slots tracked per submission)
 CREATE TABLE submission_entities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
@@ -210,7 +235,7 @@ CREATE TABLE submission_entities (
 );
 CREATE INDEX idx_sub_entities_lookup ON submission_entities (submission_id, status);
 
--- 4. Evidence Documents (Uploaded binaries & generated PDFs)
+-- 5. Evidence Documents (Uploaded binaries & generated PDFs)
 CREATE TABLE evidence_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
@@ -225,7 +250,7 @@ CREATE TABLE evidence_documents (
 );
 CREATE INDEX idx_evidence_docs_lookup ON evidence_documents (submission_id, original_filename);
 
--- 5. Evidence Links (Many-to-Many mapping to slots and DMF/PMF chapters)
+-- 6. Evidence Links (Many-to-Many mapping to slots and DMF/PMF chapters)
 CREATE TABLE evidence_links (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
@@ -236,7 +261,7 @@ CREATE TABLE evidence_links (
     CONSTRAINT uq_evidence_link UNIQUE (submission_id, evidence_document_id, submission_entity_id)
 );
 
--- 6. Continuous Validation Issues
+-- 7. Continuous Validation Issues
 CREATE TABLE validation_issues (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
@@ -248,6 +273,119 @@ CREATE TABLE validation_issues (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX idx_val_issues_severity ON validation_issues (submission_id, severity);
+
+-- 8. Asynchronous Compilation & Assembly Jobs
+CREATE TABLE background_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
+    job_type VARCHAR(50) NOT NULL, -- DOSSIER_ASSEMBLY, PDF_COMPRESSION, BULK_EXPORT
+    status VARCHAR(50) NOT NULL DEFAULT 'PENDING', -- PENDING, PROCESSING, COMPLETED, FAILED
+    progress_percent INTEGER DEFAULT 0,
+    artifact_path VARCHAR(500),
+    metadata JSONB DEFAULT '{}'::jsonb,
+    error_message TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
+);
+CREATE INDEX idx_bg_jobs_lookup ON background_jobs (submission_id, status);
+```
+
+---
+
+### 3.1 Declarative Schema Payload Contract (`application_definitions.schema_payload`)
+
+To ensure zero ambiguity during implementation, every form blueprint stored in `application_definitions.schema_payload` follows this standardized JSON contract:
+
+```json
+{
+  "form_code": "MD-14",
+  "form_title": "Application for Grant of Licence to Import Medical Device",
+  "version": "1.0",
+  "governing_rules": ["Rule 34(1)", "Fourth Schedule"],
+  "slots": [
+    {
+      "slot_id": "1.0",
+      "slot_number": "1.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Covering Letter",
+      "statutory_rule": "Rule 34(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "covering_letter",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "guidance": {
+        "what_it_is": "Formal statutory application letter addressed to the Drugs Controller General (India).",
+        "why_it_is_needed": "Establishes applicant intent, lists applied device models, and summarizes fee payments.",
+        "official_citation": "Medical Devices Rules, 2017, Rule 34(1)",
+        "who_issues": "Indian Authorized Agent on official corporate letterhead",
+        "validity_period": "Current (dated within 30 days of submission)",
+        "mandatory_inclusions": ["Device brand names", "Classification", "Manufacturing site address", "BharatKosh transaction ID"],
+        "critical_pitfalls": ["Discrepancies between letterhead entity name and Form 20B/21B wholesale licence.", "Missing authorized signatory stamp."],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.11",
+      "slot_number": "10.11",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Biocompatibility Evaluation Studies",
+      "statutory_rule": "Fourth Schedule, Part III, Clause 6.2",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_2",
+      "guidance": {
+        "what_it_is": "Biological evaluation report documenting cytotoxicity, sensitization, irritation, and systemic toxicity per ISO 10993.",
+        "why_it_is_needed": "Demonstrates device patient-contact safety without toxic leaching.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.2 & ISO 10993-1",
+        "who_issues": "GLP-accredited testing laboratory or manufacturer biological safety specialist",
+        "validity_period": "Perpetual unless material formulation or manufacturing process changes",
+        "mandatory_inclusions": ["GLP compliance statement", "Extraction conditions", "Direct raw data curves", "Study director signature"],
+        "critical_pitfalls": ["Submitting summary without raw laboratory test reports.", "Testing non-finished sterilized device samples."],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "is_contact_device",
+        "operator": "EQUALS",
+        "value": true
+      }
+    }
+  ]
+}
+```
+
+---
+
+### 3.2 Regulatory Context Schema Contract (`submissions.regulatory_context`)
+
+The `regulatory_context` column in `submissions` captures filing parameters that drive the Rules Engine:
+
+```json
+{
+  "device_category": "MEDICAL_DEVICE",      // "MEDICAL_DEVICE" | "IVD"
+  "risk_class": "CLASS_C",                  // "CLASS_A" | "CLASS_B" | "CLASS_C" | "CLASS_D"
+  "filing_modality": "FRESH",               // "FRESH" | "ENDORSEMENT" | "RETENTION"
+  "is_sterile": true,                       // Activates sterilization validation slot (Slot 10.14)
+  "is_contact_device": true,                // Activates biocompatibility reports (Slot 10.11)
+  "is_samd": false,                         // Activates IEC 62304 software dossier (Slot 10.15)
+  "has_predicate": true,                    // Activates predicate equivalence comparison (Slot 10.5)
+  "has_drug_substance": false,              // Activates medicinal substances data (Slot 10.12)
+  "has_animal_origin": false,               // Activates TSE/BSE biological safety (Slot 10.13)
+  "is_active_implantable": false,           // Activates clinical investigation & specialized bench data
+  "ivd_parameters": {                       // Populated only if device_category == "IVD"
+    "is_veterinary": false,                 // Activates Dept of Animal Husbandry NOC (Clause 4.5)
+    "is_radioimmunoassay": false            // Activates BARC Mumbai NOC (Clause 4.6)
+  }
+}
+```
 ```
 
 ---
