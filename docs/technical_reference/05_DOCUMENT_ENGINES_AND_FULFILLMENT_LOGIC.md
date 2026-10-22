@@ -328,122 +328,440 @@ flowchart LR
 
 ## 10. Engine Type 1: Guided Form Generation Logic (Dual Fulfillment Backend)
 
-When an applicant selects `Option B: Generate via In-App Guided Form`, the backend executes a structured six-step pipeline from questionnaire responses to a finalized document:
+Engine 1 fulfills the statutory requirement for documents that can be authored directly within the application via structured questionnaires, eliminating the need for applicants to prepare external Word files or manual scans.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Applicant Specialist
-    participant UI as Guided Form UI
-    participant API as API Controller
-    participant Resolver as Context & Template Resolver
-    participant Renderer as Document Rendering Engine
-    participant Storage as Document Storage & Registry
-    participant Validator as Validation Engine
+    actor User as RA Specialist
+    participant UI as Dynamic Form UI
+    participant API as FastAPI Router (/slots/{id}/generate)
+    participant Svc as GeneratorService
+    participant Ctx as ContextResolver
+    participant Tpl as Jinja2 / docxtpl Engine
+    participant PDF as WeasyPrint Headless Compiler
+    participant DB as PostgreSQL (entities & evidence)
+    participant Store as StorageProvider (FS / S3)
 
-    User->>UI: Enters questionnaire responses / table rows
-    UI->>API: Submits structured JSON payload
-    API->>Resolver: Match entity key to statutory template blueprint
-    Resolver->>Resolver: Merge organizational profile data (Company, Signatory, Address, Date)
-    Resolver->>Renderer: Dispatch populated data tree
-    Renderer->>Renderer: Render layout, paginate, and compile to PDF or DOCX
-    Renderer->>Storage: Store generated artifact and record metadata
-    Storage->>Validator: Emit document generated event
-    Validator->>UI: Update entity status to SATISFIED
+    User->>UI: Inputs questionnaire responses / clause table
+    UI->>API: POST /api/v1/submissions/{id}/slots/{slot_id}/generate { form_values }
+    API->>Svc: generate_document(submission_id, slot_id, payload)
+    Svc->>Ctx: resolve_system_context(submission_id)
+    Ctx-->>Svc: Merged Organization & Device Context JSON
+    Svc->>Tpl: Render Template with Merged Data Tree
+    alt Format is PDF (Standard Statutory Pro-Formas)
+        Tpl->>PDF: Dispatch Rendered HTML/CSS
+        PDF->>PDF: Paginate, apply repeating thead, compile PDF
+        PDF-->>Svc: Compiled PDF Binary Stream
+    else Format is DOCX (Stamp-Paper Pro-Formas like PoA)
+        Tpl->>Tpl: Fill XML placeholders via docxtpl
+        Tpl-->>Svc: Compiled DOCX Binary Stream
+    end
+    Svc->>Store: Write binary to storage/submissions/{id}/generated/
+    Svc->>DB: INSERT into evidence_documents (SHA-256, size, page_count)
+    Svc->>DB: INSERT into evidence_links (link to slot_id)
+    Svc->>DB: UPDATE submission_entities SET status = 'SATISFIED'
+    Svc-->>API: Return Generated Document DTO
+    API-->>UI: 201 Created (document_id, download_url, status: SATISFIED)
 ```
 
-### 10.1 Step-by-Step Processing Logic
+### 10.1 Engine 1 Statutory Document Catalog & Template Mapping
 
-1. **Questionnaire Schema Delivery:**
-   * The backend delivers a structured questionnaire blueprint tailored to the statutory requirement.
-   * For the Essential Principles Checklist (EPC), the schema provides the 15 statutory clauses from Fourth Schedule Appendix II, allowing the user to select applicability, cited harmonized standards (e.g. ISO 10993, ISO 11135, IEC 60601), and evidence document titles.
+| Statutory Document Name | Template Key | Target Portal Slot(s) | Applicable Forms | Compiler Engine | Output MIME Type | Governing MDR 2017 Citation |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Statutory Covering Letter** | `covering_letter` | Slot 1.0 (All Forms) | All 7 Pathways | Jinja2 + WeasyPrint | `application/pdf` | Rule 20 / Rule 34 |
+| **Essential Principles Checklist** | `essential_principles` | Slot 10.8 (MD-14), Slot 8.8 (MD-7), Slot 4.0 (MD-3) | MD-14, MD-7, MD-8, MD-3, MD-4 | Jinja2 + WeasyPrint | `application/pdf` | Fourth Schedule, Appendix II |
+| **Manufacturer Declaration of Conformity** | `declaration_of_conformity` | Slot 8.3 (MD-14), Slot 7.3 (MD-7) | MD-14, MD-7, MD-8, MD-3, MD-4 | Jinja2 + WeasyPrint | `application/pdf` | Fourth Schedule, Part I |
+| **Power of Attorney Pro-Forma** | `power_of_attorney_proforma` | Slot 4.0 (MD-14), Slot 4.0 (MD-16) | MD-14, MD-16 | docxtpl (Word) | `application/vnd.openxmlformats` | First Schedule, Part I |
+| **Non-Commercial Test Undertaking** | `non_commercial_undertaking` | Slot 10.13 (MD-12/16) | MD-12, MD-16 | Jinja2 + WeasyPrint | `application/pdf` | Rule 31 / Rule 40 |
+| **Competent Technical Staff Letter** | `technical_staff_appointment` | Slot 6.3 (MD-7), Slot 3.3 (MD-3) | MD-7, MD-8, MD-3, MD-4 | Jinja2 + WeasyPrint | `application/pdf` | Rule 26 (Production / QA) |
+| **TR6 Fee Challan Summary Sheet** | `tr6_fee_challan_summary` | Slot 2.0 (All Forms) | All 7 Pathways | Jinja2 + WeasyPrint | `application/pdf` | Second Schedule |
 
-2. **Payload Receipt and Validation:**
-   * The API receives the submitted answers.
-   * The system validates that all mandatory responses are provided and cross-references exist for all applicable clauses.
+### 10.2 Context Injection Contract (System Metadata Merge)
 
-3. **Context Injection:**
-   * The backend automatically merges system-level metadata into the template without user re-entry:
-     * Applicant corporate identity, registered address, and constitution type.
-     * Medical device proprietary name, intended use, and model variant numbers.
-     * Execution date and authorized signatory name/designation.
+The backend automatically extracts organization and device parameters from `profiles` and `submissions` and injects them into the template rendering context, ensuring zero redundant data entry:
 
-4. **Template Transformation:**
-   * The merged data tree is fed into an official layout blueprint.
-   * For tabular statutory documents (like the EPC), strict pagination rules ensure table headers repeat on page breaks, line items do not split awkwardly, and font hierarchies conform to CDSCO submission standards.
+```json
+{
+  "context": {
+    "applicant": {
+      "legal_name": "Apex MedTech Private Limited",
+      "registered_address": "Plot 42, Okhla Industrial Area, Phase-III, New Delhi, 110020, India",
+      "constitution_type": "Private Limited Company",
+      "wholesale_licence_number": "DL-OKH-2023-004218 (Form 20B/21B)",
+      "signatory_name": "Dr. Rajesh Sharma",
+      "signatory_designation": "Director & Authorized Indian Agent",
+      "contact_email": "regulatory@apexmedtech.in",
+      "contact_phone": "+91-11-45678900"
+    },
+    "manufacturer": {
+      "legal_name": "BioSensors International AG",
+      "site_name": "Main Manufacturing Campus",
+      "site_address": "Technoparkstrasse 1, 8005 Zürich, Switzerland",
+      "country": "Switzerland",
+      "site_registration_number": "CH-MFG-2018-9921",
+      "signatory_name": "Dr. Markus Weber",
+      "signatory_designation": "VP Global Regulatory Affairs"
+    },
+    "device": {
+      "brand_name": "CardioTrack Pacemaker Lead System",
+      "generic_name": "Implantable Cardiac Pacing Lead",
+      "device_type": "MEDICAL_DEVICE",
+      "risk_class": "CLASS_D",
+      "intended_use": "Transvenous pacing and sensing of cardiac chambers in bradycardia therapies.",
+      "model_variants": ["CT-PL-052", "CT-PL-058", "CT-PL-065"],
+      "shelf_life_months": 36,
+      "storage_conditions": "Store between 15°C and 25°C in dry conditions.",
+      "is_sterile": true,
+      "sterilization_method": "Ethylene Oxide (EtO)"
+    },
+    "submission": {
+      "tracking_code": "SUB-2026-MD14-00412",
+      "application_code": "MD-14",
+      "filing_modality": "FRESH",
+      "submission_date": "2026-10-22",
+      "bharatkosh_challan_id": "BK-2026-881920",
+      "fee_paid_inr": 150000
+    }
+  }
+}
+```
 
-5. **Binary Compilation:**
-   * The blueprint is compiled into a finalized binary:
-     * **PDF Compilation:** For locked statutory declarations, undertakings, and the EPC, ensuring layout stability and non-editable presentation.
-     * **Word (DOCX) Export:** For legal instruments requiring physical execution or stamp-paper drafting (e.g. Power of Attorney pro-forma or custom affidavits).
+### 10.3 Structured Input Schemas for Core Generated Documents
 
-6. **Registry and Entity State Resolution:**
-   * The compiled file is deposited into the submission's Document Library.
-   * An evidence link attaches the generated file to the requirement node.
-   * The entity's state transitions from `MISSING` to `SATISFIED`.
+#### 1. Statutory Covering Letter Questionnaire (`covering_letter`)
+```json
+{
+  "subject_line": "Application for Grant of Licence to Import Class D Medical Device under Rule 34",
+  "reference_portal_id": "CDSCO/MD/2026/009182",
+  "device_model_table": [
+    { "model_number": "CT-PL-052", "specification": "52cm Bipolar Active Fixation Lead", "accessories": "Stylet Kit" },
+    { "model_number": "CT-PL-058", "specification": "58cm Bipolar Active Fixation Lead", "accessories": "Stylet Kit" }
+  ],
+  "enclosures_list": [
+    "Treasury Fee Challan in BharatKosh",
+    "Executed Power of Attorney in First Schedule Part I",
+    "Free Sale Certificate issued by Swissmedic",
+    "Complete Device Master File (Fourth Schedule Part III)"
+  ],
+  "custom_declarations": "We confirm that the applied models are identical to those commercially marketed in Switzerland and the EU."
+}
+```
+
+#### 2. Essential Principles Checklist Questionnaire (`essential_principles`)
+The schema enforces the **15 statutory clauses** of Fourth Schedule Appendix II. Every applicable clause must reference an evidence document:
+```json
+{
+  "clauses": [
+    {
+      "clause_id": "EP_01",
+      "clause_number": "1",
+      "title": "General Safety and Performance Principles",
+      "applicable": true,
+      "justification": null,
+      "cited_standards": ["ISO 13485:2016", "ISO 14971:2019"],
+      "evidence_document_titles": ["Risk Management Report RMR-2025-01", "ISO 13485 Certificate"]
+    },
+    {
+      "clause_id": "EP_08",
+      "clause_number": "8",
+      "title": "Infection and Microbial Contamination (Sterility)",
+      "applicable": true,
+      "justification": null,
+      "cited_standards": ["ISO 11135:2014"],
+      "evidence_document_titles": ["Ethylene Oxide Sterilization Validation Report VAL-ETO-2024"]
+    },
+    {
+      "clause_id": "EP_12",
+      "clause_number": "12",
+      "title": "Devices Incorporating Software",
+      "applicable": false,
+      "justification": "The device is a passive mechanical pacing lead containing no embedded software or programmable logic.",
+      "cited_standards": [],
+      "evidence_document_titles": []
+    }
+  ]
+}
+```
+
+### 10.4 CSS Print and Pagination Specifications (WeasyPrint Standards)
+
+All Engine 1 HTML templates must adhere to strict print-CSS rules to guarantee evaluator-grade typography and zero layout defects:
+```css
+@page {
+    size: A4 portrait;
+    margin: 20mm 15mm 20mm 15mm;
+    @top-right {
+        content: "CDSCO Form MD-14 Statutory Filing";
+        font-family: "Liberation Sans", Arial, sans-serif;
+        font-size: 8pt;
+        color: #718096;
+    }
+    @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: "Liberation Sans", Arial, sans-serif;
+        font-size: 9pt;
+        color: #4a5568;
+    }
+}
+
+body {
+    font-family: "Liberation Sans", Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.45;
+    color: #1a202c;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12pt;
+    margin-bottom: 12pt;
+}
+
+thead {
+    display: table-header-group; /* Repeats table headers on every page break */
+}
+
+tr {
+    page-break-inside: avoid; /* Prevents rows from splitting awkwardly across pages */
+}
+
+th, td {
+    border: 1px solid #cbd5e0;
+    padding: 6pt 8pt;
+    font-size: 9pt;
+    vertical-align: top;
+}
+
+th {
+    background-color: #f7fafc;
+    font-weight: bold;
+    text-align: left;
+}
+
+.signature-block {
+    page-break-inside: avoid;
+    margin-top: 24pt;
+}
+```
 
 ---
 
 ## 11. Engine Type 2: Dossier Assembly Engine Logic (DMF and PMF)
 
-Because a Device Master File (DMF) or Plant Master File (PMF) contains both typed specifications and extensive external third-party test reports, it cannot be generated from a simple questionnaire.
-
-The Assembly Engine executes a composite stitching, pagination, and optimization workflow:
+Engine 2 compiles multi-chapter Fourth Schedule technical files (Device Master File and Plant Master File) from modular typed sections and third-party laboratory reports.
 
 ```mermaid
 flowchart TD
-    Start["Initiate Dossier Assembly"] --> ResolveTree["1. Resolve Dossier Tree (Chapters 1.0 to 8.0)"]
-    ResolveTree --> BuildNarratives["2. Compile Narrative Pages (Descriptions, Tables, Flowcharts)"]
-    BuildNarratives --> FetchUploads["3. Retrieve Uploaded Test Reports & Annexures"]
-    FetchUploads --> GenerateTOC["4. Calculate Page Offsets & Generate Cover + Dynamic TOC"]
-    GenerateTOC --> Stitch["5. Sequential PDF Concatenation"]
-    Stitch --> Bates["6. Apply Bates Numbering & Continuous Running Headers"]
-    Bates --> Bookmarks["7. Inject Hierarchical PDF Bookmarks"]
-    Bookmarks --> CheckSize{"8. File Size <= 10MB?"}
-    CheckSize -->|"Yes"| Done["Deliver Final Single Dossier PDF"]
-    CheckSize -->|"No"| Compress["9. Downsample Embedded Images (150 DPI)"]
-    Compress --> RecheckSize{"Size <= 10MB?"}
-    RecheckSize -->|"Yes"| Done
-    RecheckSize -->|"No"| Split["10. Split Strategy: Core Dossier + Indexed Annexures"]
-    Split --> Done
+    Start["User triggers POST /api/v1/submissions/{id}/dossiers/{type}/assemble"] --> PreAudit{"Pre-Assembly Audit:<br/>Are 100% active chapters satisfied?"}
+    PreAudit -->|"No (Missing Mandatory Chapter)"| Abort["Halt: Return 422 Unprocessable Entity<br/>(List missing chapters)"]
+    PreAudit -->|"Yes"| Pass1["Pass 1: Inspect Page Counts & Compute TOC Offsets"]
+    
+    subgraph Pass1_Math["Pass 1: Page Calculation"]
+        Scan["PyMuPDF: fitz.open() scans all chapter attachments"]
+        Scan --> RecordPages["Record page count P_i for each active chapter"]
+        RecordPages --> CalcTOC["Compute TOC length P_TOC = ceil(Entries / 25)"]
+        CalcTOC --> Offsets["Compute start page S_k = 1 + P_TOC + Sum(P_1..k-1)"]
+    end
+    
+    Offsets --> RenderTOC["WeasyPrint: Compile Cover + Hyperlinked TOC PDF"]
+    RenderTOC --> Pass2["Pass 2: Binary Sequential Merge (PyMuPDF)"]
+    
+    subgraph Pass2_Merge["Pass 2: Sequential Assembly"]
+        Init["master = fitz.open()"]
+        Init --> AppendCover["master.insert_pdf(cover_and_toc_pdf)"]
+        AppendCover --> LoopChapters["Iterate chapters in statutory ordinal order"]
+        LoopChapters --> Divider["Inject Chapter Divider Sheet (if multiple files)"]
+        Divider --> AppendPart["master.insert_pdf(chapter_pdf)"]
+        AppendPart --> LoopChapters
+    end
+    
+    AppendPart --> Bates["Apply Bates Stamps & Running Header on every page"]
+    Bates --> Bookmarks["Inject PDF Navigation Bookmarks Tree (doc.set_toc)"]
+    Bookmarks --> Measure{"File Size <= 10.0 MB (10,485,760 bytes)?"}
+    
+    Measure -->|"Yes (<= 10MB)"| Save["Write final dossier to storage/assembled/"]
+    Measure -->|"No (> 10MB)"| Opt1["Tier 1: pikepdf Lossless Stream Deflation"]
+    Opt1 --> Measure2{"Size <= 10MB?"}
+    Measure2 -->|"Yes"| Save
+    Measure2 -->|"No"| Opt2["Tier 2: PIL 150 DPI Image Downsampling (JPEG 80%)"]
+    Opt2 --> Measure3{"Size <= 10MB?"}
+    Measure3 -->|"Yes"| Save
+    Measure3 -->|"No"| Split["Tier 3: Split into Core Dossier (<10MB) + Indexed Annexures (<10MB)"]
+    Split --> Save
+    Save --> Return["200 OK (assembled_url, file_size, bates_range, page_count)"]
 ```
 
-### 11.1 Step-by-Step Assembly Logic
+### 11.1 Deterministic Statutory Assembly Sequences (Which Goes Where)
 
-1. **Hierarchy Resolution:**
-   * The engine inspects the submission's dossier tree (Fourth Schedule Part III: Chapters 1.0 through 8.0).
-   * It verifies that every required chapter contains either narrative content or an attached evidence report.
+Engine 2 enforces three statutory manifests governing chapter sequence:
 
-2. **Narrative Page Synthesis:**
-   * Chapters authored directly within the workspace (e.g. Chapter 1 Device Description, Chapter 2 Product Specifications, Chapter 3 Predicate Equivalence Table) are rendered into clean section pages.
+#### Table 1: Device Master File (DMF) General Medical Devices (Fourth Schedule Part III)
+| Ordinal | Chapter Code | Statutory Chapter Heading | Source Slot | Input Type | Inclusion & Pruning Condition |
+| :---: | :--- | :--- | :---: | :--- | :--- |
+| **0** | `COVER` | Official Dossier Cover Page | Generated | Jinja2 &rarr; PDF | Always Required |
+| **0.1** | `TOC` | Dynamic Table of Contents | Generated | WeasyPrint &rarr; PDF | Always Required |
+| **1** | `DMF_1_0` | Executive Summary & Device Description | Slot 10.1 & 10.2 | In-App / Narrative | Always Required |
+| **2** | `DMF_2_0` | Product Specifications & Engineering Drawings | Slot 10.4 | Form + PDF Schematics | Always Required |
+| **3** | `DMF_3_0` | Predicate Device Substantial Equivalence | Slot 10.5 | Tabular Comparison | Required if `has_predicate == true` |
+| **4** | `DMF_4_0` | Essential Principles (EP) Compliance Matrix | Slot 10.8 / 10.10 | Compiled PDF (Engine 1) | Always Required |
+| **5** | `DMF_5_0` | Risk Management Report (ISO 14971) | Slot 10.9 | Uploaded Third-Party File | Always Required |
+| **6.1** | `DMF_6_1` | Electrical Safety & EMC (IEC 60601-1) | Slot 10.10 | Third-Party Lab Report | Active electrical devices only |
+| **6.2** | `DMF_6_2` | Biocompatibility Studies (ISO 10993) | Slot 10.11 | GLP Lab Reports | Required if `is_contact_device == true` |
+| **6.3** | `DMF_6_3` | Sterilization Validation (ISO 11135/11137) | Slot 10.14 | Validation Report | Required if `is_sterile == true` |
+| **6.4** | `DMF_6_4` | Software Lifecycle & Cyber (IEC 62304) | Slot 10.15 | Software Architecture | Required if `is_samd == true` |
+| **6.5** | `DMF_6_5` | Usability Engineering (IEC 62366) | Slot 10.10 | Human Factors Report | Class C & D devices only |
+| **6.6** | `DMF_6_6` | Stability & Shelf-Life Validation | Slot 10.17 | Protocol + Lab Reports | Always Required |
+| **6.7** | `DMF_6_7` | Batch Release CoAs (3 Batches) | Slot 10.20 | Manufacturer QA CoAs | Always Required |
+| **7** | `DMF_7_0` | Clinical Evaluation Report (CER) / Investigation | Slot 10.18 | Literature CER or Study | Always Required |
+| **8** | `DMF_8_0` | Device Labeling Artwork & Instructions for Use | Slot 10.6 | Primary, Carton, IFU | Always Required |
 
-3. **Sequential Concatenation:**
-   * The engine stitches all assets in statutory sequence:
-     * Official Cover Page (Device Name, Manufacturer, Date, Dossier Version).
-     * Detailed Table of Contents with dynamic page numbers.
-     * Chapter 1.0 through 8.0 narratives, each followed immediately by its attached laboratory reports (Biocompatibility reports behind Chapter 6.2, Sterilization validation behind Chapter 6.3, Electrical safety behind Chapter 6.1).
+#### Table 2: Plant Master File (PMF) Chapter Sequence (Fourth Schedule Part II)
+| Ordinal | Chapter Code | Statutory Chapter Heading | Source Slot | Input Type | Inclusion & Pruning Condition |
+| :---: | :--- | :--- | :---: | :--- | :--- |
+| **0** | `COVER_TOC` | Cover Page and Dynamic Table of Contents | Generated | Synthesized PDF | Always Required |
+| **1** | `PMF_1_0` | General Facility Information & Site Registration | Slot 6.1 | Narrative + Licence | Always Required |
+| **2** | `PMF_2_0` | Manufacturing Operations & Cleanroom Classifications| Slot 6.5 | Flowcharts & Layout | Always Required |
+| **3** | `PMF_3_0` | Quality Management System (ISO 13485 Procedures) | Slot 7.2 | QMS Manual & Matrix | Always Required |
+| **4** | `PMF_4_0` | Personnel, Organogram & Competencies (Rule 26) | Slot 6.2 & 6.3 | Organogram + Letters | Always Required |
+| **5** | `PMF_5_0` | Premises, HVAC Differential Cascades & Water Systems| Slot 6.4 & 7.11 | AHU Logs + Water Tests| Always Required |
+| **6** | `PMF_6_0` | Equipment Inventory, Qualification & Calibration | Slot 6.6 | Equipment Master Plan | Always Required |
+| **7** | `PMF_7_0` | Sanitation, Pest Control & Contamination Control | Slot 6.7 | Hygiene Standard Ops | Always Required |
 
-4. **Page Numbering and Bookmark Injection:**
-   * Continuous running page numbers (`Page X of Y`) are stamped at the bottom center of every page across the entire merged document.
-   * Hierarchical PDF bookmarks are inserted corresponding to each chapter heading and attached laboratory report, enabling navigation by CDSCO regulatory evaluators.
+#### Table 3: IVD Device Master File Chapter Sequence (Fourth Schedule Appendix III)
+| Ordinal | Chapter Code | Statutory Chapter Heading | Source Slot | Input Type | Inclusion & Pruning Condition |
+| :---: | :--- | :--- | :---: | :--- | :--- |
+| **0** | `COVER_TOC` | Cover Page and Table of Contents | Generated | Synthesized PDF | Always Required |
+| **1** | `IVD_1_0` | Executive Summary & Analytical Principles | Slot 7.1 | Narrative Form | Always Required |
+| **2** | `IVD_2_0` | Regulatory Status of Similar IVDs in India | Slot 7.2 | Market Survey Table | Always Required |
+| **3** | `IVD_3_0` | Essential Principles Checklist (IVD Specifics) | Slot 7.3 | In-App Form (Engine 1)| Always Required |
+| **4** | `IVD_4_0` | Risk Management Report (ISO 14971) | Slot 7.4 | Evaluation Report | Always Required |
+| **5** | `IVD_5_0` | Analytical Performance (Sensitivity, Specificity)| Slot 7.5 | Bench Analytical Data | Always Required |
+| **6** | `IVD_6_0` | Three-Tier Stability (Shelf-Life, In-Use, Transport)| Slot 7.6 | Lab Stability Reports | Always Required |
+| **7** | `IVD_7_0` | Reagent Package Insert, Labels & Pack Presentation| Slot 7.7 | Artwork Binaries | Always Required |
+| **8** | `IVD_8_0` | Specimen Batch Release CoAs (3 Batches) | Slot 7.8 | Quality CoAs | Always Required |
+| **9** | `IVD_9_0` | Performance Evaluation Report (CDTL / Rule 83) | Slot 7.9 | Statutory Lab Report | Always Required |
+| **10** | `IVD_10_0` | Post-Marketing Surveillance (PMS) Plan | Slot 7.10 | Vigilance Procedure | Always Required |
 
-5. **Size Verification and 10MB Portal Limit Enforcement:**
-   * The engine manages the strict 10MB government portal limit through a three-stage mitigation strategy:
-     * **Stage A (Direct Pass):** If the compiled file is 10MB or less, it is accepted immediately.
-     * **Stage B (Lossless/Image Downsampling):** If the file exceeds 10MB, the engine downsamples embedded color diagrams and scanned test reports to 150 DPI (preserving crisp signatures and test curves while reducing file size by 60–80%).
-     * **Stage C (Core Dossier + Indexed Annexures):** If hundreds of pages of bench test data keep the file over 10MB, the engine creates:
-       * `Core Technical Dossier (~3–5 MB):` Contains all 8 chapters, descriptions, tables, and test report executive summaries (uploaded to SUGAM's primary DMF slot).
-       * `Indexed Individual Annexures (Each < 10MB):` e.g., `Annexure_6.2_Biocompatibility_Report.pdf` and `Annexure_6.3_Sterilization_Study.pdf` (uploaded to SUGAM's supplemental checklist rows).
+### 11.2 Inclusion, Exclusion, and Multi-File Ordering Rules (How Much to Stitch)
+
+#### 1. Context-Driven Pruning Rules
+Engine 2 inspects `submissions.regulatory_context` to prune irrelevant chapters:
+* If `is_sterile == false`: Chapter 6.3 is pruned from the manifest; in its place, Engine 2 inserts a 1-page standard statutory declaration: *"Exemption per MDR 2017: Device is supplied non-sterile and does not undergo terminal sterilization."*
+* If `is_contact_device == false`: Chapter 6.2 (Biocompatibility) is omitted from assembly.
+* If `is_samd == false`: Chapter 6.4 (IEC 62304 Software Dossier) is omitted.
+* If `has_predicate == false`: Chapter 3.0 switches from substantial equivalence to novel device waiver justification referencing Form MD-27 / MD-26.
+* If `risk_class == "CLASS_A"`: The system selects the **Abbreviated Technical File** blueprint (4 chapters) per Fourth Schedule Part II, bypassing the full 8-chapter sequence.
+
+#### 2. Multi-File Ordering Within a Single Chapter
+When a user uploads multiple files to a single chapter (e.g., Chapter 6.2 Biocompatibility having separate reports for Cytotoxicity, Sensitization, and Irritation), Engine 2 orders them deterministically:
+1. **Chapter Divider Sheet (1 Page):** Synthesized HTML cover indicating chapter number, title, governing standards (e.g. ISO 10993-5, ISO 10993-10), and a table of attached reports with test dates.
+2. **Narrative Summary Page:** Typed executive summary authored in the workspace.
+3. **Attached Laboratory Reports:** Appended in the exact order specified by the user in the workspace or ordered alphabetically by original filename.
+
+### 11.3 The Two-Pass Assembly Pipeline (Deterministic Mathematical Offsets)
+
+Because a Table of Contents must state the exact page number of every chapter, and because page lengths of third-party test reports vary, Engine 2 executes a **Two-Pass Algorithm**:
+
+#### Pass 1: Inspection & Page Offset Mathematics
+1. PyMuPDF inspects each binary attachment in the manifest:
+   $$P_i = \text{page\_count}(\text{document}_i)$$
+2. System computes the number of entries ($N$) in the Table of Contents. At 25 entries per page:
+   $$P_{\text{TOC}} = \max\left(1, \left\lceil \frac{N}{25} \right\rceil\right)$$
+3. The starting page ($S_k$) for any chapter $k$ is calculated deterministically:
+   $$S_k = 1 + P_{\text{TOC}} + \sum_{i=1}^{k-1} P_i$$
+   *(where Page 1 is the Dossier Cover Page, and Pages $2$ to $1 + P_{\text{TOC}}$ are the Table of Contents)*.
+
+#### Intermediate Step: Cover and TOC Synthesis
+The calculated page offsets are passed into `dossier_cover_toc.html`. WeasyPrint renders a standalone PDF containing:
+* Official Cover Page with device metadata and authorized signatory block.
+* Dynamic Table of Contents with hyperlinked chapter numbers pointing to internal PDF destinations (`#page=S_k`).
+
+#### Pass 2: Binary Sequential Merge & Post-Processing
+1. Engine 2 initializes an empty PyMuPDF document: `master = fitz.open()`.
+2. Appends `cover_and_toc.pdf`.
+3. Iterates through all active manifest chapters, appending each document: `master.insert_pdf(chapter_pdf)`.
+4. **Continuous Bates Margin Stamping:**
+   Engine 2 loops over all pages ($1$ to $P_{\text{total}}$) and inserts running margins:
+   * **Top Running Header:** Injected at $(X=54, Y=30)$:  
+     `"CDSCO Technical Dossier - MDR 2017 Fourth Schedule | " + submission.tracking_code`
+   * **Bottom Bates Footer:** Centered at $(Y = \text{height} - 25)$:  
+     `"{bates_prefix}-{page_num:04d}  |  Page {page_num} of {P_total}"` (e.g. `DMF-0042  |  Page 42 of 145`).
+5. **Hierarchical Bookmarks Injection:**
+   Engine 2 injects an outline tree via `master.set_toc()` allowing evaluators in Adobe Acrobat or web viewers to jump directly to any chapter or sub-annexure:
+   ```text
+   ├── Chapter 1.0: Executive Summary & Device Description (Page 4)
+   ├── Chapter 2.0: Product Specifications & Engineering Drawings (Page 12)
+   ├── Chapter 6.0: Verification and Validation Studies (Page 38)
+   │   ├── 6.1 Electrical Safety & EMC (Page 39)
+   │   ├── 6.2 Biocompatibility Evaluation (ISO 10993) (Page 58)
+   │   │   ├── Divider Sheet (Page 58)
+   │   │   ├── Cytotoxicity Report (Page 59)
+   │   │   └── Sensitization Study (Page 74)
+   │   └── 6.3 Sterilization Validation (ISO 11135) (Page 91)
+   └── Chapter 8.0: Device Labeling & IFU (Page 134)
+   ```
+
+### 11.4 Strict 10MB Government Portal Limit Enforcement
+
+The CDSCO online portal (`cdscomdonline.gov.in`) enforces an absolute maximum upload size of **10.0 MB (10,485,760 bytes)** per checklist slot. Third-party test reports containing high-resolution scans often cause assembled dossiers to reach 30MB to 70MB.
+
+Engine 2 executes an automated three-tier optimization cascade:
+
+```mermaid
+flowchart TD
+    Raw["Raw Assembled PDF Stream"] --> Gate0{"Size <= 10,485,760 Bytes?"}
+    Gate0 -->|"Yes"| Pass["Pass Directly (Zero Compression Applied)"]
+    
+    Gate0 -->|"No (> 10MB)"| Tier1["Tier 1: Lossless Stream Deflation (pikepdf)"]
+    Tier1 --> Gate1{"Size <= 10MB?"}
+    Gate1 -->|"Yes"| Pass
+    
+    Gate1 -->|"No (> 10MB)"| Tier2["Tier 2: 150 DPI Raster Downsampling (PIL + pikepdf)"]
+    Tier2 --> Gate2{"Size <= 10MB?"}
+    Gate2 -->|"Yes"| Pass
+    
+    Gate2 -->|"No (> 10MB)"| Tier3["Tier 3: Core Dossier + Indexed Annexure Splitting"]
+    Tier3 --> PassSplit["Deliver Core Dossier (<= 5MB) + Split Annexures (<= 10MB each)"]
+```
+
+#### Tier 1: Lossless Stream Deflation (pikepdf / qpdf)
+* Recompresses all internal PDF streams using Flate compression (`compression_streams=pikepdf.CompressionStreams.generate`).
+* Deduplicates redundant embedded font subsets and removes unreferenced dictionary objects (`normalize_content=True`).
+* Achieves 10–25% reduction with zero loss of visual quality.
+
+#### Tier 2: 150 DPI Raster Downsampling (PIL + pikepdf)
+* Scans all embedded image objects in the PDF stream.
+* If an image's effective resolution exceeds 150 DPI (such as 300–600 DPI scanner output from testing laboratories):
+  1. Decodes raw bitmap stream.
+  2. Resamples image to **150 DPI** using high-quality Lanczos anti-aliasing.
+  3. Re-encodes image as progressive JPEG with quality factor `80%` in sRGB color space.
+  4. Replaces original heavy stream in the PDF object table.
+* **Statutory Compliance Guarantee:** 150 DPI preserves full visual legibility of laboratory director signatures, NABL stamp seals, calibration stamps, and oscillogram / test curves, while reducing document file size by **65% to 80%**.
+
+#### Tier 3: Deterministic Overflow Split Strategy (Fallback)
+If a master dossier with extensive raw bench data (e.g. 500+ pages) remains over 10.0 MB after Tier 2 downsampling, Engine 2 engages the Split Strategy:
+1. **Core Technical Dossier (`Master_DMF_Core.pdf` - typically 3 to 5 MB):** Contains all Chapter 1.0 through 8.0 narratives, specifications, executive summaries, and the complete Table of Contents. Uploaded to SUGAM's primary DMF upload slot.
+2. **Indexed Individual Annexures (Each strictly &le; 10MB):** Heavy laboratory test reports are extracted into standalone Bates-stamped files matching CDSCO's supplemental upload slots:
+   * `Annexure_6_1_Electrical_Safety_Report.pdf`
+   * `Annexure_6_2_Biocompatibility_Study.pdf`
+   * `Annexure_6_3_Sterilization_Validation.pdf`
+   * `Annexure_7_0_Clinical_Evaluation_Report.pdf`
 
 ---
 
-## 12. Comparative Engine Summary
+## 12. Comparative Summary: Engine 1 versus Engine 2
 
-| Functional Metric | Guided Form Generator (Engine 1) | Dossier Assembly Engine (Engine 2) |
+| Architectural Parameter | Engine Type 1: Guided Form Generator | Engine Type 2: Dossier Assembly Engine |
 | :--- | :--- | :--- |
-| **Primary Target Documents** | EPC, Covering Letter, PoA Pro-Forma, Undertakings, Technical Staff Letters | Device Master File (DMF), Plant Master File (PMF) |
-| **Input Data** | Structured questionnaire answers and tabular JSON | Rich text narratives, specification tables, and uploaded binary PDF reports |
-| **Processing Operation** | Single template rendering and layout pagination | Multi-file merging, offset calculation, bookmarking, Bates stamping, compression |
-| **Portal Destination** | Specific administrative and checklist upload slots | Primary Technical Dossier upload slot (with overflow annexures) |
-| **Applicable Forms** | All 7 Forms (MD-14, MD-7, MD-8, MD-3, MD-4, MD-12, MD-16) | Commercial & Loan streams only (MD-14, MD-7, MD-8, MD-3, MD-4) |
-| **Output Format** | Standardized PDF or editable DOCX | Optimized single PDF (with overflow Annexure splitting) |
+| **Primary Scope** | Single statutory pro-formas, declarations, letters, and checklists | Multi-chapter statutory technical files (Device Master File & Plant Master File) |
+| **Input Data Source** | Dynamic questionnaire answers, boolean toggles, and tabular JSON | Narrative section markdown/HTML + uploaded external binary PDFs |
+| **Underlying Technologies** | Jinja2, docxtpl (Word), WeasyPrint (Headless Chromium/Pango) | PyMuPDF (`fitz`), pikepdf (`qpdf`), PIL / Pillow |
+| **Processing Pipeline** | Single-template render &rarr; HTML-to-PDF / DOCX compilation | Two-pass scan &rarr; offset math &rarr; dynamic TOC &rarr; merge &rarr; Bates &rarr; bookmarks |
+| **Pagination Handling** | Static/flow-based pagination via CSS `@page` and repeating `thead` | Dynamic offset calculation across mixed source files + continuous running Bates stamps |
+| **10MB Constraint Role** | Output rarely exceeds 500KB; direct validation only | Active 3-tier compression cascade (Lossless &rarr; 150 DPI Lanczos &rarr; Split Strategy) |
+| **Applicable Pathways** | All 7 Pathways (MD-14, MD-7, MD-8, MD-3, MD-4, MD-12, MD-16) | Commercial & Loan Pathways only (MD-14, MD-7, MD-8, MD-3, MD-4) |
+| **Output Artifacts** | Standardized PDF or editable DOCX | Unified Master Dossier PDF (&le; 10MB) + overflow Annexure PDFs |
+| **State Mutation on Completion** | Sets target `submission_entities.status = 'SATISFIED'` | Attaches assembled PDF to master dossier slot; creates chapter bookmark edges |
+

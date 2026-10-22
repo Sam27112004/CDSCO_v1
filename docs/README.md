@@ -31,6 +31,7 @@ Detailed engineering blueprints, relational schemas, DSL rules, and document gen
 | **04** | **Engineering & Data Model Spec** | Relational schemas, DSL rules engine, RESTful API endpoints, and validation severities. | [04_ENGINEERING_AND_DATA_MODEL_SPEC.md](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/04_ENGINEERING_AND_DATA_MODEL_SPEC.md) |
 | **05** | **Document Engines & Dual Fulfillment Logic** | Cross-form document landscape, engine applicability (commercial vs test), guided questionnaire processing logic, and multi-file dossier assembly under 10MB. | [05_DOCUMENT_ENGINES_AND_FULFILLMENT_LOGIC.md](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/05_DOCUMENT_ENGINES_AND_FULFILLMENT_LOGIC.md) |
 | **06** | **Team Distribution & Sequential Workflow** | 2-3 team sequential roadmap, granular WBS checklists, acceptance gates, and live progress tracking dashboard. | [06_TEAM_DISTRIBUTION_AND_SEQUENTIAL_WORKFLOW.md](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/06_TEAM_DISTRIBUTION_AND_SEQUENTIAL_WORKFLOW.md) |
+| **07** | **System Verification & Test Traceability Matrix** | Complete Requirements Traceability Matrix (RTM) mapping UR-01..09 & NFRs to unit, integration, and E2E test suites with CI/CD gates. | [07_SYSTEM_VERIFICATION_AND_TEST_TRACEABILITY.md](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/07_SYSTEM_VERIFICATION_AND_TEST_TRACEABILITY.md) |
 
 ---
 

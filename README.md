@@ -26,6 +26,7 @@ Complete engineering specifications, data schemas, and document generation archi
 * **[04. Engineering and Data Model Specification](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/04_ENGINEERING_AND_DATA_MODEL_SPEC.md)**: Relational schemas, DSL rules engine, RESTful API endpoints, and validation severities.
 * **[05. Document Engines and Dual Fulfillment Logic](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/05_DOCUMENT_ENGINES_AND_FULFILLMENT_LOGIC.md)**: Cross-form document landscape, engine applicability (commercial vs test), guided questionnaire processing logic, and multi-file dossier assembly under 10MB.
 * **[06. Team Distribution and Sequential Workflow](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/06_TEAM_DISTRIBUTION_AND_SEQUENTIAL_WORKFLOW.md)**: 2-3 team sequential roadmap, granular WBS checklists, hand-off verification gates, and live progress tracking dashboard.
+* **[07. System Verification & Test Traceability Matrix](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/07_SYSTEM_VERIFICATION_AND_TEST_TRACEABILITY.md)**: Complete RTM mapping every requirement (UR-01 through UR-09 and NFRs) to unit, integration, and E2E test suites with CI/CD gates.
 
 ---
 

@@ -185,3 +185,12 @@ flowchart TD
 | **NFR-04** | **Information Security** | Encryption at rest (AES-256) for technical dossiers and proprietary files. Encryption in transit via TLS 1.3. |
 | **NFR-05** | **Architecture Decoupling** | Complete separation of regulatory logic and form schemas from backend code. |
 | **NFR-06** | **Browser Compatibility** | Full operational capability across modern desktop browsers (Chrome, Edge, Safari, Firefox). |
+
+---
+
+## 4. Requirements Traceability & Verification
+
+Every requirement specified herein (UR-01 through UR-09 and NFR-01 through NFR-06) maps directly to explicit unit, integration, and end-to-end test specifications with automated test cases. For the complete verification matrix, test execution procedures, and CI/CD quality gates, refer to:
+
+* **[07. System Verification, Test Specification, and Requirements Traceability Matrix (RTM)](file:///c:/Users/Sam/Documents/MyData/Projects/CDSCO_new/docs/technical_reference/07_SYSTEM_VERIFICATION_AND_TEST_TRACEABILITY.md)**
+
