@@ -1,0 +1,41 @@
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Storage & artifacts
+storage/
+uploads/
+scratch/
+*.log
+
+# Node & Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
