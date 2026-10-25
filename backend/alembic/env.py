@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.core.config import settings
+import app.models  # Ensure all ORM models are registered in Base.metadata
 from app.models.base import Base
 
 # Alembic Config object

@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.1.1: Initialize Python 3.11+ FastAPI project with async SQLAlchemy 2.0 and Alembic (2026-10-25 10:55 IST | git `9f76b40`: feat(backend): initialize FastAPI project with async SQLAlchemy 2.0, Pydantic v2, and Alembic)
-* **Next Active Sub-Task:** **Task 1.1.2: Author and execute Alembic migrations for core PostgreSQL tables**
+* **Last Completed Sub-Task:** Task 1.1.2: Author and execute Alembic migrations for core PostgreSQL tables (2026-10-25 11:35 IST | Alembic revision `e0f736a11ec1`: create_core_tables)
+* **Next Active Sub-Task:** **Task 1.1.3: Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context`**
 
 ---
 
@@ -18,7 +18,7 @@
 
 ### Task 1.1: Backend Project Scaffolding & Database Tier
 - [x] **1.1.1:** Initialize Python 3.11+ FastAPI project structure with async SQLAlchemy 2.0, Pydantic v2, and Alembic configuration.
-- [ ] **1.1.2:** Author and execute Alembic migrations for core PostgreSQL tables:
+- [x] **1.1.2:** Author and execute Alembic migrations for core PostgreSQL tables:
   - `application_definitions`
   - `profiles`
   - `submissions`
