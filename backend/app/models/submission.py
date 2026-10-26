@@ -12,6 +12,7 @@ class Submission(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "submissions"
     __table_args__ = (
         Index("idx_submissions_status", "status"),
+        Index("idx_submissions_regulatory_context", "regulatory_context", postgresql_using="gin"),
     )
 
     application_definition_id: Mapped[uuid.UUID] = mapped_column(

@@ -43,3 +43,15 @@ def test_model_instantiation():
     )
     assert profile.profile_type == "APPLICANT"
     assert profile.name == "MedTech India Pvt Ltd"
+
+
+def test_gin_indexes_registered():
+    """Verifies that GIN indexes on schema_payload and regulatory_context are configured."""
+    app_def_indexes = {idx.name: idx for idx in ApplicationDefinition.__table__.indexes}
+    assert "idx_app_def_schema" in app_def_indexes
+    assert app_def_indexes["idx_app_def_schema"].dialect_options["postgresql"]["using"] == "gin"
+
+    sub_indexes = {idx.name: idx for idx in Submission.__table__.indexes}
+    assert "idx_submissions_regulatory_context" in sub_indexes
+    assert sub_indexes["idx_submissions_regulatory_context"].dialect_options["postgresql"]["using"] == "gin"
+

@@ -33,6 +33,7 @@ You implement **one atomic sub-task at a time**, stop, report, and wait for user
 - Do not implement the next sub-task "while you're at it".
 - Do not refactor unrelated code.
 - Do not introduce dependencies not listed in the engineering specifications without explicitly flagging them first.
+- **Consolidated Commit Rule:** Make exactly **one single, clean git commit** per completed sub-task. Do not create micro-commits for status updates, typo fixes, or config tweaks during sub-task execution.
 
 ---
 
@@ -42,11 +43,14 @@ You implement **one atomic sub-task at a time**, stop, report, and wait for user
    - Mark the completed sub-task `[x]`
    - Update the "Last completed" line with timestamp and git commit/diff summary
    - Mark the next sub-task `[ ]` as active
-2. **Report to the user** (short, in chat — no fluff, zero emojis):
-   - **What was implemented:** 2 to 3 concise bullet points
-   - **Files created or modified:** List of file paths only
-   - **How to validate it works:** 1 to 3 direct commands or verification checks (no lengthy essays)
-3. **Stop. Wait for approval before proceeding.**
+2. **Execute Consolidated Git Commit:** Stage all modified/created files and author a clear, conventional commit message for the sub-task.
+3. **Report to the user** (in chat — zero emojis, direct and educational):
+   - **Git Commit Message:** Full message for the commit.
+   - **What was implemented & Why:** 2 to 4 concise bullet points explaining what was built and the engineering rationale behind it.
+   - **Concepts & Learning:** Clear, beginner-friendly explanations of the core technologies, patterns, or tools used in the sub-task to teach while building.
+   - **Files created or modified:** List of file paths only.
+   - **How to validate it works:** 1 to 3 direct, copy-pasteable verification commands.
+4. **Stop. Wait for approval before proceeding.**
 
 ---
 

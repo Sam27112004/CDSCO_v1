@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional, List
-from sqlalchemy import String, Boolean, UniqueConstraint
+from sqlalchemy import String, Boolean, UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, UUIDMixin, TimestampMixin
@@ -12,6 +12,7 @@ class ApplicationDefinition(Base, UUIDMixin):
     __tablename__ = "application_definitions"
     __table_args__ = (
         UniqueConstraint("code", "version", name="uq_app_def_code_version"),
+        Index("idx_app_def_schema", "schema_payload", postgresql_using="gin"),
     )
 
     code: Mapped[str] = mapped_column(String(50), nullable=False, index=True)

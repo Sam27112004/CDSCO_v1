@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.1.2: Author and execute Alembic migrations for core PostgreSQL tables (2026-10-25 11:35 IST | Alembic revision `e0f736a11ec1`: create_core_tables)
-* **Next Active Sub-Task:** **Task 1.1.3: Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context`**
+* **Last Completed Sub-Task:** Task 1.1.3: Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context` (2026-10-26 15:40 IST | Alembic revision `f1a2b3c4d5e6`: create_gin_indexes)
+* **Next Active Sub-Task:** **Task 1.2.1: Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots)**
 
 ---
 
@@ -27,7 +27,7 @@
   - `evidence_links`
   - `validation_issues`
   - `background_jobs`
-- [ ] **1.1.3:** Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context`.
+- [x] **1.1.3:** Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context`.
 
 ### Task 1.2: Application Definition & Slot Blueprint Service
 - [ ] **1.2.1:** Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots).
