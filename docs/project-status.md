@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.1.3: Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context` (2026-10-26 15:40 IST | Alembic revision `f1a2b3c4d5e6`: create_gin_indexes)
-* **Next Active Sub-Task:** **Task 1.2.1: Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots)**
+* **Last Completed Sub-Task:** Task 1.2.1: Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots) (2026-10-26 15:52 IST | `form_md_14.json` fixture & Pydantic blueprint schemas)
+* **Next Active Sub-Task:** **Task 1.2.2: Author declarative JSON schema blueprint fixture for Form MD-7 (48 discrete upload slots)**
 
 ---
 
@@ -30,7 +30,7 @@
 - [x] **1.1.3:** Create GIN indexes on `application_definitions.schema_payload` and `submissions.regulatory_context`.
 
 ### Task 1.2: Application Definition & Slot Blueprint Service
-- [ ] **1.2.1:** Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots).
+- [x] **1.2.1:** Author declarative JSON schema blueprint fixture for Form MD-14 (36 discrete upload slots).
 - [ ] **1.2.2:** Author declarative JSON schema blueprint fixture for Form MD-7 (48 discrete upload slots).
 - [ ] **1.2.3:** Build `DefinitionService` to load blueprints and resolve statutory slot hierarchies.
 - [ ] **1.2.4:** Build `RulesEngine` predicate evaluator to activate/deactivate slots based on `regulatory_context`.

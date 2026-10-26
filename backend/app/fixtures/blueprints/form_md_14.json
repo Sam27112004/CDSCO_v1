@@ -1,0 +1,1250 @@
+{
+  "form_code": "MD-14",
+  "form_title": "Application for Grant of Licence to Import Medical Device",
+  "version": "1.0",
+  "governing_rules": [
+    "Rule 34(1)",
+    "Rule 34(2)",
+    "Rule 34(3)",
+    "Rule 34(4)",
+    "Fourth Schedule (Part I, II, III)"
+  ],
+  "slots": [
+    {
+      "slot_id": "1.0",
+      "slot_number": "1.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Covering Letter",
+      "statutory_rule": "Rule 34(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "covering_letter",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Formal statutory application letter addressed to the Drugs Controller General (India).",
+        "why_it_is_needed": "Establishes applicant intent, lists applied device models, accessories, intended use, and summarizes statutory fee payments.",
+        "official_citation": "Medical Devices Rules, 2017, Rule 34(1)",
+        "who_issues": "Indian Authorized Agent on official corporate letterhead",
+        "validity_period": "Current (dated within 30 days of submission)",
+        "mandatory_inclusions": [
+          "Device brand names and generic names",
+          "Risk classification (Class A, B, C, or D)",
+          "Foreign manufacturing site physical address",
+          "BharatKosh treasury transaction ID and payment date"
+        ],
+        "critical_pitfalls": [
+          "Discrepancies between letterhead entity name and Form 20B/21B wholesale licence.",
+          "Missing authorized signatory stamp or signature."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "2.0",
+      "slot_number": "2.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Fee Challan",
+      "statutory_rule": "Rule 34(1) & Second Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Official treasury payment receipt generated from the BharatKosh portal (Non-Tax Receipt Portal).",
+        "why_it_is_needed": "Mandatory proof of statutory fee deposit into the Consolidated Fund of India for import licence evaluation.",
+        "official_citation": "MDR 2017 Second Schedule, Rule 34(1)",
+        "who_issues": "Government of India BharatKosh Portal (bharatkosh.gov.in)",
+        "validity_period": "Current (transaction reference valid for applied filing)",
+        "mandatory_inclusions": [
+          "BharatKosh Transaction Reference Number",
+          "Correct CDSCO Drawing & Disbursing Officer (DDO) code",
+          "Head of Account 0210 - Medical and Public Health",
+          "Exact statutory fee matching device count and manufacturing site tier"
+        ],
+        "critical_pitfalls": [
+          "Payment mapped to incorrect DDO account or state treasury.",
+          "Underpayment due to uncalculated distinct manufacturing sites or device models."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "3.0",
+      "slot_number": "3.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Application (Form MD-14 Execution)",
+      "statutory_rule": "Rule 34(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "form_md_14",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Prescribed statutory pro-forma Form MD-14 for import licence application under Medical Devices Rules, 2017.",
+        "why_it_is_needed": "Legal instrument formally requesting grant of licence in Form MD-15 from the Central Licensing Authority.",
+        "official_citation": "MDR 2017, Rule 34(1), Form MD-14",
+        "who_issues": "Authorized Indian Agent representing the overseas manufacturer",
+        "validity_period": "Current (dated at time of filing)",
+        "mandatory_inclusions": [
+          "Full corporate legal name and address of overseas manufacturer",
+          "Actual manufacturing site address where manufacturing occurs",
+          "Complete device nomenclature, model codes, and intended usage",
+          "Authorized Agent constitution and wholesale drug licence details"
+        ],
+        "critical_pitfalls": [
+          "Mismatch between device trade names on Form MD-14 and overseas Free Sale Certificate.",
+          "Missing digital or physical statutory signature of authorized agent."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "4.0",
+      "slot_number": "4.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Power of Attorney along with undertaking per Fourth Schedule Part I",
+      "statutory_rule": "Rule 34(1) & Fourth Schedule Part I",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "power_of_attorney_proforma",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Legal instrument authorizing Indian Agent to act on behalf of the foreign manufacturer, executed on non-judicial stamp paper.",
+        "why_it_is_needed": "Statutory prerequisite conferring legal standing under Indian law to submit dossiers, report vigilances, and market devices.",
+        "official_citation": "MDR 2017 Fourth Schedule Part I, Clause 1",
+        "who_issues": "Foreign Manufacturer (Executive Director / Managing Director)",
+        "validity_period": "Valid for stated tenure (typically 5 years) or until revoked in writing",
+        "mandatory_inclusions": [
+          "Apostille certificate (Hague Convention) or Indian Embassy / Consular legalization",
+          "Specific enumeration of applied device models and variants",
+          "Mandatory Fourth Schedule Part I undertaking clauses verbatim",
+          "Notarization in country of origin"
+        ],
+        "critical_pitfalls": [
+          "Unapostilled or unnotarized power of attorney from overseas jurisdiction.",
+          "Omission of mandatory statutory undertaking clauses from Fourth Schedule Part I."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "5.0",
+      "slot_number": "5.0",
+      "category": "LEGAL_ELIGIBILITY",
+      "title": "Copy of Whole Sale Licence / Manufacturing Licence / Form MD-42",
+      "statutory_rule": "Rule 34(2)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Certified copy of valid wholesale drug licence (Form 20B / Form 21B) or Medical Device Registration Certificate (Form MD-42).",
+        "why_it_is_needed": "Proves the authorized agent is licensed under Drugs & Cosmetics Act to stock, sell, and distribute medical devices in India.",
+        "official_citation": "MDR 2017 Rule 34(2)",
+        "who_issues": "State Drugs Control Administration (SLA) of respective Indian State / UT",
+        "validity_period": "Must remain unexpired during entire evaluation and licensing period",
+        "mandatory_inclusions": [
+          "Active validity date with retention fee receipt if applicable",
+          "Competent technical personnel / registered pharmacist endorsement",
+          "Physical warehouse address matching Indian Agent address"
+        ],
+        "critical_pitfalls": [
+          "Submitting expired licence without proof of retention fee payment.",
+          "Address mismatch between wholesale licence and corporate profile."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "6.0",
+      "slot_number": "6.0",
+      "category": "LEGAL_ELIGIBILITY",
+      "title": "Constitution Details of the Authorized Agent",
+      "statutory_rule": "Rule 34(2)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Legal constitutional documents establishing the corporate identity and authorized signatories of the Indian entity.",
+        "why_it_is_needed": "Verifies that the entity and signatories have legal authority to enter binding regulatory agreements in India.",
+        "official_citation": "MDR 2017 Rule 34(2)",
+        "who_issues": "Ministry of Corporate Affairs (ROC) / Registrar of Firms",
+        "validity_period": "Perpetual (reflecting latest active directorship and shareholding)",
+        "mandatory_inclusions": [
+          "Certificate of Incorporation (CIN / LLPIN)",
+          "Memorandum & Articles of Association (MoA & AoA) or Partnership Deed",
+          "Current List of Directors with DIN numbers",
+          "Board Resolution authorizing designated signatory"
+        ],
+        "critical_pitfalls": [
+          "Board resolution signed by unauthorized person or missing official corporate seal.",
+          "Outdated director list conflicting with Ministry of Corporate Affairs portal."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "7.1",
+      "slot_number": "7.1",
+      "category": "REGULATORY_APPROVALS",
+      "title": "Free Sale Certificate from Country of Origin",
+      "statutory_rule": "Rule 34(3)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Free Sale Certificate (FSC) or Certificate to Foreign Government (CFG) issued by National Regulatory Authority of country of origin.",
+        "why_it_is_needed": "Certifies that the device is freely marketed and distributed in the domestic market of the overseas manufacturer without restrictions.",
+        "official_citation": "MDR 2017 Rule 34(3)",
+        "who_issues": "National Regulatory Authority / Ministry of Health of Country of Origin",
+        "validity_period": "Valid as indicated on certificate, or within 2 years from date of issuance",
+        "mandatory_inclusions": [
+          "Exact commercial device names and catalogue / model numbers",
+          "Explicit confirmation that devices are approved for domestic sale",
+          "Legal manufacturer and manufacturing site name and address",
+          "Duly notarized and apostilled / legalized"
+        ],
+        "critical_pitfalls": [
+          "Certificate states 'For Export Only' (immediate CDSCO rejection).",
+          "Omission of catalogue numbers or variant codes applied in India."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "7.2",
+      "slot_number": "7.2",
+      "category": "REGULATORY_APPROVALS",
+      "title": "Free Sale Certificate from Reference Countries (USA, UK, EU, Canada, Japan, Australia)",
+      "statutory_rule": "Rule 34(3)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Marketing authorization or Certificate to Foreign Government from one or more GHTF/IMDRF recognized reference jurisdictions.",
+        "why_it_is_needed": "Statutory benchmark establishing proven international safety record; prerequisite for clinical evaluation waivers in India.",
+        "official_citation": "MDR 2017 Rule 34(3)",
+        "who_issues": "US FDA, UK MHRA, EU Competent Authority, Health Canada, Japan PMDA/MHLW, or TGA Australia",
+        "validity_period": "Current and unexpired",
+        "mandatory_inclusions": [
+          "US FDA 510(k) Premarket Notification / PMA / CFG, or EU CE Certificate under MDR 2017/745, or TGA ARTG Entry",
+          "Model listing covering applied SKUs",
+          "Notarized certificate copy"
+        ],
+        "critical_pitfalls": [
+          "Reference approval under transition period without valid MDR extension documentation.",
+          "Applied device variant not covered in the reference approval scope."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "7.3",
+      "slot_number": "7.3",
+      "category": "REGULATORY_APPROVALS",
+      "title": "Overseas Manufacturing Site / Establishment Registration",
+      "statutory_rule": "Rule 34(3)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Official registration certificate or licence proving the foreign manufacturing facility is legally registered in its host jurisdiction.",
+        "why_it_is_needed": "Confirms the manufacturing premises are authorized by host government authorities to engage in device manufacturing.",
+        "official_citation": "MDR 2017 Rule 34(3)",
+        "who_issues": "Host Country Regulatory Department / Municipal Health Bureau",
+        "validity_period": "Current active establishment registration",
+        "mandatory_inclusions": [
+          "Facility Establishment Identifier (FEI) / Registration Number",
+          "Exact physical manufacturing site location",
+          "Approved manufacturing activities (assembly, packaging, sterilization)"
+        ],
+        "critical_pitfalls": [
+          "Address discrepancy between establishment licence and ISO 13485 QMS certificate."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "7.4",
+      "slot_number": "7.4",
+      "category": "REGULATORY_APPROVALS",
+      "title": "Latest Inspection or Audit Report within last 3 years",
+      "statutory_rule": "Rule 34(3)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Regulatory audit report or inspection outcome conducted by a competent regulatory authority or MDSAP auditing organization.",
+        "why_it_is_needed": "Evaluates ongoing GMP compliance, systemic corrective actions, and historical audit findings for the manufacturing facility.",
+        "official_citation": "MDR 2017 Rule 34(3)",
+        "who_issues": "Competent National Authority / Notified Body / MDSAP Auditing Organization",
+        "validity_period": "Conducted within preceding 36 months of submission",
+        "mandatory_inclusions": [
+          "Date and scope of facility inspection",
+          "Summary of inspection findings or Form FDA 483 with closeout letter",
+          "Formal closeout of observed major non-conformities"
+        ],
+        "critical_pitfalls": [
+          "Submitting an audit report older than 3 years.",
+          "Submitting open warning letters without formal regulatory clearance proof."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "8.1",
+      "slot_number": "8.1",
+      "category": "QUALITY_CERTIFICATES",
+      "title": "Quality Management System Certificate (ISO 13485:2016)",
+      "statutory_rule": "Rule 34(4)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Accredited ISO 13485:2016 Quality Management System Certificate for the foreign manufacturing facility.",
+        "why_it_is_needed": "Statutory proof under MDR 2017 that medical devices are produced under validated, international quality control standards.",
+        "official_citation": "MDR 2017 Rule 34(4) & Fifth Schedule",
+        "who_issues": "IAF-accredited Certification Body or Notified Body",
+        "validity_period": "Active and unexpired (typically 3-year certification cycle)",
+        "mandatory_inclusions": [
+          "Explicit scope covering design, manufacture, and packaging of applied device category",
+          "Exact manufacturing site physical address matching application",
+          "Accreditation mark (e.g. UKAS, DakkS, ANAB) and certificate number",
+          "Duly notarized copy"
+        ],
+        "critical_pitfalls": [
+          "Applied device type missing from scope of certification.",
+          "Certificate expiring within less than 60 days of submission."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "8.2",
+      "slot_number": "8.2",
+      "category": "QUALITY_CERTIFICATES",
+      "title": "Full Quality Assurance Certificate / CE Certificate",
+      "statutory_rule": "Rule 34(4)",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "European CE Certificate under EU MDR 2017/745 or MDD 93/42/EEC (with valid extension confirmation) issued by a designated Notified Body.",
+        "why_it_is_needed": "Demonstrates independent third-party assessment of design dossier and production quality system.",
+        "official_citation": "MDR 2017 Rule 34(4)",
+        "who_issues": "Designated European Notified Body (e.g. BSI, TÜV SÜD, DNV, DEKRA)",
+        "validity_period": "Current validity period or official Regulation (EU) 2023/607 transition confirmation",
+        "mandatory_inclusions": [
+          "Notified Body 4-digit identification number",
+          "Annex IX (Quality Management) or Annex X (Type Examination) certification",
+          "Product catalogue codes and classifications"
+        ],
+        "critical_pitfalls": [
+          "Submitting expired MDD certificate without manufacturer declaration of EU transition compliance.",
+          "Mismatch in Notified Body identification."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "8.3",
+      "slot_number": "8.3",
+      "category": "QUALITY_CERTIFICATES",
+      "title": "Declaration of Conformity by Manufacturer",
+      "statutory_rule": "Rule 34(4) & Fourth Schedule Part I",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "declaration_of_conformity",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Solemn legal declaration issued under sole responsibility of the manufacturer affirming conformity to applicable regulatory standards.",
+        "why_it_is_needed": "Legally binds manufacturer to declarations of compliance with essential safety, performance, and harmonized international standards.",
+        "official_citation": "MDR 2017 Fourth Schedule Part I, Clause 2",
+        "who_issues": "Legal Manufacturer (Head of Quality Assurance / Regulatory Affairs)",
+        "validity_period": "Current (dated within 6 months of submission)",
+        "mandatory_inclusions": [
+          "Full device trade names, risk classification, and product codes",
+          "List of harmonized standards applied (ISO 13485, ISO 14971, IEC 60601)",
+          "Statement of sole manufacturer legal responsibility",
+          "Signature and title of responsible regulatory officer"
+        ],
+        "critical_pitfalls": [
+          "Missing reference to Indian Medical Devices Rules, 2017.",
+          "Omission of applied device model numbers."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "9.0",
+      "slot_number": "9.0",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "Plant Master File (Appendix I of Fourth Schedule)",
+      "statutory_rule": "Rule 34 & Fourth Schedule Part II",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "PMF_ALL",
+      "guidance": {
+        "what_it_is": "Comprehensive technical dossier detailing manufacturing premises, environmental controls, equipment, and quality operations.",
+        "why_it_is_needed": "Enables statutory evaluation of cleanrooms, contamination controls, water systems, and GMP readiness of overseas facility.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Foreign Manufacturer Operations & Quality Engineering Teams",
+        "validity_period": "Current (updated on major facility change or annually)",
+        "mandatory_inclusions": [
+          "General information and corporate organogram",
+          "Scaled cleanroom layout plans (ISO Class 7/8) with air pressure cascades",
+          "HVAC and water system validation summaries",
+          "Equipment calibration master list and validation protocols (IQ/OQ/PQ)"
+        ],
+        "critical_pitfalls": [
+          "Unscaled architectural layouts or missing cleanroom classifications.",
+          "Exceeding the 10MB portal size ceiling without pikepdf downsampling."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.1",
+      "slot_number": "10.1",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Executive Summary",
+      "statutory_rule": "Fourth Schedule Part III Clause 1.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_1_0",
+      "guidance": {
+        "what_it_is": "Concise overview summarizing technical dossier, regulatory history, commercial background, and risk profile.",
+        "why_it_is_needed": "Primary evaluation briefing document reviewed by CDSCO technical officers and Subject Expert Committees (SEC).",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 1.0",
+        "who_issues": "Manufacturer Regulatory Affairs Team",
+        "validity_period": "Current filing version",
+        "mandatory_inclusions": [
+          "Intended clinical purpose and indications for use",
+          "Global marketing history across reference countries",
+          "Adverse event summary and recall history",
+          "Statutory risk-benefit conclusion"
+        ],
+        "critical_pitfalls": [
+          "Contradiction between intended use in Executive Summary and approved IFU."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.2",
+      "slot_number": "10.2",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Descriptive Information of Device",
+      "statutory_rule": "Fourth Schedule Part III Clause 2.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_2_0",
+      "guidance": {
+        "what_it_is": "Detailed scientific narrative describing operating principles, raw materials, physical dimensions, and engineering schematics.",
+        "why_it_is_needed": "Provides technical understanding of how the device functions and interacts with biological systems.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 2.0",
+        "who_issues": "Manufacturer R&D and Product Engineering",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Device operational mechanisms and diagrams",
+          "Comprehensive Bill of Materials (BOM) including patient-contacting polymers/metals",
+          "Novel technology disclosures (if applicable)"
+        ],
+        "critical_pitfalls": [
+          "Generic descriptions omitting chemical grades of patient-contacting materials."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.3",
+      "slot_number": "10.3",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Justification for Medical Device Grouping",
+      "statutory_rule": "Fourth Schedule Part III Clause 3.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_3_0",
+      "guidance": {
+        "what_it_is": "Scientific rationale explaining why applied models are grouped under a single application per CDSCO grouping guidelines.",
+        "why_it_is_needed": "Validates grouping category (Single, Family, System, IVD Test Kit, or Group) to prevent improper fee minimization.",
+        "official_citation": "MDR 2017 Rule 34 & CDSCO Grouping Guidelines",
+        "who_issues": "Regulatory Specialist / Manufacturer",
+        "validity_period": "Current application",
+        "mandatory_inclusions": [
+          "Grouping category applied (Single, Family, System, Kit)",
+          "Demonstration of identical intended use, design technology, and manufacturing process",
+          "Tabular model comparison across dimensional variations"
+        ],
+        "critical_pitfalls": [
+          "Grouping devices with different intended uses or distinct manufacturing sites under a single Family."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.4",
+      "slot_number": "10.4",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Product Specification, including variants, accessories, etc.",
+      "statutory_rule": "Fourth Schedule Part III Clause 4.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_4_0",
+      "guidance": {
+        "what_it_is": "Comprehensive technical specification sheet enumerating all catalogue numbers, sizes, configurations, and compatible accessories.",
+        "why_it_is_needed": "Defines the exact legal scope of devices authorized for commercial import into India.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 4.0",
+        "who_issues": "Manufacturer Product Quality Engineering",
+        "validity_period": "Current commercial catalogue",
+        "mandatory_inclusions": [
+          "Table listing Catalogue Number, Variant Name, Dimensions, Shelf-Life",
+          "Identification of included accessories and spare components",
+          "Physical, electrical, and chemical performance limits"
+        ],
+        "critical_pitfalls": [
+          "Omitting catalogue numbers from technical specification table that appear on commercial packaging."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.5",
+      "slot_number": "10.5",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Substantial Equivalence with Predicate Device",
+      "statutory_rule": "Fourth Schedule Part III Clause 5.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_5_0",
+      "guidance": {
+        "what_it_is": "Side-by-side comparative table demonstrating substantial equivalence between applied device and a legally marketed predicate device.",
+        "why_it_is_needed": "Substantiates safety and performance equivalency, supporting waiver of local clinical trials in India.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 5.0",
+        "who_issues": "Regulatory Affairs Specialist",
+        "validity_period": "Current submission",
+        "mandatory_inclusions": [
+          "Predicate brand name, manufacturer, and CDSCO import licence / US FDA 510(k) number",
+          "Side-by-side comparison of intended use, materials, performance, and technology",
+          "Detailed scientific justification of any dimensional or material differences"
+        ],
+        "critical_pitfalls": [
+          "Selecting an unapproved device in India as predicate without clinical trial data.",
+          "Superficial comparison table ignoring technological differences."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.6",
+      "slot_number": "10.6",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Labelling Information (Labels, Instruction for Use, etc.)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.0 & Chapter VI",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_0",
+      "guidance": {
+        "what_it_is": "Complete artwork files for primary packaging labels, outer carton labels, blister packs, and Instructions for Use (IFU).",
+        "why_it_is_needed": "Enforces compliance with statutory Indian labelling rules under Chapter VI of MDR 2017.",
+        "official_citation": "MDR 2017 Chapter VI, Rules 44–58 & Fourth Schedule",
+        "who_issues": "Manufacturer Packaging Design Team",
+        "validity_period": "Current commercial artwork",
+        "mandatory_inclusions": [
+          "Prominent 'FOR IMPORT' statement or Indian Import Licence placeholder (Licence No. MD-15-XXXX)",
+          "Indian Authorized Agent legal name and physical address",
+          "Standardized ISO 15223-1 symbols (Sterile, Lot, Expiry Date, Single Use)",
+          "Storage temperature specifications and warning precautions"
+        ],
+        "critical_pitfalls": [
+          "Missing MRP sticker space or Indian Agent details on outer carton artwork.",
+          "Discrepancies in shelf-life between label and stability study data."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.7",
+      "slot_number": "10.7",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Device Design and Manufacturing Information",
+      "statutory_rule": "Fourth Schedule Part III Clause 7.0",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_7_0",
+      "guidance": {
+        "what_it_is": "Detailed engineering schematics, manufacturing flowcharts, critical in-process control points, and subcontracted process details.",
+        "why_it_is_needed": "Demonstrates process capability and reproducibility across all stages from raw material to finished packaged device.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 7.0",
+        "who_issues": "Manufacturer Process Engineering Team",
+        "validity_period": "Current validated manufacturing process",
+        "mandatory_inclusions": [
+          "Sequential manufacturing process flowchart",
+          "In-process quality control (IPQC) inspection gates and acceptance criteria",
+          "Details of critical subcontractors (e.g. outsourced contract sterilizer)"
+        ],
+        "critical_pitfalls": [
+          "Failure to disclose offsite contract sterilization facilities."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.8",
+      "slot_number": "10.8",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Essential Principles Checklist for Demonstrating Conformity to Safety and Performance",
+      "statutory_rule": "Fourth Schedule Appendix II",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "essential_principles",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_8_0",
+      "guidance": {
+        "what_it_is": "Statutory matrix evaluating device conformity against all General and Specific Essential Principles of Safety and Performance.",
+        "why_it_is_needed": "Core regulatory spine demonstrating conformance to statutory safety principles per Fourth Schedule Appendix II.",
+        "official_citation": "MDR 2017 Fourth Schedule Appendix II",
+        "who_issues": "Manufacturer Regulatory Compliance Engineering",
+        "validity_period": "Current design baseline",
+        "mandatory_inclusions": [
+          "Applicability determination across all statutory clauses (Clauses 1 to 15)",
+          "Specific harmonized international standard cited for each clause",
+          "Precise cross-reference to supporting laboratory test report in dossier",
+          "Clear scientific justification for any non-applicable clauses"
+        ],
+        "critical_pitfalls": [
+          "Marking clauses as 'Not Applicable' without valid scientific rationale.",
+          "Missing cross-references to test report numbers in validation annexures."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.9",
+      "slot_number": "10.9",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Risk Analysis and Control Summary",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.1",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_1",
+      "guidance": {
+        "what_it_is": "Risk management summary report conducted in strict adherence with ISO 14971:2019.",
+        "why_it_is_needed": "Demonstrates all foreseeable hazards have been identified, mitigated, and residual risks are outweighed by clinical benefits.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.1 & ISO 14971",
+        "who_issues": "Risk Management Lead & Product Safety Committee",
+        "validity_period": "Current product lifecycle version",
+        "mandatory_inclusions": [
+          "Risk management plan and comprehensive Failure Mode Effects Analysis (FMEA)",
+          "Pre-mitigation and post-mitigation risk severity/probability matrices",
+          "Risk-benefit analysis conclusion signed by qualified authority"
+        ],
+        "critical_pitfalls": [
+          "Submitting an outdated risk assessment omitting post-marketing complaint data.",
+          "Unmitigated risks remaining in unacceptable hazard regions."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.10",
+      "slot_number": "10.10",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Verification and Validation of the Medical Device",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.2",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_2_OVERVIEW",
+      "guidance": {
+        "what_it_is": "Master verification and validation summary covering bench mechanical testing, electrical safety, EMC, and environmental durability.",
+        "why_it_is_needed": "Primary engineering proof confirming physical device conforms to design specifications under stress conditions.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.2",
+        "who_issues": "Accredited Laboratory (NABL / GLP / ILAC) or Manufacturer Test Lab",
+        "validity_period": "Current device configuration",
+        "mandatory_inclusions": [
+          "Test protocols, acceptance criteria, raw data curves, and final results",
+          "IEC 60601-1 (Electrical Safety) and IEC 60601-1-2 (EMC) test reports (if active/powered)",
+          "Mechanical fatigue, burst strength, and tensile test records"
+        ],
+        "critical_pitfalls": [
+          "Submitting summaries without complete underlying test laboratory reports.",
+          "Tests performed on non-sterilized or non-production-equivalent prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.11",
+      "slot_number": "10.11",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Biocompatibility Validation Data",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.2",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_2",
+      "guidance": {
+        "what_it_is": "Biological evaluation report documenting cytotoxicity, sensitization, irritation, and systemic toxicity per ISO 10993 series.",
+        "why_it_is_needed": "Demonstrates device patient-contact safety without toxic leaching or biological incompatibility.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.2 & ISO 10993-1",
+        "who_issues": "GLP-accredited testing laboratory or certified toxicologist",
+        "validity_period": "Perpetual unless material formulation or manufacturing process changes",
+        "mandatory_inclusions": [
+          "GLP compliance statement from accredited testing laboratory",
+          "Sample preparation extraction conditions (polar and non-polar solvents)",
+          "Endpoints evaluated matching device contact category and duration per ISO 10993-1"
+        ],
+        "critical_pitfalls": [
+          "Submitting testing on raw resin pellets rather than finished, sterilized devices.",
+          "Testing conducted by non-GLP accredited facility."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.12",
+      "slot_number": "10.12",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Medicinal Substances Data (if device contains Drug)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.3",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_3",
+      "guidance": {
+        "what_it_is": "Scientific dossier on ancillary medicinal substance incorporated in the medical device (e.g. drug-eluting stent, antimicrobial catheter).",
+        "why_it_is_needed": "Allows statutory consultation between Medical Device division and Central Drug Standard Control Organization pharmaceutical reviewers.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.3",
+        "who_issues": "Drug Manufacturer / Active Pharmaceutical Ingredient (API) Supplier",
+        "validity_period": "Current Drug Master File (DMF) version",
+        "mandatory_inclusions": [
+          "Proof of qualitative and quantitative API composition",
+          "Drug elution kinetic profile and in vitro release curves",
+          "Compatibility and stability of drug in combined matrix"
+        ],
+        "critical_pitfalls": [
+          "Missing Drug Master File (DMF) accession letter from API manufacturer."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "has_medicinal_substance",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "10.13",
+      "slot_number": "10.13",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Biological Safety (TSE/BSE Animal Tissue)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.4",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD", "GENERATE"],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "non_commercial_undertaking",
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_4",
+      "guidance": {
+        "what_it_is": "Risk assessment and viral/prion inactivation validation for devices containing materials of animal or human origin (ISO 22442).",
+        "why_it_is_needed": "Ensures elimination of Transmissible Spongiform Encephalopathies (TSE/BSE) risks in biological tissues.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.4 & ISO 22442",
+        "who_issues": "Tissue Source Supplier / Qualified Virologist / Manufacturer",
+        "validity_period": "Current veterinary source certificate",
+        "mandatory_inclusions": [
+          "Source animal origin, geographic sourcing, and veterinary health certs",
+          "Viral clearance and prion inactivation validation studies",
+          "Alternatively, Non-Animal Origin Declaration if synthetic"
+        ],
+        "critical_pitfalls": [
+          "Sourcing tissues from countries not classified as negligible BSE risk."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "field": "has_animal_origin",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "10.14",
+      "slot_number": "10.14",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Sterilization Validation Data",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.5",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_5",
+      "guidance": {
+        "what_it_is": "Sterilization validation study report establishing Sterility Assurance Level (SAL 10^-6) in accordance with ISO 11135 or ISO 11137.",
+        "why_it_is_needed": "Mandatory proof that sterile devices are free from viable microorganisms and ethylene oxide (EO) residual limits comply with ISO 10993-7.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.5",
+        "who_issues": "Sterilization Facility / Accredited Microbiology Laboratory",
+        "validity_period": "Annual re-validation audit or upon sterilization cycle alteration",
+        "mandatory_inclusions": [
+          "Sterilization method (EO, Gamma Irradiation, E-Beam, Moist Heat)",
+          "Bioburden testing and fractional cycle sublethal lethality runs",
+          "Sterile barrier packaging validation per ISO 11607-1/2 (dye penetration, burst, peel)",
+          "Ethylene oxide and ethylene chlorohydrin residual test data (for EO sterilization)"
+        ],
+        "critical_pitfalls": [
+          "Packaging integrity test omitted after simulated shipping transit.",
+          "EO residuals exceeding statutory limits permitted by ISO 10993-7."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "is_sterile",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "10.15",
+      "slot_number": "10.15",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Software Verification and Validation",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.6",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_6",
+      "guidance": {
+        "what_it_is": "Software lifecycle documentation, architecture diagrams, cybersecurity risk assessment, and verification reports per IEC 62304.",
+        "why_it_is_needed": "Ensures Software as a Medical Device (SaMD) and embedded firmware function reliably without algorithmic flaws or cyber vulnerabilities.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.6 & IEC 62304",
+        "who_issues": "Software Engineering & Cybersecurity Verification Teams",
+        "validity_period": "Current major software version / build release",
+        "mandatory_inclusions": [
+          "Software Safety Classification (Class A, B, or C) per IEC 62304",
+          "Software Architecture & Software Requirements Specification (SRS)",
+          "Cybersecurity threat modeling and vulnerability patch protocol",
+          "Traceability matrix linking software requirements to test cases"
+        ],
+        "critical_pitfalls": [
+          "Missing software version release history or unexplained unresolved anomalies."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "has_software",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "10.16",
+      "slot_number": "10.16",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Animal Studies Preclinical Data",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.7",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_7",
+      "guidance": {
+        "what_it_is": "In vivo pre-clinical animal study reports evaluating functional tissue remodeling, implant placement, and physiological compatibility.",
+        "why_it_is_needed": "Substantiates safety and preliminary performance in living models prior to human clinical exposure.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.7",
+        "who_issues": "GLP Pre-clinical CRO / Institutional Animal Ethics Committee (IAEC)",
+        "validity_period": "Permanent design record",
+        "mandatory_inclusions": [
+          "Animal ethics committee approval documentation",
+          "Study protocol, animal model rationale, and histology / pathology slides",
+          "Statistical evaluation of in vivo performance"
+        ],
+        "critical_pitfalls": [
+          "Animal studies performed in non-GLP accredited facilities without ethics committee approval."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "has_animal_studies",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "10.17",
+      "slot_number": "10.17",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Stability Study Data (Real-time and Accelerated)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.8",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_8",
+      "guidance": {
+        "what_it_is": "Real-time and accelerated stability study reports validating physical, chemical, and packaging integrity over the claimed shelf-life.",
+        "why_it_is_needed": "Statutory basis supporting the expiration date printed on commercial device labels.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.8 & ASTM F1980",
+        "who_issues": "Manufacturer Quality Control Laboratory",
+        "validity_period": "Full claimed shelf-life duration (e.g. 3 years or 5 years)",
+        "mandatory_inclusions": [
+          "Arrhenius equation acceleration factors and temperature/humidity conditions (e.g. 55°C / 75% RH)",
+          "Testing across minimum 3 distinct production lots",
+          "Package seal strength and sterile barrier testing at all time intervals"
+        ],
+        "critical_pitfalls": [
+          "Claiming a 5-year shelf life based solely on ongoing accelerated testing without interim data.",
+          "Testing on non-production-standard packaging."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.18",
+      "slot_number": "10.18",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Clinical Evidence / Clinical Evaluation Report (CER)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.9 & Chapter VII",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_9",
+      "guidance": {
+        "what_it_is": "Comprehensive Clinical Evaluation Report (CER) synthesizing clinical investigation data and peer-reviewed scientific literature.",
+        "why_it_is_needed": "Demonstrates clinical safety, clinical performance, and acceptable risk-benefit profile in the target patient population.",
+        "official_citation": "MDR 2017 Chapter VII & Fourth Schedule Part III Clause 6.9",
+        "who_issues": "Certified Clinical Regulatory Evaluator / Medical Director",
+        "validity_period": "Updated annually (Class C/D) or biennially (Class A/B)",
+        "mandatory_inclusions": [
+          "Systematic literature review search protocol, inclusion/exclusion criteria, and appraisal",
+          "Analysis of clinical investigations conducted worldwide",
+          "Clinical evaluator curriculum vitae and signed declaration of objectivity"
+        ],
+        "critical_pitfalls": [
+          "Submitting superficial literature reviews that omit known adverse complications.",
+          "Evaluating off-label clinical uses not matching the statutory IFU."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.19",
+      "slot_number": "10.19",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Post Marketing Surveillance Data (Vigilance Reporting)",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.10",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_10",
+      "guidance": {
+        "what_it_is": "Periodic Safety Update Report (PSUR) and global post-marketing vigilance log summarizing complaints, recalls, and Field Safety Notices.",
+        "why_it_is_needed": "Demonstrates that active surveillance is maintained and device malfunction rates in the field remain within acceptable risk bounds.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.10 & Rule 88",
+        "who_issues": "Manufacturer Post-Market Vigilance Team",
+        "validity_period": "Cumulative data covering preceding 3 to 5 years",
+        "mandatory_inclusions": [
+          "Global distribution sales volume vs total reported adverse events ratio",
+          "Summary of Field Safety Corrective Actions (FSCAs) and recalls",
+          "Trend analysis and corrective/preventive actions (CAPA) implemented"
+        ],
+        "critical_pitfalls": [
+          "Concealing foreign market recalls or regulatory warning notices.",
+          "Missing adverse event complaint rate calculations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "10.20",
+      "slot_number": "10.20",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "Batch Release Certificates or Certificate of Analysis for 3 Consecutive Batches",
+      "statutory_rule": "Fourth Schedule Part III Clause 6.11",
+      "is_mandatory": true,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": "DMF_6_11",
+      "guidance": {
+        "what_it_is": "Finished product Certificates of Analysis (CoAs) from 3 consecutive commercial manufacturing batches (or Software Version Release Certificate).",
+        "why_it_is_needed": "Demonstrates manufacturing consistency, parameter control, and release testing conformance across production lots.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III Clause 6.11",
+        "who_issues": "Manufacturer Quality Assurance & Release Chemist",
+        "validity_period": "Commercial release records",
+        "mandatory_inclusions": [
+          "Batch numbers, manufacturing dates, and expiration dates",
+          "All finished device release testing parameters and quantitative results",
+          "Quality Assurance Manager approval signature and date"
+        ],
+        "critical_pitfalls": [
+          "Submitting CoAs from non-consecutive or laboratory experimental batches.",
+          "Results reported as 'Complies' without quantitative test values."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "11.0",
+      "slot_number": "11.0",
+      "category": "SUPPLEMENTARY",
+      "title": "Any Other Additional Documents",
+      "statutory_rule": "MDR 2017 General",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Supplementary documents, non-commercial undertakings, distributor authorizations, or regulatory clarification letters.",
+        "why_it_is_needed": "Allows applicant to address specific statutory queries, previous rejection observations, or ancillary certifications.",
+        "official_citation": "MDR 2017 Discretionary",
+        "who_issues": "Applicant / Foreign Manufacturer",
+        "validity_period": "Current submission",
+        "mandatory_inclusions": [
+          "Clear explanatory note stating the purpose of each attached exhibit"
+        ],
+        "critical_pitfalls": [
+          "Uploading unorganized or redundant files that do not directly pertain to statutory requirements."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE"
+      }
+    },
+    {
+      "slot_id": "12.0",
+      "slot_number": "12.0",
+      "category": "REGULATORY_APPROVALS",
+      "title": "Copy of Permission in Form MD-27 (in case of Investigational Medical Device)",
+      "statutory_rule": "Rule 34 & Chapter VII",
+      "is_mandatory": false,
+      "fulfillment_modes": ["UPLOAD"],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": ["application/pdf"],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Official approval permission in Form MD-27 issued by the Central Licensing Authority for investigational medical devices.",
+        "why_it_is_needed": "Statutory prerequisite for devices without predicate or approved clinical history in India requiring local clinical trial clearance.",
+        "official_citation": "MDR 2017 Rule 34 & Rule 59 (Form MD-27)",
+        "who_issues": "Drugs Controller General (India), CDSCO HQ New Delhi",
+        "validity_period": "Valid as specified on Form MD-27",
+        "mandatory_inclusions": [
+          "Official Form MD-27 permission certificate number and date",
+          "Subject Expert Committee (SEC) recommendation endorsement",
+          "Approved clinical trial protocol identification"
+        ],
+        "critical_pitfalls": [
+          "Applying for commercial import licence without prior Form MD-27 clearance for novel investigational devices."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "field": "is_investigational",
+        "operator": "EQUALS",
+        "value": true
+      }
+    }
+  ]
+}
