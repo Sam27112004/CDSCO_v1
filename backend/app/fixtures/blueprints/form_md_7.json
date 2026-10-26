@@ -1,0 +1,1962 @@
+{
+  "form_code": "MD-7",
+  "form_title": "Application for Grant of Licence to Manufacture for Sale or for Distribution of Class C or Class D Medical Device",
+  "version": "1.0",
+  "governing_rules": [
+    "Rule 20(1)",
+    "Rule 21",
+    "Rule 26",
+    "Fourth Schedule (Part II, III)",
+    "Fifth Schedule"
+  ],
+  "slots": [
+    {
+      "slot_id": "1.0",
+      "slot_number": "1.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Covering Letter",
+      "statutory_rule": "Rule 20(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD",
+        "GENERATE"
+      ],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "covering_letter",
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Formal statutory application letter addressed to the Central Licensing Authority (DCGI).",
+        "why_it_is_needed": "Formally requests grant of Class C or Class D medical device manufacturing licence.",
+        "official_citation": "MDR 2017 Rule 20(1)",
+        "who_issues": "Authorized Signatory / Managing Director of domestic manufacturing firm",
+        "validity_period": "Current (dated within 30 days of submission)",
+        "mandatory_inclusions": [
+          "Applied device commercial names and generic descriptions",
+          "Assigned risk classification (Class C or Class D)",
+          "Physical address of domestic manufacturing facility",
+          "BharatKosh statutory fee payment reference"
+        ],
+        "critical_pitfalls": [
+          "Applying for Class A or Class B devices under Form MD-7 (jurisdiction of State Licensing Authority).",
+          "Missing authorized signatory corporate stamp."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "2.0",
+      "slot_number": "2.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Application (Form MD-7 Execution)",
+      "statutory_rule": "Rule 20(1), Form MD-7",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD",
+        "GENERATE"
+      ],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "form_md_7",
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Statutory application pro-forma Form MD-7 for licence to manufacture Class C or Class D medical devices.",
+        "why_it_is_needed": "Legal basis for grant of commercial manufacturing licence in Form MD-9.",
+        "official_citation": "MDR 2017 Rule 20(1), Form MD-7",
+        "who_issues": "Domestic Manufacturer Authorized Signatory",
+        "validity_period": "Current submission",
+        "mandatory_inclusions": [
+          "Name and corporate address of applicant firm",
+          "Physical manufacturing and testing premises address",
+          "Names, chemical compositions, and intended use of applied devices",
+          "Technical staff appointment references"
+        ],
+        "critical_pitfalls": [
+          "Product description discrepancies between Form MD-7 and Device Master File."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "3.0",
+      "slot_number": "3.0",
+      "category": "ADMINISTRATIVE",
+      "title": "Fee Challan",
+      "statutory_rule": "Rule 20(1) & Second Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Treasury payment receipt generated from BharatKosh portal (Non-Tax Receipt Portal).",
+        "why_it_is_needed": "Mandatory statutory fee deposit for manufacturing site inspection and product evaluation.",
+        "official_citation": "MDR 2017 Second Schedule, Rule 20(1)",
+        "who_issues": "Government of India BharatKosh Portal (bharatkosh.gov.in)",
+        "validity_period": "Current transaction receipt",
+        "mandatory_inclusions": [
+          "BharatKosh Transaction Reference ID",
+          "Head of Account 0210 - Medical and Public Health",
+          "CDSCO Drawing and Disbursing Officer (DDO) code",
+          "Calculated fee covering site licence and distinct device models"
+        ],
+        "critical_pitfalls": [
+          "Paying under incorrect DDO or State Licensing Authority head."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "4.0",
+      "slot_number": "4.0",
+      "category": "LEGAL_ELIGIBILITY",
+      "title": "Constitution Details of the Firm",
+      "statutory_rule": "Rule 20(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Constitutional legal documents defining corporate ownership, shareholding, and authorized signatories.",
+        "why_it_is_needed": "Validates that the manufacturing entity is legally incorporated under Indian corporate law.",
+        "official_citation": "MDR 2017 Rule 20(1)",
+        "who_issues": "Ministry of Corporate Affairs (ROC) / Registrar of Firms",
+        "validity_period": "Perpetual (reflecting latest active directorship)",
+        "mandatory_inclusions": [
+          "Certificate of Incorporation (CIN / LLPIN)",
+          "Memorandum & Articles of Association (MoA & AoA) / Partnership Deed",
+          "Current List of Directors with DIN numbers",
+          "Board Resolution empowering designated signing officer"
+        ],
+        "critical_pitfalls": [
+          "Discrepancies in corporate registered address or unauthorized signatory resolution."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "5.0",
+      "slot_number": "5.0",
+      "category": "LEGAL_ELIGIBILITY",
+      "title": "Premises / Site Ownership Deed or Tenancy Agreement",
+      "statutory_rule": "Rule 20(1)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Registered title deed, land allotment letter, or registered lease/tenancy agreement of manufacturing premises.",
+        "why_it_is_needed": "Proves undisputed legal possession of the physical plant where manufacturing will take place.",
+        "official_citation": "MDR 2017 Rule 20(1)",
+        "who_issues": "Sub-Registrar of Assurances / Industrial Development Corporation (SIDC/GIDC/MIDC)",
+        "validity_period": "Active lease tenure (minimum remaining validity covering licence evaluation)",
+        "mandatory_inclusions": [
+          "Physical plot number, industrial estate, and geographic boundaries",
+          "Registered lease agreement with clear industrial manufacturing permitted use",
+          "Municipal / Pollution Control Board consent to establish (CTE)"
+        ],
+        "critical_pitfalls": [
+          "Unregistered lease deed or residential/commercial non-industrial zoning."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.1",
+      "slot_number": "6.1",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 1: General Information of the Facility",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 1)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_1_0",
+      "guidance": {
+        "what_it_is": "General corporate overview, site location, surrounding environment, and manufacturing activities.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.2",
+      "slot_number": "6.2",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 2: Personnel - Organisation Chart",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 2)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_2_0",
+      "guidance": {
+        "what_it_is": "Corporate organogram depicting reporting hierarchy and quality control independence.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.3",
+      "slot_number": "6.3",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 3: Personnel - Technical Staff Qualifications (Rule 26)",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 3)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_2_1",
+      "guidance": {
+        "what_it_is": "Academic degrees, pharmacy/engineering certificates, and appointment letters for Production and QA In-Charges.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.4",
+      "slot_number": "6.4",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 4: Premises and Facilities Overview",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 4)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_4_0",
+      "guidance": {
+        "what_it_is": "Detailed description of construction materials, surface finishes, drainage, and utilities.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.5",
+      "slot_number": "6.5",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 5: Plant Layout of Premise with Scale",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 5)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_4_1",
+      "guidance": {
+        "what_it_is": "Architectural CAD layout drawing indicating classified cleanrooms (ISO 7/8), airlocks, material flow, and personnel gowning cascades.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.6",
+      "slot_number": "6.6",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 6: Equipment and Instruments List",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 6)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_5_0",
+      "guidance": {
+        "what_it_is": "Comprehensive equipment inventory for manufacturing, in-process testing, calibration status, and IQ/OQ/PQ records.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.7",
+      "slot_number": "6.7",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 7: Sanitation and Hygiene Protocols",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 7)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_6_0",
+      "guidance": {
+        "what_it_is": "Cleanroom garmenting procedures, personnel health screening, hygiene rules, and cleaning validation.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.8",
+      "slot_number": "6.8",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 8: Production Operations and Controls",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 8)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_7_0",
+      "guidance": {
+        "what_it_is": "Flowcharts of manufacturing operations, segregation of sterile/non-sterile steps, and line clearance protocols.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.9",
+      "slot_number": "6.9",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 9: Quality Assurance Operations",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 9)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_8_0",
+      "guidance": {
+        "what_it_is": "Quality control testing procedures, analytical release testing, sampling plans, and batch record review.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.10",
+      "slot_number": "6.10",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 10: Storage and Warehousing",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 10)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_9_0",
+      "guidance": {
+        "what_it_is": "Quarantine areas, raw material storage conditions, temperature/humidity monitoring, and rejected materials control.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "6.11",
+      "slot_number": "6.11",
+      "category": "TECHNICAL_DOSSIER_PMF",
+      "title": "PMF Part 11: Documentation System",
+      "statutory_rule": "Fourth Schedule Part II (Appendix I, Clause 11)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "PMF_10_0",
+      "guidance": {
+        "what_it_is": "Standard Operating Procedure (SOP) index, change control system, master formula records, and archive policies.",
+        "why_it_is_needed": "Statutory evaluation of manufacturing site capability and GMP compliance prior to CDSCO physical site inspection.",
+        "official_citation": "MDR 2017 Fourth Schedule Part II (Appendix I)",
+        "who_issues": "Plant Operations / Quality Assurance Leadership",
+        "validity_period": "Current operational facility baseline",
+        "mandatory_inclusions": [
+          "Exact physical facility address",
+          "Authorizing signatures and date",
+          "Direct reference to validated procedures"
+        ],
+        "critical_pitfalls": [
+          "Discrepancy between plant layout drawings and actual cleanroom differential pressure cascade."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.1",
+      "slot_number": "7.1",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Fifth Schedule Compliance Undertaking",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD",
+        "GENERATE"
+      ],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "fifth_schedule_undertaking",
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_1",
+      "guidance": {
+        "what_it_is": "Statutory legal undertaking affirming full operational compliance with Fifth Schedule QMS.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.2",
+      "slot_number": "7.2",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Quality Manual",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_2",
+      "guidance": {
+        "what_it_is": "Corporate Quality Manual defining QMS scope, process interactions, and exclusions.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.3",
+      "slot_number": "7.3",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Control of Documents",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_3",
+      "guidance": {
+        "what_it_is": "SOP governing creation, revision, approval, and distribution of statutory records.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.4",
+      "slot_number": "7.4",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Control of Records",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_4",
+      "guidance": {
+        "what_it_is": "SOP and retention schedule ensuring records remain legible, identifiable, and retrievable for 5+ years.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.5",
+      "slot_number": "7.5",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Management Responsibility",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_5",
+      "guidance": {
+        "what_it_is": "Executive management commitment, quality policy, and management review meeting records.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.6",
+      "slot_number": "7.6",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Resource Management",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_6",
+      "guidance": {
+        "what_it_is": "Infrastructure maintenance, competency training matrices, and work environment controls.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.7",
+      "slot_number": "7.7",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Control of Production and Service Provision",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_7",
+      "guidance": {
+        "what_it_is": "Standardized operating work instructions, batch production records, and equipment maintenance.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.8",
+      "slot_number": "7.8",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Internal Audit System",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_8",
+      "guidance": {
+        "what_it_is": "Annual internal audit schedule, auditor qualification records, and closure of non-conformances.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.9",
+      "slot_number": "7.9",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Control of Nonconforming Product",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_9",
+      "guidance": {
+        "what_it_is": "Identification, segregation, disposition, and rework procedures for non-conforming items.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.10",
+      "slot_number": "7.10",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Corrective and Preventive Action (CAPA)",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_10",
+      "guidance": {
+        "what_it_is": "Root cause analysis methodology, verification of corrective action effectiveness, and risk updating.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "7.11",
+      "slot_number": "7.11",
+      "category": "QUALITY_MANAGEMENT_SYSTEM",
+      "title": "QMS: Environmental Requirement Table (Annexure A of Fifth Schedule)",
+      "statutory_rule": "MDR 2017 Fifth Schedule",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "QMS_7_11",
+      "guidance": {
+        "what_it_is": "Cleanroom classification table specifying airborne particulate limits, microbial air/surface counts, and pressure differentials.",
+        "why_it_is_needed": "Demonstrates establishment of an accredited Quality Management System compliant with Fifth Schedule of MDR 2017.",
+        "official_citation": "MDR 2017 Fifth Schedule",
+        "who_issues": "Head of Quality Assurance",
+        "validity_period": "Current active QMS procedure",
+        "mandatory_inclusions": [
+          "Document control number, version number, and approval signatures",
+          "Detailed procedural workflow and operational forms",
+          "Compliance with ISO 13485:2016 principles"
+        ],
+        "critical_pitfalls": [
+          "Submitting generic uncustomized ISO templates that do not reflect actual site operations."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.1",
+      "slot_number": "8.1",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 1: Executive Summary",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 1)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_1_0",
+      "guidance": {
+        "what_it_is": "Concise technical summary of medical device, design principles, risk profile, and commercial intent.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.2",
+      "slot_number": "8.2",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 2: Descriptive Information of the Device",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 2)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_2_0",
+      "guidance": {
+        "what_it_is": "Detailed engineering description, operating principles, physical dimensions, and material compositions.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.3",
+      "slot_number": "8.3",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 3: Justification for Medical Device Grouping",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 3)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_3_0",
+      "guidance": {
+        "what_it_is": "Scientific rationale grouping applied variants under single Class C/D application per CDSCO grouping norms.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.4",
+      "slot_number": "8.4",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 4: Product Specification (Variants, Accessories)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 4)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_4_0",
+      "guidance": {
+        "what_it_is": "Tabular specification of catalogue numbers, physical tolerances, shelf-life, and included accessories.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.5",
+      "slot_number": "8.5",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 5: Substantial Equivalence / Predicate Comparison",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 5)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_5_0",
+      "guidance": {
+        "what_it_is": "Side-by-side technological comparison table against approved Indian or foreign predicate device.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.6",
+      "slot_number": "8.6",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 6: Labelling Information (Labels, Carton Artwork, IFU)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 6)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_0",
+      "guidance": {
+        "what_it_is": "Artwork files for primary packaging labels, cartons, blister packs, and Instructions for Use per Chapter VI.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.7",
+      "slot_number": "8.7",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 7: Device Design and Manufacturing Information",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 7)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_7_0",
+      "guidance": {
+        "what_it_is": "Step-by-step manufacturing process flowchart, in-process quality control gates, and sub-assembly validation.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.8",
+      "slot_number": "8.8",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 8: Essential Principles Checklist (EPSP)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 8)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD",
+        "GENERATE"
+      ],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "essential_principles",
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_8_0",
+      "guidance": {
+        "what_it_is": "Statutory matrix evaluating compliance with Safety and Performance Principles per Fourth Schedule Appendix II.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.9",
+      "slot_number": "8.9",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 9: Risk Analysis and Control Summary (ISO 14971)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 9)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_1",
+      "guidance": {
+        "what_it_is": "Risk management file, hazard identification, FMEA risk matrix, and risk-benefit analysis conclusion.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.10",
+      "slot_number": "8.10",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 10: Verification and Validation of the Device",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 10)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_2_OVERVIEW",
+      "guidance": {
+        "what_it_is": "Comprehensive bench testing summary, tensile/fatigue test curves, electrical safety (IEC 60601-1), and EMC.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.11",
+      "slot_number": "8.11",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 11: Biocompatibility Validation Data (ISO 10993)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 11)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_2",
+      "guidance": {
+        "what_it_is": "Biological safety evaluation reports: cytotoxicity, sensitization, irritation, and systemic toxicity.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.12",
+      "slot_number": "8.12",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 12: Medicinal Substances Data (Combination Device)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 12)",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_3",
+      "guidance": {
+        "what_it_is": "Pharmacological dossier for devices incorporating active pharmaceutical ingredients (APIs).",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": null,
+        "field": "has_medicinal_substance",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "8.13",
+      "slot_number": "8.13",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 13: Biological Safety (TSE/BSE)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 13)",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD",
+        "GENERATE"
+      ],
+      "default_fulfillment_mode": "GENERATE",
+      "template_key": "non_commercial_undertaking",
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_4",
+      "guidance": {
+        "what_it_is": "Viral clearance, prion inactivation, or synthetic non-animal origin undertaking for devices with biological materials.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": true
+      },
+      "applicability_rule": {
+        "condition": null,
+        "field": "has_animal_origin",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "8.14",
+      "slot_number": "8.14",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 14: Sterilization Validation Data",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 14)",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_5",
+      "guidance": {
+        "what_it_is": "Sterilization study report establishing SAL 10^-6 (ISO 11135 / ISO 11137) and packaging seal integrity (ISO 11607).",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": null,
+        "field": "is_sterile",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "8.15",
+      "slot_number": "8.15",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 15: Software Verification and Validation (IEC 62304)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 15)",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_6",
+      "guidance": {
+        "what_it_is": "Software lifecycle architecture, SRS, cybersecurity threat modeling, and code verification reports.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": null,
+        "field": "has_software",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "8.16",
+      "slot_number": "8.16",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 16: Animal Studies Preclinical Data",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 16)",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_7",
+      "guidance": {
+        "what_it_is": "In vivo animal study reports evaluating functional tissue integration and physiological response.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": null,
+        "field": "has_animal_studies",
+        "operator": "EQUALS",
+        "value": true
+      }
+    },
+    {
+      "slot_id": "8.17",
+      "slot_number": "8.17",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 17: Stability Study Data (Real-time & Accelerated)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 17)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_8",
+      "guidance": {
+        "what_it_is": "Real-time and accelerated stability study reports validating claimed expiration date under ASTM F1980.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.18",
+      "slot_number": "8.18",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 18: Clinical Evidence / Evaluation Report (CER)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 18)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_9",
+      "guidance": {
+        "what_it_is": "Literature-based CER synthesizing published clinical investigations, state-of-the-art appraisal, and safety endpoints.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.19",
+      "slot_number": "8.19",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 19: Post-Marketing Surveillance Data & Vigilance",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 19)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_10",
+      "guidance": {
+        "what_it_is": "Vigilance complaint log, CAPA records, and field safety notices from existing commercial distribution.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "8.20",
+      "slot_number": "8.20",
+      "category": "TECHNICAL_DOSSIER_DMF",
+      "title": "DMF Part 20: Batch Release Certificates (3 Consecutive Batches)",
+      "statutory_rule": "Fourth Schedule Part III (Appendix II, Clause 20)",
+      "is_mandatory": true,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": "DMF_6_11",
+      "guidance": {
+        "what_it_is": "Finished device release testing Certificates of Analysis (CoAs) from 3 consecutive commercial production lots.",
+        "why_it_is_needed": "Statutory technical file requirement demonstrating design safety, manufacturing reproducibility, and clinical benefit.",
+        "official_citation": "MDR 2017 Fourth Schedule Part III (Appendix II)",
+        "who_issues": "R&D / Quality Assurance / Regulatory Affairs",
+        "validity_period": "Current design version",
+        "mandatory_inclusions": [
+          "Raw quantitative test curves and acceptance criteria",
+          "Authorizing signatures of qualified technical personnel",
+          "Traceability to statutory device trade names"
+        ],
+        "critical_pitfalls": [
+          "Summaries without underlying test laboratory reports.",
+          "Testing performed on non-production-standard prototypes."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    },
+    {
+      "slot_id": "9.0",
+      "slot_number": "9.0",
+      "category": "SUPPLEMENTARY",
+      "title": "Any Other Additional Documents (including Test Licence MD-13 / MD-27 permissions)",
+      "statutory_rule": "MDR 2017 General",
+      "is_mandatory": false,
+      "fulfillment_modes": [
+        "UPLOAD"
+      ],
+      "default_fulfillment_mode": "UPLOAD",
+      "template_key": null,
+      "max_size_mb": 10.0,
+      "allowed_mimes": [
+        "application/pdf"
+      ],
+      "dossier_chapter": null,
+      "guidance": {
+        "what_it_is": "Supplementary attachments, Form MD-13 test licence records, or Form MD-27 permissions.",
+        "why_it_is_needed": "Accommodates ancillary documents or specific clarifications requested by CDSCO evaluators.",
+        "official_citation": "MDR 2017 Discretionary",
+        "who_issues": "Applicant Domestic Manufacturer",
+        "validity_period": "Current application",
+        "mandatory_inclusions": [
+          "Explanatory memorandum specifying purpose of attached documents"
+        ],
+        "critical_pitfalls": [
+          "Attaching unreferenced, redundant files."
+        ],
+        "pro_forma_available": false
+      },
+      "applicability_rule": {
+        "condition": "ALWAYS_TRUE",
+        "field": null,
+        "operator": null,
+        "value": null
+      }
+    }
+  ]
+}
