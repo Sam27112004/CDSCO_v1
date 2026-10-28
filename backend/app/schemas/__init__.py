@@ -4,6 +4,9 @@ from app.schemas.definition import (
     SlotGuidance,
     SlotBlueprint,
     FormBlueprint,
+    ChapterGroup,
+    CategorySection,
+    ResolvedSlotHierarchy,
 )
 
 __all__ = [
@@ -12,4 +15,8 @@ __all__ = [
     "SlotGuidance",
     "SlotBlueprint",
     "FormBlueprint",
+    "ChapterGroup",
+    "CategorySection",
+    "ResolvedSlotHierarchy",
 ]
+

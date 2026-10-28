@@ -64,3 +64,40 @@ class FormBlueprint(BaseModel):
     version: str = Field(description="Blueprint version identifier")
     governing_rules: List[str] = Field(description="Governing rules under MDR 2017")
     slots: List[SlotBlueprint] = Field(description="Decomposed discrete checklist slots")
+
+
+class ChapterGroup(BaseModel):
+    """Sub-grouping of technical dossier slots under a specific chapter (e.g. DMF 6.0, PMF 4.0)."""
+
+    chapter_code: str = Field(description="Dossier chapter identifier or code")
+    chapter_title: str = Field(description="Descriptive chapter title")
+    slots: List[SlotBlueprint] = Field(description="Slots belonging to this chapter")
+
+
+class CategorySection(BaseModel):
+    """Statutory taxonomy section grouping related portal slots."""
+
+    category_code: str = Field(description="Category identifier (e.g. ADMINISTRATIVE, TECHNICAL_DOSSIER_DMF)")
+    category_title: str = Field(description="Human-readable section title")
+    display_order: int = Field(description="Sequential ordering index in UI navigation")
+    slots: List[SlotBlueprint] = Field(description="All slots under this category in sequential order")
+    chapters: List[ChapterGroup] = Field(
+        default_factory=list, description="Subdivided chapter groups if technical dossier"
+    )
+    total_slots_count: int = Field(description="Total slot count in this category")
+    mandatory_slots_count: int = Field(description="Number of mandatory slots in this category")
+
+
+class ResolvedSlotHierarchy(BaseModel):
+    """Hierarchical slot tree resolved for workspace navigation and dossier assembly."""
+
+    form_code: str = Field(description="Statutory form code (e.g. MD-14, MD-7)")
+    form_title: str = Field(description="Official CDSCO form title")
+    version: str = Field(description="Blueprint version identifier")
+    governing_rules: List[str] = Field(description="Governing statutory rules")
+    total_slots: int = Field(description="Total slots count in the blueprint")
+    mandatory_slots: int = Field(description="Total mandatory slots count")
+    upload_only_slots: int = Field(description="Slots requiring external binary upload")
+    generatable_slots: int = Field(description="Slots supporting in-app template generation")
+    sections: List[CategorySection] = Field(description="Ordered statutory categories with nested slots")
+

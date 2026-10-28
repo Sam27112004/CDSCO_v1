@@ -12,7 +12,7 @@ if str(backend_path) not in sys.path:
 
 from app.main import app
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import AsyncSessionLocal, get_db
 
 
 @pytest_asyncio.fixture
@@ -21,3 +21,14 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
+
+
+@pytest_asyncio.fixture
+async def db_session() -> AsyncGenerator:
+    """Provides an isolated async database session rolled back after each test."""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.rollback()
+
