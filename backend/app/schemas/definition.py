@@ -7,8 +7,11 @@ class ApplicabilityRule(BaseModel):
 
     condition: Optional[Literal["ALWAYS_TRUE", "ALWAYS_FALSE"]] = None
     field: Optional[str] = None
-    operator: Optional[Literal["EQUALS", "NOT_EQUALS", "IN", "NOT_IN"]] = None
+    operator: Optional[
+        Literal["EQUALS", "NOT_EQUALS", "IN", "NOT_IN", "GREATER_THAN", "LESS_THAN"]
+    ] = None
     value: Optional[Any] = None
+
 
 
 class SlotGuidance(BaseModel):

@@ -8,6 +8,11 @@ from app.schemas.definition import (
     CategorySection,
     ResolvedSlotHierarchy,
 )
+from app.schemas.context import (
+    RegulatoryContext,
+    IVDParameters,
+    EvaluatedSlot,
+)
 
 __all__ = [
     "HealthResponse",
@@ -18,5 +23,9 @@ __all__ = [
     "ChapterGroup",
     "CategorySection",
     "ResolvedSlotHierarchy",
+    "RegulatoryContext",
+    "IVDParameters",
+    "EvaluatedSlot",
 ]
+
 
