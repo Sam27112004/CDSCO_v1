@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.2.4: Build `RulesEngine` predicate evaluator to activate/deactivate slots based on `regulatory_context` (2026-10-28 15:00 IST | `RulesEngine` statutory guardrails, dynamic slot activation, and unit test coverage)
-* **Next Active Sub-Task:** **Task 1.3.1: Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`).**
+* **Last Completed Sub-Task:** Task 1.3.1: Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`) (2026-11-01 11:06 IST | `StorageProvider` abstract interface, path sanitization, and unit tests)
+* **Next Active Sub-Task:** **Task 1.3.2: Implement `LocalStorageProvider` writing to `./storage/submissions/{id}/...`.**
 
 ---
 
@@ -36,8 +36,7 @@
 - [x] **1.2.4:** Build `RulesEngine` predicate evaluator to activate/deactivate slots based on `regulatory_context`.
 
 ### Task 1.3: Abstract Storage Provider Architecture
-- [ ] **1.3.1:** Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`).
-
+- [x] **1.3.1:** Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`).
 - [ ] **1.3.2:** Implement `LocalStorageProvider` writing to `./storage/submissions/{id}/...`.
 - [ ] **1.3.3:** Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO.
 - [ ] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.

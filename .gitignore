@@ -21,9 +21,9 @@ htmlcov/
 .env.*.local
 
 # Storage & artifacts
-storage/
-uploads/
-scratch/
+/storage/
+/uploads/
+/scratch/
 *.log
 
 # Node & Next.js
