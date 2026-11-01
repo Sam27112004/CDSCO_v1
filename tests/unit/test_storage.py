@@ -2,6 +2,9 @@ import io
 from typing import BinaryIO, Union
 import pytest
 
+from unittest.mock import MagicMock
+from botocore.exceptions import ClientError
+
 from app.services.storage.base import (
     StorageError,
     StorageFileNotFoundError,
@@ -9,6 +12,7 @@ from app.services.storage.base import (
     StorageProvider,
 )
 from app.services.storage.local import LocalStorageProvider
+from app.services.storage.s3 import S3StorageProvider
 
 
 def test_storage_provider_cannot_be_instantiated_directly():
@@ -286,5 +290,179 @@ def test_local_storage_path_traversal_rejection(tmp_path):
 
     # exists() safely returns False without raising
     assert provider.exists("../non_existent.txt") is False
+
+
+# ==============================================================================
+# S3StorageProvider Test Suite
+# ==============================================================================
+
+
+def test_s3_storage_provider_init():
+    """Verifies S3StorageProvider initializes with default and custom settings."""
+    # Custom settings with injected mock client
+    mock_client = MagicMock()
+    provider = S3StorageProvider(
+        bucket_name="custom-bucket",
+        region_name="eu-central-1",
+        endpoint_url="https://minio.local:9000",
+        s3_client=mock_client,
+    )
+    assert provider.bucket_name == "custom-bucket"
+    assert provider.region_name == "eu-central-1"
+    assert provider.endpoint_url == "https://minio.local:9000"
+    assert provider.client is mock_client
+
+
+def test_s3_save_file_bytes():
+    """Verifies saving raw bytes via put_object."""
+    mock_client = MagicMock()
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+
+    test_path = "submissions/sub-100/raw/certificate.pdf"
+    test_bytes = b"%PDF-1.4 s3 test content"
+
+    saved_key = provider.save_file(test_bytes, test_path)
+    assert saved_key == test_path
+
+    mock_client.put_object.assert_called_once_with(
+        Bucket="my-bucket",
+        Key=test_path,
+        Body=test_bytes,
+    )
+
+
+def test_s3_save_file_stream():
+    """Verifies saving file-like streams via upload_fileobj."""
+    mock_client = MagicMock()
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+
+    test_path = "submissions/sub-100/generated/dossier.pdf"
+    stream = io.BytesIO(b"binary-stream-data")
+
+    saved_key = provider.save_file(stream, test_path)
+    assert saved_key == test_path
+
+    mock_client.upload_fileobj.assert_called_once_with(
+        Fileobj=stream,
+        Bucket="my-bucket",
+        Key=test_path,
+    )
+
+
+def test_s3_get_file_stream_success():
+    """Verifies retrieving S3 object as a stream."""
+    mock_client = MagicMock()
+    mock_body = io.BytesIO(b"stored-s3-binary")
+    mock_client.get_object.return_value = {"Body": mock_body}
+
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+    stream = provider.get_file_stream("submissions/sub-100/raw/file.pdf")
+
+    assert stream.read() == b"stored-s3-binary"
+    mock_client.get_object.assert_called_once_with(
+        Bucket="my-bucket",
+        Key="submissions/sub-100/raw/file.pdf",
+    )
+
+
+def test_s3_get_file_stream_not_found():
+    """Verifies NoSuchKey raises StorageFileNotFoundError."""
+    mock_client = MagicMock()
+    mock_client.get_object.side_effect = ClientError(
+        {"Error": {"Code": "NoSuchKey", "Message": "The specified key does not exist."}},
+        "GetObject",
+    )
+
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+    with pytest.raises(StorageFileNotFoundError, match="Object not found in S3 bucket"):
+        provider.get_file_stream("submissions/sub-100/missing.pdf")
+
+
+def test_s3_exists_and_get_file_size():
+    """Verifies head_object logic for exists() and get_file_size()."""
+    mock_client = MagicMock()
+    mock_client.head_object.return_value = {"ContentLength": 1024}
+
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+    rel_path = "submissions/sub-100/raw/spec.pdf"
+
+    assert provider.exists(rel_path) is True
+    assert provider.get_file_size(rel_path) == 1024
+
+    # When 404
+    mock_client.head_object.side_effect = ClientError(
+        {"Error": {"Code": "404", "Message": "Not Found"}},
+        "HeadObject",
+    )
+    assert provider.exists("submissions/sub-100/missing.pdf") is False
+    with pytest.raises(StorageFileNotFoundError):
+        provider.get_file_size("submissions/sub-100/missing.pdf")
+
+
+def test_s3_delete_file():
+    """Verifies delete_object logic and non-existent handling."""
+    mock_client = MagicMock()
+    # First file exists
+    mock_client.head_object.return_value = {"ContentLength": 500}
+
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+    rel_path = "submissions/sub-100/raw/temp.pdf"
+
+    assert provider.delete_file(rel_path) is True
+    mock_client.delete_object.assert_called_once_with(
+        Bucket="my-bucket",
+        Key=rel_path,
+    )
+
+    # When file doesn't exist
+    mock_client.head_object.side_effect = ClientError(
+        {"Error": {"Code": "NoSuchKey"}},
+        "HeadObject",
+    )
+    assert provider.delete_file("submissions/sub-100/non_existent.pdf") is False
+
+
+def test_s3_get_file_url():
+    """Verifies pre-signed URL generation and expiry handling."""
+    mock_client = MagicMock()
+    mock_client.head_object.return_value = {"ContentLength": 2048}
+    mock_client.generate_presigned_url.return_value = (
+        "https://my-bucket.s3.ap-south-1.amazonaws.com/test.pdf?X-Amz-Signature=xyz"
+    )
+
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+    rel_path = "submissions/sub-100/raw/test.pdf"
+
+    url = provider.get_file_url(rel_path, expires_in=1800)
+    assert "https://my-bucket.s3.ap-south-1.amazonaws.com" in url
+
+    mock_client.generate_presigned_url.assert_called_once_with(
+        ClientMethod="get_object",
+        Params={"Bucket": "my-bucket", "Key": rel_path},
+        ExpiresIn=1800,
+    )
+
+    # When object not found
+    mock_client.head_object.side_effect = ClientError(
+        {"Error": {"Code": "404"}},
+        "HeadObject",
+    )
+    with pytest.raises(StorageFileNotFoundError):
+        provider.get_file_url("submissions/sub-100/missing.pdf")
+
+
+def test_s3_path_traversal_rejection():
+    """Verifies S3StorageProvider rejects path traversal and absolute paths."""
+    mock_client = MagicMock()
+    provider = S3StorageProvider(bucket_name="my-bucket", s3_client=mock_client)
+
+    with pytest.raises(StorageInvalidPathError):
+        provider.save_file(b"attack", "../evil.pdf")
+
+    with pytest.raises(StorageInvalidPathError):
+        provider.get_file_stream("/absolute/path.pdf")
+
+    assert provider.exists("../secret.txt") is False
+
 
 

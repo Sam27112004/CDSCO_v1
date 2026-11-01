@@ -219,3 +219,4 @@ class LocalStorageProvider(StorageProvider):
             raise StorageError(
                 f"Failed to inspect file size for '{path}': {exc}"
             ) from exc
+

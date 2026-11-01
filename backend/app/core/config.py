@@ -63,5 +63,15 @@ class Settings(BaseSettings):
     STORAGE_DIR: str = "./storage"
     MAX_FILE_SIZE_BYTES: int = 10_485_760  # 10.0 MB CDSCO Portal Ceiling
 
+    # S3 / MinIO / Cloudflare R2 Object Storage Configuration
+    STORAGE_BACKEND: str = "local"  # "local" | "s3"
+    S3_BUCKET_NAME: str = "cdsco-dossiers"
+    S3_REGION_NAME: str = "ap-south-1"  # Asia Pacific (Mumbai)
+    S3_ENDPOINT_URL: Optional[str] = None  # Custom endpoint for MinIO or Cloudflare R2
+    S3_ACCESS_KEY_ID: Optional[str] = None
+    S3_SECRET_ACCESS_KEY: Optional[str] = None
+    S3_USE_SSL: bool = True
+
+
 
 settings = Settings()

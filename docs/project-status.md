@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.3.2: Implement `LocalStorageProvider` writing to `./storage/submissions/{id}/...` (2026-11-01 11:43 IST | `LocalStorageProvider` implementation, chunked binary streaming, parent directory auto-creation, and 16 unit tests)
-* **Next Active Sub-Task:** **Task 1.3.3: Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO.**
+* **Last Completed Sub-Task:** Task 1.3.3: Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO (2026-11-01 12:17 IST | `S3StorageProvider` implementation, pre-signed URLs, multipart upload support, and 9 mock unit tests)
+* **Next Active Sub-Task:** **Task 1.3.4: Implement SHA-256 cryptographic checksum calculation on all incoming file streams.**
 
 ---
 
@@ -38,7 +38,8 @@
 ### Task 1.3: Abstract Storage Provider Architecture
 - [x] **1.3.1:** Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`).
 - [x] **1.3.2:** Implement `LocalStorageProvider` writing to `./storage/submissions/{id}/...`.
-- [ ] **1.3.3:** Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO.
+- [x] **1.3.3:** Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO.
+- [ ] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
 - [ ] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
 
 ### Task 1.4: Evidence Ingestion & Document Service

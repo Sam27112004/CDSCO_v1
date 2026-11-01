@@ -11,6 +11,7 @@ from app.services.rules_engine import (
 from app.services.storage import (
     StorageProvider,
     LocalStorageProvider,
+    S3StorageProvider,
     StorageError,
     StorageFileNotFoundError,
     StorageInvalidPathError,
@@ -24,6 +25,7 @@ __all__ = [
     "StatutoryConstraintError",
     "StorageProvider",
     "LocalStorageProvider",
+    "S3StorageProvider",
     "StorageError",
     "StorageFileNotFoundError",
     "StorageInvalidPathError",
