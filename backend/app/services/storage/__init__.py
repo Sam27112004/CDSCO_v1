@@ -6,11 +6,14 @@ from app.services.storage.base import (
     StorageInvalidPathError,
     StorageProvider,
 )
+from app.services.storage.local import LocalStorageProvider
 
 __all__ = [
     "StorageProvider",
+    "LocalStorageProvider",
     "StorageError",
     "StorageFileNotFoundError",
     "StorageInvalidPathError",
 ]
+
 

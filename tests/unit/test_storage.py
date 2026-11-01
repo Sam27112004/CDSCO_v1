@@ -8,6 +8,7 @@ from app.services.storage.base import (
     StorageInvalidPathError,
     StorageProvider,
 )
+from app.services.storage.local import LocalStorageProvider
 
 
 def test_storage_provider_cannot_be_instantiated_directly():
@@ -162,4 +163,128 @@ def test_storage_exception_hierarchy():
     assert issubclass(StorageError, Exception)
     assert issubclass(StorageFileNotFoundError, StorageError)
     assert issubclass(StorageInvalidPathError, StorageError)
+
+
+# ==============================================================================
+# LocalStorageProvider Test Suite
+# ==============================================================================
+
+
+def test_local_storage_provider_init(tmp_path):
+    """Verifies LocalStorageProvider initializes and creates base_dir."""
+    custom_dir = tmp_path / "custom_storage"
+    assert not custom_dir.exists()
+
+    provider = LocalStorageProvider(base_dir=custom_dir)
+    assert custom_dir.exists()
+    assert provider.base_dir == custom_dir.resolve()
+
+
+def test_local_storage_save_bytes_and_get_stream(tmp_path):
+    """Verifies saving raw bytes and reading back via binary stream."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+    rel_path = "submissions/sub-001/raw/iso_13485.pdf"
+    file_bytes = b"%PDF-1.7 statutory certificate data"
+
+    # Save
+    saved_path = provider.save_file(file_bytes, rel_path)
+    assert saved_path == rel_path
+
+    # Check physical file exists on disk
+    expected_file = tmp_path / "submissions" / "sub-001" / "raw" / "iso_13485.pdf"
+    assert expected_file.is_file()
+    assert expected_file.read_bytes() == file_bytes
+
+    # Stream
+    stream = provider.get_file_stream(rel_path)
+    try:
+        assert stream.read() == file_bytes
+    finally:
+        stream.close()
+
+
+def test_local_storage_save_stream_chunked(tmp_path):
+    """Verifies saving from a file-like stream using chunked writes."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+    rel_path = "submissions/sub-001/generated/covering_letter.pdf"
+
+    # Create stream larger than default 64KB chunk size to test chunking
+    large_data = b"X" * (1024 * 150)  # 150 KB
+    stream_input = io.BytesIO(large_data)
+
+    saved_path = provider.save_file(stream_input, rel_path)
+    assert saved_path == rel_path
+    assert provider.get_file_size(rel_path) == len(large_data)
+
+    stream_out = provider.get_file_stream(rel_path)
+    try:
+        assert stream_out.read() == large_data
+    finally:
+        stream_out.close()
+
+
+def test_local_storage_exists_and_get_file_size(tmp_path):
+    """Verifies exists() and get_file_size() functionality."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+    rel_path = "submissions/sub-002/assembled/master_dmf.pdf"
+    content = b"PDF-DMF-BODY"
+
+    assert provider.exists(rel_path) is False
+    with pytest.raises(StorageFileNotFoundError, match="File not found in local storage"):
+        provider.get_file_size(rel_path)
+
+    provider.save_file(content, rel_path)
+    assert provider.exists(rel_path) is True
+    assert provider.get_file_size(rel_path) == len(content)
+
+
+def test_local_storage_delete_file(tmp_path):
+    """Verifies delete_file() removes the file from disk."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+    rel_path = "submissions/sub-003/raw/temp.pdf"
+
+    # Non-existent file returns False
+    assert provider.delete_file(rel_path) is False
+
+    # Save and verify
+    provider.save_file(b"data", rel_path)
+    assert provider.exists(rel_path) is True
+
+    # Delete existing returns True
+    assert provider.delete_file(rel_path) is True
+    assert provider.exists(rel_path) is False
+
+    # Subsequent delete returns False
+    assert provider.delete_file(rel_path) is False
+
+
+def test_local_storage_get_file_url(tmp_path):
+    """Verifies get_file_url() returns relative streaming endpoint."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+    rel_path = "submissions/sub-004/raw/challan.pdf"
+
+    with pytest.raises(StorageFileNotFoundError):
+        provider.get_file_url(rel_path)
+
+    provider.save_file(b"TR6-CHALLAN", rel_path)
+    url = provider.get_file_url(rel_path)
+    assert url == f"/api/v1/evidence/stream?path={rel_path}"
+
+
+def test_local_storage_path_traversal_rejection(tmp_path):
+    """Verifies LocalStorageProvider strictly rejects path traversal and escapes."""
+    provider = LocalStorageProvider(base_dir=tmp_path)
+
+    with pytest.raises(StorageInvalidPathError):
+        provider.save_file(b"attack", "../escaped.txt")
+
+    with pytest.raises(StorageInvalidPathError):
+        provider.get_file_stream("../../etc/passwd")
+
+    with pytest.raises(StorageInvalidPathError):
+        provider.delete_file("submissions/../../../root.key")
+
+    # exists() safely returns False without raising
+    assert provider.exists("../non_existent.txt") is False
+
 
