@@ -15,6 +15,8 @@ from app.schemas.context import (
 )
 from app.schemas.evidence import (
     EvidenceDocumentResponse,
+    EvidenceLinkCreate,
+    EvidenceLinkResponse,
     PdfInspectionResult,
     PdfPageGeometry,
 )
@@ -32,6 +34,8 @@ __all__ = [
     "IVDParameters",
     "EvaluatedSlot",
     "EvidenceDocumentResponse",
+    "EvidenceLinkCreate",
+    "EvidenceLinkResponse",
     "PdfInspectionResult",
     "PdfPageGeometry",
 ]

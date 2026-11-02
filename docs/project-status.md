@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.4.2: Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version, scan for encryption/password locks (2026-11-02 20:07 IST | `PDFInspector` service, page dimensions profiling, password-lock detection, corrupted stream protection, and 12 unit + 3 API tests)
-* **Next Active Sub-Task:** **Task 1.4.3: Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.**
+* **Last Completed Sub-Task:** Task 1.4.3: Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots (2026-11-02 20:30 IST | slot & entity linking, blueprint chapter auto-resolution, multi-requirement attachment `TC-UR04-02`, idempotent duplicate handling, unlink reset to `MISSING`, and 13 API tests)
+* **Next Active Sub-Task:** **Task 1.4.4: Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.**
 
 ---
 
@@ -44,7 +44,8 @@
 ### Task 1.4: Evidence Ingestion & Document Service
 - [x] **1.4.1:** Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).
 - [x] **1.4.2:** Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version.
-- [ ] **1.4.3:** Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.
+- [x] **1.4.3:** Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.
+- [ ] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
 - [ ] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
 
 ### Task 1.5: Frontend Workspace Shell (Next.js 14 / TypeScript)

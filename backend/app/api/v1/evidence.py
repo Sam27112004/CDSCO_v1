@@ -26,9 +26,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.models.evidence import EvidenceDocument
+from app.models.application_definition import ApplicationDefinition
+from app.models.evidence import EvidenceDocument, EvidenceLink
 from app.models.submission import Submission
-from app.schemas.evidence import EvidenceDocumentResponse
+from app.models.submission_entity import SubmissionEntity
+from app.schemas.evidence import (
+    EvidenceDocumentResponse,
+    EvidenceLinkCreate,
+    EvidenceLinkResponse,
+)
+from app.services.definition_service import definition_service, DefinitionService
 from app.services.pdf_inspector import (
     PDFInspector,
     PdfCorruptedError,
@@ -201,3 +208,215 @@ async def upload_evidence_document(
         raise
 
     return doc
+
+
+@router.post(
+    "/submissions/{submission_id}/evidence/link",
+    response_model=EvidenceLinkResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Link evidence document to checklist slot or dossier chapter",
+)
+async def link_evidence_document(
+    submission_id: uuid.UUID = UrlPath(
+        ...,
+        description="Target submission workspace identifier",
+    ),
+    payload: EvidenceLinkCreate = ...,
+    db: AsyncSession = Depends(get_db),
+) -> EvidenceLinkResponse:
+    """Associates an uploaded evidence document with a discrete portal slot and/or Fourth Schedule chapter.
+
+    Transitions the target slot entity status from MISSING to SATISFIED.
+    """
+    # 1. Verify target submission
+    stmt_sub = select(Submission).where(Submission.id == submission_id)
+    res_sub = await db.execute(stmt_sub)
+    submission = res_sub.scalar_one_or_none()
+    if not submission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Submission '{submission_id}' not found.",
+        )
+
+    # 2. Verify evidence document belongs to this submission
+    stmt_doc = select(EvidenceDocument).where(
+        EvidenceDocument.id == payload.document_id,
+        EvidenceDocument.submission_id == submission_id,
+    )
+    res_doc = await db.execute(stmt_doc)
+    doc = res_doc.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=(
+                f"Evidence document '{payload.document_id}' not found "
+                f"in submission '{submission_id}'."
+            ),
+        )
+
+    # 3. Resolve target SubmissionEntity
+    entity: Optional[SubmissionEntity] = None
+    if payload.submission_entity_id:
+        stmt_ent = select(SubmissionEntity).where(
+            SubmissionEntity.id == payload.submission_entity_id,
+            SubmissionEntity.submission_id == submission_id,
+        )
+        res_ent = await db.execute(stmt_ent)
+        entity = res_ent.scalar_one_or_none()
+        if not entity:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=(
+                    f"Submission entity '{payload.submission_entity_id}' not found "
+                    f"in submission '{submission_id}'."
+                ),
+            )
+    elif payload.slot_id:
+        stmt_ent = select(SubmissionEntity).where(
+            SubmissionEntity.submission_id == submission_id,
+            SubmissionEntity.slot_id == payload.slot_id,
+        )
+        res_ent = await db.execute(stmt_ent)
+        entity = res_ent.scalar_one_or_none()
+
+        if not entity:
+            # Query blueprint to verify and auto-initialize the slot entity
+            app_def = await db.get(ApplicationDefinition, submission.application_definition_id)
+            slot_def = None
+            if app_def:
+                svc = DefinitionService()
+                bp = svc.get_blueprint(app_def.code)
+                if bp:
+                    slot_def = svc.get_slot_by_id(bp, payload.slot_id)
+
+            if not slot_def:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Checklist slot '{payload.slot_id}' not found in blueprint.",
+                )
+
+            entity = SubmissionEntity(
+                id=uuid.uuid4(),
+                submission_id=submission_id,
+                slot_id=payload.slot_id,
+                slot_title=slot_def.title,
+                fulfillment_mode="UPLOAD",
+                status="MISSING",
+                form_values={},
+                updated_at=datetime.now(timezone.utc),
+            )
+            db.add(entity)
+            await db.flush()
+
+    # 4. Determine dossier chapter
+    chapter = payload.chapter or payload.dossier_chapter
+    if not chapter and entity:
+        app_def = await db.get(ApplicationDefinition, submission.application_definition_id)
+        if app_def:
+            svc = DefinitionService()
+            bp = svc.get_blueprint(app_def.code)
+            if bp:
+                slot_def = svc.get_slot_by_id(bp, entity.slot_id)
+                if slot_def and slot_def.dossier_chapter:
+                    chapter = slot_def.dossier_chapter
+
+    # 5. Check for existing link (idempotent handling)
+    stmt_link = select(EvidenceLink).where(
+        EvidenceLink.submission_id == submission_id,
+        EvidenceLink.evidence_document_id == doc.id,
+        EvidenceLink.submission_entity_id == entity.id,
+    )
+    res_link = await db.execute(stmt_link)
+    existing_link = res_link.scalar_one_or_none()
+
+    if existing_link:
+        if chapter and existing_link.dossier_chapter != chapter:
+            existing_link.dossier_chapter = chapter
+            await db.commit()
+            await db.refresh(existing_link)
+        link = existing_link
+    else:
+        link = EvidenceLink(
+            id=uuid.uuid4(),
+            submission_id=submission_id,
+            evidence_document_id=doc.id,
+            submission_entity_id=entity.id,
+            dossier_chapter=chapter,
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(link)
+
+    # 6. Update Slot Status to SATISFIED
+    entity.status = "SATISFIED"
+    entity.updated_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    await db.refresh(link)
+    await db.refresh(entity)
+
+    return EvidenceLinkResponse(
+        id=link.id,
+        submission_id=link.submission_id,
+        evidence_document_id=link.evidence_document_id,
+        submission_entity_id=link.submission_entity_id,
+        slot_id=entity.slot_id,
+        dossier_chapter=link.dossier_chapter,
+        created_at=link.created_at,
+        document_title=doc.document_title,
+        original_filename=doc.original_filename,
+        entity_status=entity.status,
+    )
+
+
+@router.delete(
+    "/submissions/{submission_id}/evidence/links/{link_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Unlink evidence document from slot",
+)
+async def unlink_evidence_document(
+    submission_id: uuid.UUID = UrlPath(
+        ...,
+        description="Target submission workspace identifier",
+    ),
+    link_id: uuid.UUID = UrlPath(
+        ...,
+        description="UUID of evidence link to delete",
+    ),
+    db: AsyncSession = Depends(get_db),
+):
+    """Deletes an association between an evidence document and a slot.
+
+    Resets the slot state to MISSING if no other evidence documents remain linked.
+    """
+    stmt = select(EvidenceLink).where(
+        EvidenceLink.id == link_id,
+        EvidenceLink.submission_id == submission_id,
+    )
+    result = await db.execute(stmt)
+    link = result.scalar_one_or_none()
+    if not link:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Evidence link '{link_id}' not found in submission '{submission_id}'.",
+        )
+
+    entity_id = link.submission_entity_id
+    await db.delete(link)
+    await db.flush()
+
+    # Check if other documents remain linked to this entity
+    stmt_rem = select(EvidenceLink).where(
+        EvidenceLink.submission_entity_id == entity_id,
+    )
+    res_rem = await db.execute(stmt_rem)
+    remaining_links = res_rem.scalars().all()
+
+    if not remaining_links:
+        entity = await db.get(SubmissionEntity, entity_id)
+        if entity:
+            entity.status = "MISSING"
+            entity.updated_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    return None
+
