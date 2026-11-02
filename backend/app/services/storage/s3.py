@@ -261,3 +261,4 @@ class S3StorageProvider(StorageProvider):
             raise StorageError(
                 f"Failed to inspect size for S3 object '{clean_path}': {exc}"
             ) from exc
+

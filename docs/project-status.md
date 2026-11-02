@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.3.3: Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO (2026-11-01 12:17 IST | `S3StorageProvider` implementation, pre-signed URLs, multipart upload support, and 9 mock unit tests)
-* **Next Active Sub-Task:** **Task 1.3.4: Implement SHA-256 cryptographic checksum calculation on all incoming file streams.**
+* **Last Completed Sub-Task:** Task 1.3.4: Implement SHA-256 cryptographic checksum calculation on all incoming file streams (2026-11-02 12:03 IST | `calculate_sha256`, `verify_sha256`, `HashingReader`, and 10 unit tests)
+* **Next Active Sub-Task:** **Task 1.4.1: Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).**
 
 ---
 
@@ -39,8 +39,7 @@
 - [x] **1.3.1:** Define `StorageProvider` abstract base interface (`save_file`, `get_file_stream`, `delete_file`, `get_file_url`).
 - [x] **1.3.2:** Implement `LocalStorageProvider` writing to `./storage/submissions/{id}/...`.
 - [x] **1.3.3:** Implement `S3StorageProvider` interface (`boto3`) for AWS S3, Cloudflare R2, or MinIO.
-- [ ] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
-- [ ] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
+- [x] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
 
 ### Task 1.4: Evidence Ingestion & Document Service
 - [ ] **1.4.1:** Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).

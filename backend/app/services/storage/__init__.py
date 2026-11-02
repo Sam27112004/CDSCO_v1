@@ -8,6 +8,13 @@ from app.services.storage.base import (
 )
 from app.services.storage.local import LocalStorageProvider
 from app.services.storage.s3 import S3StorageProvider
+from app.services.storage.checksum import (
+    ChecksumError,
+    ChecksumMismatchError,
+    HashingReader,
+    calculate_sha256,
+    verify_sha256,
+)
 
 __all__ = [
     "StorageProvider",
@@ -16,7 +23,13 @@ __all__ = [
     "StorageError",
     "StorageFileNotFoundError",
     "StorageInvalidPathError",
+    "ChecksumError",
+    "ChecksumMismatchError",
+    "HashingReader",
+    "calculate_sha256",
+    "verify_sha256",
 ]
+
 
 
 

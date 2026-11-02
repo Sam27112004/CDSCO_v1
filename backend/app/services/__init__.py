@@ -15,6 +15,11 @@ from app.services.storage import (
     StorageError,
     StorageFileNotFoundError,
     StorageInvalidPathError,
+    ChecksumError,
+    ChecksumMismatchError,
+    HashingReader,
+    calculate_sha256,
+    verify_sha256,
 )
 
 __all__ = [
@@ -29,6 +34,12 @@ __all__ = [
     "StorageError",
     "StorageFileNotFoundError",
     "StorageInvalidPathError",
+    "ChecksumError",
+    "ChecksumMismatchError",
+    "HashingReader",
+    "calculate_sha256",
+    "verify_sha256",
 ]
+
 
 
