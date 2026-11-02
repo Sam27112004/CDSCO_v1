@@ -18,6 +18,28 @@ from app.models.evidence import EvidenceDocument
 from app.models.submission import Submission
 from app.services.definition_service import DefinitionService
 from app.services.storage import LocalStorageProvider, get_storage_provider
+import pymupdf
+
+
+def make_sample_pdf(
+    pages: int = 1,
+    title: str = "",
+    encrypt: bool = False,
+    password: str = "pass123",
+) -> bytes:
+    """Helper generating memory-buffered PDF binaries with configurable attributes."""
+    doc = pymupdf.open()
+    for _ in range(pages):
+        doc.new_page(width=595.0, height=842.0)
+    if title:
+        doc.set_metadata({"title": title, "creator": "CDSCO Test Suite"})
+    if encrypt:
+        return doc.tobytes(
+            encryption=pymupdf.PDF_ENCRYPT_AES_256,
+            owner_pw=password,
+            user_pw=password,
+        )
+    return doc.tobytes()
 
 
 @pytest.fixture
@@ -64,8 +86,8 @@ async def sample_submission():
             await session.commit()
 
 
-# Minimal valid PDF binary
-VALID_PDF_BYTES = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n"
+# Valid 1-page sample PDF binary
+VALID_PDF_BYTES = make_sample_pdf(pages=1, title="Test Document")
 VALID_PDF_SHA256 = hashlib.sha256(VALID_PDF_BYTES).hexdigest()
 
 
@@ -333,3 +355,92 @@ async def test_evidence_upload_db_error_triggers_storage_cleanup(
     # Confirm no orphaned files remain in temp storage
     saved_files = list(tmp_path.glob("**/*.pdf"))
     assert len(saved_files) == 0
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_encrypted_pdf_rejected(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that password-locked or encrypted PDFs are rejected with 400 Bad Request."""
+    submission_id = sample_submission.id
+    encrypted_bytes = make_sample_pdf(pages=1, encrypt=True, password="secret_password")
+
+    files = {
+        "file": ("encrypted_certificate.pdf", io.BytesIO(encrypted_bytes), "application/pdf")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 400
+    assert "Password-protected or encrypted PDF documents are not supported" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_corrupted_pdf_rejected(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that malformed or corrupted PDF binaries are rejected with 400 Bad Request."""
+    submission_id = sample_submission.id
+    corrupted_bytes = b"%PDF-1.4\x00\xff\xfe\xca\xfe\xba\xbe unreadable_corrupted_stream_data"
+
+    files = {
+        "file": ("corrupted_report.pdf", io.BytesIO(corrupted_bytes), "application/pdf")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 400
+    assert "Corrupted or invalid PDF binary" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_multi_page_extraction_tc_ur02_01(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies TC-UR02-01: Uploading a 3-page PDF accurately records page_count: 3 and page geometries."""
+    submission_id = sample_submission.id
+    three_page_bytes = make_sample_pdf(pages=3, title="ISO 13485 Multi-Page Audit")
+    three_page_sha256 = hashlib.sha256(three_page_bytes).hexdigest()
+
+    files = {
+        "file": ("sample_iso.pdf", io.BytesIO(three_page_bytes), "application/pdf")
+    }
+    data = {
+        "document_title": "ISO 13485 Full Audit Dossier"
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+        data=data,
+    )
+
+    assert response.status_code == 201
+    res_data = response.json()
+
+    assert res_data["page_count"] == 3
+    assert res_data["file_size_bytes"] == len(three_page_bytes)
+    assert res_data["extracted_metadata"]["sha256"] == three_page_sha256
+    assert res_data["extracted_metadata"]["pdf_version"] in ("1.7", "1.4", "1.5", "1.6")
+    assert res_data["extracted_metadata"]["is_encrypted"] is False
+    assert res_data["extracted_metadata"]["title"] == "ISO 13485 Multi-Page Audit"
+
+    page_dims = res_data["extracted_metadata"]["page_dimensions"]
+    assert len(page_dims) == 3
+    assert page_dims[0]["page_number"] == 1
+    assert page_dims[0]["width"] == 595.0
+    assert page_dims[0]["height"] == 842.0
+    assert page_dims[0]["is_portrait"] is True
+

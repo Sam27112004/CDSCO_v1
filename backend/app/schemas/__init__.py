@@ -13,7 +13,11 @@ from app.schemas.context import (
     IVDParameters,
     EvaluatedSlot,
 )
-from app.schemas.evidence import EvidenceDocumentResponse
+from app.schemas.evidence import (
+    EvidenceDocumentResponse,
+    PdfInspectionResult,
+    PdfPageGeometry,
+)
 
 __all__ = [
     "HealthResponse",
@@ -28,6 +32,8 @@ __all__ = [
     "IVDParameters",
     "EvaluatedSlot",
     "EvidenceDocumentResponse",
+    "PdfInspectionResult",
+    "PdfPageGeometry",
 ]
 
 

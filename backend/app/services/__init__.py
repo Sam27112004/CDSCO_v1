@@ -21,6 +21,15 @@ from app.services.storage import (
     calculate_sha256,
     verify_sha256,
 )
+from app.services.pdf_inspector import (
+    PDFInspector,
+    PdfInspectionResult,
+    PdfPageGeometry,
+    PdfInspectionError,
+    PdfCorruptedError,
+    PdfEncryptedError,
+    PdfEmptyError,
+)
 
 __all__ = [
     "DefinitionService",
@@ -39,6 +48,13 @@ __all__ = [
     "HashingReader",
     "calculate_sha256",
     "verify_sha256",
+    "PDFInspector",
+    "PdfInspectionResult",
+    "PdfPageGeometry",
+    "PdfInspectionError",
+    "PdfCorruptedError",
+    "PdfEncryptedError",
+    "PdfEmptyError",
 ]
 
 

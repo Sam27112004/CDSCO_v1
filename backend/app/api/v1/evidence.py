@@ -29,6 +29,12 @@ from app.core.database import get_db
 from app.models.evidence import EvidenceDocument
 from app.models.submission import Submission
 from app.schemas.evidence import EvidenceDocumentResponse
+from app.services.pdf_inspector import (
+    PDFInspector,
+    PdfCorruptedError,
+    PdfEmptyError,
+    PdfEncryptedError,
+)
 from app.services.storage import StorageProvider, calculate_sha256, get_storage_provider
 
 router = APIRouter(tags=["Evidence Documents"])
@@ -120,25 +126,44 @@ async def upload_evidence_document(
             detail="Invalid file format. File does not start with standard PDF header (%PDF).",
         )
 
-    # 6. Compute cryptographic SHA-256 checksum
+    # 6. Deep pre-flight structural inspection via PyMuPDF (fitz)
+    try:
+        inspection = PDFInspector.inspect(file.file)
+    except PdfEncryptedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except (PdfCorruptedError, PdfEmptyError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to inspect PDF document: {str(exc)}",
+        )
+
+    # 7. Compute cryptographic SHA-256 checksum
     sha256_checksum = calculate_sha256(file.file)
 
-    # 7. Construct isolated storage path
+    # 8. Construct isolated storage path
     evidence_id = uuid.uuid4()
     safe_filename = re.sub(r"[^\w\.\-]", "_", clean_filename)
     storage_path = f"submissions/{submission_id}/raw/{evidence_id}_{safe_filename}"
 
-    # 8. Save binary into storage provider
+    # 9. Save binary into storage provider
     stored_path = storage.save_file(file.file, storage_path)
 
-    # 9. Determine document title
+    # 10. Determine document title
     title = (
         document_title.strip()
         if document_title and document_title.strip()
         else clean_filename
     )
 
-    # 10. Record metadata in PostgreSQL
+    # 11. Record metadata in PostgreSQL
     doc = EvidenceDocument(
         id=evidence_id,
         submission_id=submission_id,
@@ -147,9 +172,18 @@ async def upload_evidence_document(
         storage_path=stored_path,
         mime_type="application/pdf",
         file_size_bytes=file_size,
-        page_count=1,
+        page_count=inspection.page_count,
         extracted_metadata={
             "sha256": sha256_checksum,
+            "pdf_version": inspection.pdf_version,
+            "is_encrypted": inspection.is_encrypted,
+            "title": inspection.title,
+            "author": inspection.author,
+            "creator": inspection.creator,
+            "producer": inspection.producer,
+            "creation_date": inspection.creation_date,
+            "modification_date": inspection.modification_date,
+            "page_dimensions": [p.model_dump() for p in inspection.page_dimensions],
         },
         uploaded_at=datetime.now(timezone.utc),
     )

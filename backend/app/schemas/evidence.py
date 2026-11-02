@@ -6,6 +6,9 @@ import uuid
 from pydantic import BaseModel, ConfigDict, Field
 
 
+from app.services.pdf_inspector import PdfInspectionResult, PdfPageGeometry
+
+
 class EvidenceDocumentResponse(BaseModel):
     """Response payload for uploaded and cataloged evidence documents."""
 
@@ -24,3 +27,4 @@ class EvidenceDocumentResponse(BaseModel):
         description="Extracted technical and regulatory metadata (SHA-256, dates, version)",
     )
     uploaded_at: datetime = Field(description="UTC timestamp of upload")
+
