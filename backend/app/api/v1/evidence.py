@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import io
 from pathlib import Path
 import re
-from typing import Optional
+from typing import BinaryIO, Generator, Optional, Tuple
 import uuid
 
 from fastapi import (
@@ -16,11 +16,15 @@ from fastapi import (
     Depends,
     File,
     Form,
+    Header,
     HTTPException,
     Path as UrlPath,
+    Request,
+    Response,
     UploadFile,
     status,
 )
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -419,4 +423,180 @@ async def unlink_evidence_document(
 
     await db.commit()
     return None
+
+
+def parse_range_header(range_header: str, total_size: int) -> Optional[Tuple[int, int]]:
+    """Parses an HTTP 'Range: bytes=start-end' header per RFC 7233.
+
+    Returns:
+        (start, end) tuple of inclusive byte offsets, or None if invalid or unsatisfiable.
+    """
+    if not range_header or not range_header.startswith("bytes="):
+        return None
+
+    range_val = range_header[6:].strip()
+    if "," in range_val:
+        range_val = range_val.split(",")[0].strip()
+
+    if "-" not in range_val:
+        return None
+
+    start_str, end_str = range_val.split("-", 1)
+    start_str = start_str.strip()
+    end_str = end_str.strip()
+
+    try:
+        if not start_str and end_str:
+            suffix_len = int(end_str)
+            if suffix_len <= 0:
+                return None
+            start = max(0, total_size - suffix_len)
+            end = total_size - 1
+        elif start_str and not end_str:
+            start = int(start_str)
+            end = total_size - 1
+        elif start_str and end_str:
+            start = int(start_str)
+            end = int(end_str)
+        else:
+            return None
+    except ValueError:
+        return None
+
+    if start < 0 or start >= total_size or end < start:
+        return None
+
+    end = min(end, total_size - 1)
+    return start, end
+
+
+def stream_range_chunks(
+    stream: BinaryIO,
+    start: int,
+    length: int,
+    chunk_size: int = 65536,
+) -> Generator[bytes, None, None]:
+    """Streams a slice of bytes from a binary stream in chunks, then closes the stream."""
+    try:
+        try:
+            stream.seek(start)
+        except (io.UnsupportedOperation, AttributeError, OSError):
+            discarded = 0
+            while discarded < start:
+                chunk = stream.read(min(chunk_size, start - discarded))
+                if not chunk:
+                    break
+                discarded += len(chunk)
+
+        remaining = length
+        while remaining > 0:
+            chunk = stream.read(min(chunk_size, remaining))
+            if not chunk:
+                break
+            remaining -= len(chunk)
+            yield chunk
+    finally:
+        try:
+            stream.close()
+        except Exception:
+            pass
+
+
+@router.api_route(
+    "/evidence/{document_id}/stream",
+    methods=["GET", "HEAD"],
+    summary="Stream evidence document with HTTP byte-range support",
+)
+async def stream_evidence_document(
+    document_id: uuid.UUID = UrlPath(
+        ...,
+        description="Unique identifier of the evidence document to stream",
+    ),
+    request: Request = ...,
+    range: Optional[str] = Header(None, alias="Range"),
+    db: AsyncSession = Depends(get_db),
+    storage: StorageProvider = Depends(get_storage_provider),
+):
+    """Streams an uploaded PDF binary supporting HTTP 206 Partial Content byte ranges
+
+    for responsive, non-blocking rendering in browser PDF.js viewer modals.
+    """
+    # 1. Query document record from DB
+    stmt = select(EvidenceDocument).where(EvidenceDocument.id == document_id)
+    result = await db.execute(stmt)
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Evidence document '{document_id}' not found.",
+        )
+
+    # 2. Check storage presence and resolve file size
+    if not storage.exists(doc.storage_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Physical binary for document '{document_id}' not found in storage.",
+        )
+
+    total_size = storage.get_file_size(doc.storage_path)
+    safe_filename = re.sub(r"[^\w\.\-]", "_", doc.original_filename)
+    mime_type = doc.mime_type or "application/pdf"
+
+    # 3. Handle HEAD probe
+    if request.method == "HEAD":
+        return Response(
+            content=b"",
+            status_code=status.HTTP_200_OK,
+            headers={
+                "Accept-Ranges": "bytes",
+                "Content-Length": str(total_size),
+                "Content-Type": mime_type,
+                "Content-Disposition": f'inline; filename="{safe_filename}"',
+            },
+            media_type=mime_type,
+        )
+
+    # 4. Handle Range Requests (HTTP 206 vs HTTP 416)
+    if range:
+        parsed_range = parse_range_header(range, total_size)
+        if parsed_range is None:
+            raise HTTPException(
+                status_code=status.HTTP_416_RANGE_NOT_SATISFIABLE,
+                detail="Requested range is not satisfiable.",
+                headers={"Content-Range": f"bytes */{total_size}"},
+            )
+
+        start, end = parsed_range
+        content_length = end - start + 1
+        stream = storage.get_file_stream(doc.storage_path)
+
+        headers = {
+            "Content-Range": f"bytes {start}-{end}/{total_size}",
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(content_length),
+            "Content-Type": mime_type,
+            "Content-Disposition": f'inline; filename="{safe_filename}"',
+        }
+        return StreamingResponse(
+            content=stream_range_chunks(stream, start, content_length),
+            status_code=status.HTTP_206_PARTIAL_CONTENT,
+            headers=headers,
+            media_type=mime_type,
+        )
+
+    # 5. Full Document Stream (HTTP 200 OK)
+    stream = storage.get_file_stream(doc.storage_path)
+    headers = {
+        "Accept-Ranges": "bytes",
+        "Content-Length": str(total_size),
+        "Content-Type": mime_type,
+        "Content-Disposition": f'inline; filename="{safe_filename}"',
+    }
+    return StreamingResponse(
+        content=stream_range_chunks(stream, 0, total_size),
+        status_code=status.HTTP_200_OK,
+        headers=headers,
+        media_type=mime_type,
+    )
+
 

@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.4.3: Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots (2026-11-02 20:30 IST | slot & entity linking, blueprint chapter auto-resolution, multi-requirement attachment `TC-UR04-02`, idempotent duplicate handling, unlink reset to `MISSING`, and 13 API tests)
-* **Next Active Sub-Task:** **Task 1.4.4: Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.**
+* **Last Completed Sub-Task:** Task 1.4.4: Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support (2026-11-02 20:40 IST | RFC 7233 partial content 206 streaming, open/suffix range support, 416 range boundary enforcement, HEAD probe handling for PDF.js, and 11 API tests)
+* **Next Active Sub-Task:** **Task 1.5.1: Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.**
 
 ---
 
@@ -45,8 +45,7 @@
 - [x] **1.4.1:** Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).
 - [x] **1.4.2:** Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version.
 - [x] **1.4.3:** Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.
-- [ ] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
-- [ ] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
+- [x] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
 
 ### Task 1.5: Frontend Workspace Shell (Next.js 14 / TypeScript)
 - [ ] **1.5.1:** Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.
