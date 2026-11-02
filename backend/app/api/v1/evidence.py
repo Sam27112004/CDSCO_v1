@@ -40,6 +40,11 @@ from app.schemas.evidence import (
     EvidenceLinkResponse,
 )
 from app.services.definition_service import definition_service, DefinitionService
+from app.services.document_converter import (
+    DocumentConverter,
+    DocumentConversionError,
+    UnsupportedFormatError,
+)
 from app.services.pdf_inspector import (
     PDFInspector,
     PdfCorruptedError,
@@ -101,45 +106,72 @@ async def upload_evidence_document(
             detail="Filename cannot be empty.",
         )
 
-    # 3. Validate file extension (.pdf)
-    if not clean_filename.lower().endswith(".pdf"):
+    # 3. Validate file extension support (PDF, DOCX, Images)
+    clean_filename = Path(file.filename).name.strip()
+    if not DocumentConverter.is_supported(clean_filename):
+        allowed = ", ".join(sorted(DocumentConverter.get_supported_extensions()))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid file format. Only PDF files (.pdf) are permitted.",
+            detail=(
+                f"Invalid file format '{Path(clean_filename).suffix}'. "
+                f"Permitted formats: {allowed}."
+            ),
         )
 
-    # 4. Inspect file size and enforce 10MB ceiling
+    # 4. Inspect raw file size and enforce 10MB ceiling
     file.file.seek(0, io.SEEK_END)
-    file_size = file.file.tell()
+    upload_size = file.file.tell()
     file.file.seek(0)
 
-    if file_size == 0:
+    if upload_size == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Uploaded file is empty (0 bytes).",
         )
 
-    if file_size > settings.MAX_FILE_SIZE_BYTES:
+    if upload_size > settings.MAX_FILE_SIZE_BYTES:
         raise HTTPException(
             status_code=status.HTTP_413_CONTENT_TOO_LARGE,
             detail=(
-                f"File size ({file_size} bytes) exceeds maximum allowable "
+                f"File size ({upload_size} bytes) exceeds maximum allowable "
                 f"portal limit of {settings.MAX_FILE_SIZE_BYTES} bytes (10.0 MB)."
             ),
         )
 
-    # 5. Validate PDF header magic bytes (%PDF)
-    header = file.file.read(4)
-    file.file.seek(0)
-    if header != b"%PDF":
+    # 5. Process and convert incoming binary into standardized PDF stream
+    try:
+        converted_doc = DocumentConverter.convert_to_pdf(file.file, clean_filename)
+    except UnsupportedFormatError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid file format. File does not start with standard PDF header (%PDF).",
+            detail=str(exc),
+        )
+    except DocumentConversionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to process document: {str(exc)}",
+        )
+
+    processed_stream = converted_doc.pdf_stream
+    processed_size = converted_doc.file_size_bytes
+
+    if processed_size > settings.MAX_FILE_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+            detail=(
+                f"Converted PDF file size ({processed_size} bytes) exceeds maximum allowable "
+                f"portal limit of {settings.MAX_FILE_SIZE_BYTES} bytes (10.0 MB)."
+            ),
         )
 
     # 6. Deep pre-flight structural inspection via PyMuPDF (fitz)
     try:
-        inspection = PDFInspector.inspect(file.file)
+        inspection = PDFInspector.inspect(processed_stream)
     except PdfEncryptedError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -156,16 +188,18 @@ async def upload_evidence_document(
             detail=f"Failed to inspect PDF document: {str(exc)}",
         )
 
-    # 7. Compute cryptographic SHA-256 checksum
-    sha256_checksum = calculate_sha256(file.file)
+    # 7. Compute cryptographic SHA-256 checksum on standardized PDF
+    processed_stream.seek(0)
+    sha256_checksum = calculate_sha256(processed_stream)
+    processed_stream.seek(0)
 
-    # 8. Construct isolated storage path
+    # 8. Construct isolated storage path with standardized .pdf extension
     evidence_id = uuid.uuid4()
-    safe_filename = re.sub(r"[^\w\.\-]", "_", clean_filename)
-    storage_path = f"submissions/{submission_id}/raw/{evidence_id}_{safe_filename}"
+    safe_stem = re.sub(r"[^\w\-]", "_", Path(clean_filename).stem)
+    storage_path = f"submissions/{submission_id}/raw/{evidence_id}_{safe_stem}.pdf"
 
-    # 9. Save binary into storage provider
-    stored_path = storage.save_file(file.file, storage_path)
+    # 9. Save PDF binary into storage provider
+    stored_path = storage.save_file(processed_stream, storage_path)
 
     # 10. Determine document title
     title = (
@@ -182,7 +216,7 @@ async def upload_evidence_document(
         original_filename=clean_filename,
         storage_path=stored_path,
         mime_type="application/pdf",
-        file_size_bytes=file_size,
+        file_size_bytes=processed_size,
         page_count=inspection.page_count,
         extracted_metadata={
             "sha256": sha256_checksum,
@@ -194,6 +228,8 @@ async def upload_evidence_document(
             "producer": inspection.producer,
             "creation_date": inspection.creation_date,
             "modification_date": inspection.modification_date,
+            "converted": converted_doc.converted,
+            "source_format": converted_doc.source_format,
             "page_dimensions": [p.model_dump() for p in inspection.page_dimensions],
         },
         uploaded_at=datetime.now(timezone.utc),

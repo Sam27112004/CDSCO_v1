@@ -18,6 +18,8 @@ from app.models.evidence import EvidenceDocument
 from app.models.submission import Submission
 from app.services.definition_service import DefinitionService
 from app.services.storage import LocalStorageProvider, get_storage_provider
+import docx
+from PIL import Image
 import pymupdf
 
 
@@ -233,7 +235,7 @@ async def test_evidence_upload_non_pdf_rejected(
     )
 
     assert response.status_code == 400
-    assert "Only PDF files (.pdf) are permitted" in response.json()["detail"]
+    assert "Invalid file format '.exe'" in response.json()["detail"]
 
 
 @pytest.mark.asyncio
@@ -443,4 +445,157 @@ async def test_evidence_upload_multi_page_extraction_tc_ur02_01(
     assert page_dims[0]["width"] == 595.0
     assert page_dims[0]["height"] == 842.0
     assert page_dims[0]["is_portrait"] is True
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_jpg_image_auto_converted_to_pdf(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that uploading a JPEG image automatically converts it into a valid PDF."""
+    submission_id = sample_submission.id
+
+    img = Image.new("RGB", (600, 400), color=(100, 149, 237))
+    img_buf = io.BytesIO()
+    img.save(img_buf, format="JPEG")
+    img_bytes = img_buf.getvalue()
+
+    files = {
+        "file": ("factory_site.jpg", io.BytesIO(img_bytes), "image/jpeg")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 201
+    doc = response.json()
+
+    assert doc["original_filename"] == "factory_site.jpg"
+    assert doc["mime_type"] == "application/pdf"
+    assert doc["page_count"] == 1
+    assert doc["storage_path"].endswith(".pdf")
+    assert doc["extracted_metadata"]["converted"] is True
+    assert doc["extracted_metadata"]["source_format"] == "jpg"
+    assert "sha256" in doc["extracted_metadata"]
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_png_image_auto_converted_to_pdf(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that uploading a PNG image with transparency converts cleanly to PDF."""
+    submission_id = sample_submission.id
+
+    img = Image.new("RGBA", (300, 300), color=(255, 0, 0, 128))
+    img_buf = io.BytesIO()
+    img.save(img_buf, format="PNG")
+    img_bytes = img_buf.getvalue()
+
+    files = {
+        "file": ("device_label.png", io.BytesIO(img_bytes), "image/png")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 201
+    doc = response.json()
+
+    assert doc["original_filename"] == "device_label.png"
+    assert doc["mime_type"] == "application/pdf"
+    assert doc["page_count"] == 1
+    assert doc["storage_path"].endswith(".pdf")
+    assert doc["extracted_metadata"]["converted"] is True
+    assert doc["extracted_metadata"]["source_format"] == "png"
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_docx_auto_converted_to_pdf(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that uploading a Word .docx automatically converts into a standardized PDF."""
+    submission_id = sample_submission.id
+
+    doc = docx.Document()
+    doc.add_heading("Statutory Undertaking (Form MD-14)", level=0)
+    doc.add_paragraph("We hereby declare that all technical information submitted is accurate.")
+    table = doc.add_table(rows=2, cols=2)
+    table.cell(0, 0).text = "Clause"
+    table.cell(0, 1).text = "Compliance"
+    table.cell(1, 0).text = "Rule 34(1)"
+    table.cell(1, 1).text = "Full Compliance"
+
+    docx_buf = io.BytesIO()
+    doc.save(docx_buf)
+    docx_bytes = docx_buf.getvalue()
+
+    files = {
+        "file": ("undertaking.docx", io.BytesIO(docx_bytes), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 201
+    res_data = response.json()
+
+    assert res_data["original_filename"] == "undertaking.docx"
+    assert res_data["mime_type"] == "application/pdf"
+    assert res_data["page_count"] >= 1
+    assert res_data["storage_path"].endswith(".pdf")
+    assert res_data["extracted_metadata"]["converted"] is True
+    assert res_data["extracted_metadata"]["source_format"] == "docx"
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_corrupted_image_rejected(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that corrupted image bytes with .jpg extension are rejected with 400 Bad Request."""
+    submission_id = sample_submission.id
+    files = {
+        "file": ("corrupted.jpg", io.BytesIO(b"NOT_A_REAL_IMAGE_DATA"), "image/jpeg")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 400
+    assert "Unidentified or invalid image" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_evidence_upload_corrupted_docx_rejected(
+    async_client: AsyncClient,
+    sample_submission: Submission,
+    temp_storage,
+):
+    """Verifies that corrupted docx bytes with .docx extension are rejected with 400 Bad Request."""
+    submission_id = sample_submission.id
+    files = {
+        "file": ("corrupted.docx", io.BytesIO(b"NOT_A_REAL_DOCX_DATA"), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    }
+
+    response = await async_client.post(
+        f"/api/v1/submissions/{submission_id}/evidence/upload",
+        files=files,
+    )
+
+    assert response.status_code == 400
+    assert "Failed to convert Word document" in response.json()["detail"]
 

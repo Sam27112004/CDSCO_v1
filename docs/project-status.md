@@ -46,6 +46,7 @@
 - [x] **1.4.2:** Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version.
 - [x] **1.4.3:** Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.
 - [x] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
+- [x] **1.4.5:** Build `DocumentConverter` service auto-converting images (JPG, PNG, WebP, TIFF, BMP) and Word (`.docx`) to standardized PDFs on upload.
 
 ### Task 1.5: Frontend Workspace Shell (Next.js 14 / TypeScript)
 - [ ] **1.5.1:** Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.
