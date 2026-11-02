@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.3.4: Implement SHA-256 cryptographic checksum calculation on all incoming file streams (2026-11-02 12:03 IST | `calculate_sha256`, `verify_sha256`, `HashingReader`, and 10 unit tests)
-* **Next Active Sub-Task:** **Task 1.4.1: Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).**
+* **Last Completed Sub-Task:** Task 1.4.1: Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (2026-11-02 12:32 IST | multipart/form-data upload, SHA-256 calculation, PDF magic header & 10MB ceiling validation, `StorageProvider` integration, transactional rollback, and 10 API tests)
+* **Next Active Sub-Task:** **Task 1.4.2: Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version.**
 
 ---
 
@@ -42,7 +42,7 @@
 - [x] **1.3.4:** Implement SHA-256 cryptographic checksum calculation on all incoming file streams.
 
 ### Task 1.4: Evidence Ingestion & Document Service
-- [ ] **1.4.1:** Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).
+- [x] **1.4.1:** Build `POST /api/v1/submissions/{id}/evidence/upload` endpoint (multipart/form-data).
 - [ ] **1.4.2:** Integrate PyMuPDF (`fitz`) to inspect uploaded PDFs: extract page count, byte size, PDF version.
 - [ ] **1.4.3:** Build `POST /api/v1/submissions/{id}/evidence/link` endpoint to associate files with slots.
 - [ ] **1.4.4:** Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support.
