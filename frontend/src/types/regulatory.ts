@@ -87,6 +87,7 @@ export interface EvidenceLink {
   original_filename?: string;
   file_size_bytes?: number;
   page_count?: number;
+  extracted_metadata?: ExtractedMetadata;
   evidence_document?: EvidenceDocument;
 }
 

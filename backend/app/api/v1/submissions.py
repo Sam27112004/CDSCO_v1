@@ -55,6 +55,7 @@ def _build_entity_response(entity: SubmissionEntity, slot_map: dict) -> dict:
                 "original_filename": link.document.original_filename if link.document else None,
                 "file_size_bytes": link.document.file_size_bytes if link.document else None,
                 "page_count": link.document.page_count if link.document else None,
+                "extracted_metadata": link.document.extracted_metadata if link.document else {},
             }
             for link in (entity.evidence_links or [])
         ],
