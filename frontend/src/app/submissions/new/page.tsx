@@ -28,6 +28,8 @@ interface PathwayOption {
   eligibleClasses: RiskClass[];
   isImport: boolean;
   slotsCount: number;
+  isAvailable: boolean;
+  phaseNote?: string;
 }
 
 const PATHWAY_OPTIONS: PathwayOption[] = [
@@ -39,6 +41,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     eligibleClasses: ["CLASS_A", "CLASS_B", "CLASS_C", "CLASS_D"],
     isImport: true,
     slotsCount: 36,
+    isAvailable: true,
   },
   {
     code: "MD-7",
@@ -48,6 +51,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     eligibleClasses: ["CLASS_C", "CLASS_D"],
     isImport: false,
     slotsCount: 48,
+    isAvailable: true,
   },
   {
     code: "MD-8",
@@ -57,24 +61,30 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     eligibleClasses: ["CLASS_C", "CLASS_D"],
     isImport: false,
     slotsCount: 48,
+    isAvailable: false,
+    phaseNote: "Phase 2 Blueprint",
   },
   {
     code: "MD-3",
     title: "Form MD-3: Commercial Manufacturing Licence (Class A & B)",
-    description: "Domestic manufacturing licence for low and low-medium risk medical devices.",
+    description: "Domestic manufacturing licence for low and low-medium risk medical devices under State Licensing Authority (SLA).",
     authority: "State Licensing Authority (SLA)",
     eligibleClasses: ["CLASS_A", "CLASS_B"],
     isImport: false,
     slotsCount: 32,
+    isAvailable: false,
+    phaseNote: "Phase 2 Blueprint",
   },
   {
     code: "MD-4",
     title: "Form MD-4: Loan Licence to Manufacture (Class A & B)",
-    description: "State loan licence for Class A & B devices manufactured through contract facilities.",
+    description: "State loan licence for Class A & B devices manufactured through contract facilities under State Licensing Authority (SLA).",
     authority: "State Licensing Authority (SLA)",
     eligibleClasses: ["CLASS_A", "CLASS_B"],
     isImport: false,
     slotsCount: 32,
+    isAvailable: false,
+    phaseNote: "Phase 2 Blueprint",
   },
 ];
 
@@ -97,6 +107,7 @@ export default function SetupWizardPage() {
   const [agentProfileId, setAgentProfileId] = useState<string>("");
   const [mfgProfileId, setMfgProfileId] = useState<string>("");
   const [siteProfileId, setSiteProfileId] = useState<string>("");
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   // Regulatory Context Predicates
   const [isSterile, setIsSterile] = useState<boolean>(true);
@@ -140,19 +151,22 @@ export default function SetupWizardPage() {
   }, [profiles, activePathway.isImport, agentProfiles, foreignMfgProfiles, domesticMfgProfiles, siteProfiles, agentProfileId, mfgProfileId, siteProfileId]);
 
   // Handle pathway change with Smart Statutory Constraints (TC-UR01-01)
-  const handlePathwaySelect = (pathwayCode: string) => {
-    setSelectedPathway(pathwayCode);
-    const target = PATHWAY_OPTIONS.find((p) => p.code === pathwayCode);
-    if (!target) return;
+  const handlePathwaySelect = (pathway: PathwayOption) => {
+    if (!pathway.isAvailable) {
+      return;
+    }
+    setSubmissionError(null);
+    setSelectedPathway(pathway.code);
 
     // Enforce valid risk class
-    if (!target.eligibleClasses.includes(riskClass)) {
-      setRiskClass(target.eligibleClasses[0]);
+    if (!pathway.eligibleClasses.includes(riskClass)) {
+      setRiskClass(pathway.eligibleClasses[0]);
     }
   };
 
   // Submit Handler
   const handleLaunchWorkspace = async () => {
+    setSubmissionError(null);
     try {
       const payload = {
         pathway_code: selectedPathway,
@@ -174,8 +188,10 @@ export default function SetupWizardPage() {
 
       const result = await createSubmission.mutateAsync(payload);
       router.push(`/submissions/${result.id}`);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to initialize submission workspace:", err);
+      const msg = err instanceof Error ? err.message : "Failed to initialize submission workspace.";
+      setSubmissionError(msg);
     }
   };
 
@@ -364,21 +380,31 @@ export default function SetupWizardPage() {
             <div className="space-y-3 mt-4">
               {PATHWAY_OPTIONS.map((pathway) => {
                 const isSelected = selectedPathway === pathway.code;
+                const isAvailable = pathway.isAvailable;
+
                 return (
                   <div
                     key={pathway.code}
-                    onClick={() => handlePathwaySelect(pathway.code)}
-                    className={`cursor-pointer rounded-xl border p-4.5 transition-all ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-600"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                    onClick={() => {
+                      if (isAvailable) {
+                        handlePathwaySelect(pathway);
+                      }
+                    }}
+                    className={`rounded-xl border p-4.5 transition-all ${
+                      !isAvailable
+                        ? "cursor-not-allowed border-slate-200 bg-slate-50/70 opacity-60"
+                        : isSelected
+                        ? "cursor-pointer border-blue-600 bg-blue-50/40 ring-1 ring-blue-600"
+                        : "cursor-pointer border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
                         <div
                           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
-                            isSelected
+                            !isAvailable
+                              ? "border-slate-300 bg-slate-200 text-slate-400"
+                              : isSelected
                               ? "border-blue-600 bg-blue-600 text-white"
                               : "border-slate-300 bg-white"
                           }`}
@@ -386,11 +412,22 @@ export default function SetupWizardPage() {
                           {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-slate-900">{pathway.title}</span>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`text-sm font-bold ${isAvailable ? "text-slate-900" : "text-slate-600"}`}>
+                              {pathway.title}
+                            </span>
                             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
                               {pathway.slotsCount} Checklist Slots
                             </span>
+                            {isAvailable ? (
+                              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
+                                Active Blueprint
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                                Phase 2 Scheduled
+                              </span>
+                            )}
                           </div>
                           <p className="mt-1 text-xs text-slate-600 leading-relaxed">
                             {pathway.description}
@@ -398,6 +435,11 @@ export default function SetupWizardPage() {
                           <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500">
                             <span className="font-semibold text-slate-700">Authority:</span>
                             <span>{pathway.authority}</span>
+                            {!isAvailable && (
+                              <span className="text-amber-700 font-semibold ml-2">
+                                • Statutory blueprint scheduled for Phase 2
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -836,6 +878,17 @@ export default function SetupWizardPage() {
               </div>
             </div>
           </div>
+
+          {/* Submission Error Alert */}
+          {submissionError && (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-900 flex items-start gap-2.5">
+              <Info className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Failed to Initialize Application</p>
+                <p className="mt-0.5 text-red-700">{submissionError}</p>
+              </div>
+            </div>
+          )}
 
           {/* Dynamic Summary Card & Launch Action */}
           <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 p-6 shadow-xs">
