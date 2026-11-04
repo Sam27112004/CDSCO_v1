@@ -21,6 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: cdsco-backend:latest
     container_name: cdsco-backend
     restart: always
     depends_on:
@@ -41,6 +42,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: cdsco-frontend:latest
     container_name: cdsco-frontend
     restart: always
     depends_on:
