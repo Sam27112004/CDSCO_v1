@@ -33,7 +33,7 @@ docker compose up --build
 ```
 
 This starts:
-- **PostgreSQL 15 Database:** Available internally for services and mapped to port `5434` on the host to prevent conflicts with any local PostgreSQL instance.
+- **PostgreSQL 15 Database:** Unified container `cdsco-postgres` running on port `5433` (avoiding port `5432` conflicts with local Windows PostgreSQL instances).
 - **FastAPI Backend:** Runs migrations automatically and exposes endpoints on `http://localhost:8000` (Interactive API Swagger Docs: `http://localhost:8000/docs`).
 - **Next.js 14 Frontend:** Accessible in your browser at `http://localhost:3000`.
 
