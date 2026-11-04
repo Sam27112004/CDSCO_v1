@@ -46,3 +46,15 @@ export function useCreateSubmission() {
     },
   });
 }
+
+export function useDeleteSubmission() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: (submissionId: string) =>
+      apiClient.delete<void>(`/submissions/${submissionId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+    },
+  });
+}

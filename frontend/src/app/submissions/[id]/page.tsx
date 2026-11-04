@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   RefreshCw,
@@ -10,8 +10,9 @@ import {
   AlertTriangle,
   ChevronRight,
   Sparkles,
+  Trash2,
 } from "lucide-react";
-import { useSubmission } from "@/hooks/useSubmissions";
+import { useSubmission, useDeleteSubmission } from "@/hooks/useSubmissions";
 import { ChecklistTree } from "@/components/workspace/ChecklistTree";
 import { GuidanceCard } from "@/components/workspace/GuidanceCard";
 import { SlotActionArea } from "@/components/workspace/SlotActionArea";
@@ -20,11 +21,26 @@ import {
   RiskBadge,
   StatusBadge,
 } from "@/components/submissions/StatusBadge";
+import { DeleteSubmissionModal } from "@/components/submissions/DeleteSubmissionModal";
 
 export default function SubmissionWorkspacePage() {
+  const router = useRouter();
   const params = useParams();
   const submissionId = String(params?.id || "");
   const { data: submission, isLoading, isError, error, refetch, isFetching } = useSubmission(submissionId);
+  const deleteMutation = useDeleteSubmission();
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteSubmission = async () => {
+    try {
+      await deleteMutation.mutateAsync(submissionId);
+      setIsDeleteModalOpen(false);
+      router.push("/");
+    } catch (err) {
+      console.error("Failed to delete submission:", err);
+    }
+  };
 
   const entities = useMemo(() => submission?.entities || [], [submission]);
 
@@ -160,6 +176,14 @@ export default function SubmissionWorkspacePage() {
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             </button>
+
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="rounded-md border border-slate-200 p-1.5 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors"
+              title="Delete statutory submission workspace"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       </header>
@@ -266,6 +290,15 @@ export default function SubmissionWorkspacePage() {
           </div>
         </aside>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteSubmissionModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteSubmission}
+        trackingCode={submission.tracking_code}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }

@@ -405,3 +405,4 @@ export interface CDSCOApplicationFields {
      * Section 5: Dynamic Technology Predicates (Sterile, Software, Drug, Animal Tissue, IVD)
    * Render side-by-side **Connected Statutory Requirement Cards** beside each field group, highlighting the exact slot ID, governing rule citation, and consistency requirements.
    * Auto-save or explicit "Save Application Fields" action with visual confirmation.
+

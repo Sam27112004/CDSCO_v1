@@ -13,18 +13,32 @@ import {
   Search,
   RefreshCw,
   Sparkles,
+  Trash2,
 } from "lucide-react";
-import { useSubmissions } from "@/hooks/useSubmissions";
+import { useSubmissions, useDeleteSubmission } from "@/hooks/useSubmissions";
 import {
   PathwayBadge,
   RiskBadge,
   StatusBadge,
 } from "@/components/submissions/StatusBadge";
+import { DeleteSubmissionModal } from "@/components/submissions/DeleteSubmissionModal";
 
 export default function PortfolioDashboardPage() {
   const { data: submissions, isLoading, isError, error, refetch, isFetching } = useSubmissions();
+  const deleteMutation = useDeleteSubmission();
   const [searchQuery, setSearchQuery] = useState("");
   const [pathwayFilter, setPathwayFilter] = useState("ALL");
+  const [submissionToDelete, setSubmissionToDelete] = useState<{ id: string; tracking_code: string } | null>(null);
+
+  const handleDeleteSubmission = async () => {
+    if (!submissionToDelete) return;
+    try {
+      await deleteMutation.mutateAsync(submissionToDelete.id);
+      setSubmissionToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete submission:", err);
+    }
+  };
 
   const items = submissions || [];
 
@@ -343,13 +357,29 @@ export default function PortfolioDashboardPage() {
 
                       {/* Actions */}
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <Link
-                          href={`/submissions/${sub.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-100 hover:text-blue-600 transition-colors"
-                        >
-                          <span>Open</span>
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </Link>
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/submissions/${sub.id}`}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-xs hover:bg-slate-100 hover:text-blue-600 transition-colors"
+                          >
+                            <span>Open</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </Link>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSubmissionToDelete({
+                                id: sub.id,
+                                tracking_code: sub.tracking_code,
+                              })
+                            }
+                            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors"
+                            title={`Delete submission ${sub.tracking_code}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -359,6 +389,15 @@ export default function PortfolioDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteSubmissionModal
+        isOpen={Boolean(submissionToDelete)}
+        onClose={() => setSubmissionToDelete(null)}
+        onConfirm={handleDeleteSubmission}
+        trackingCode={submissionToDelete?.tracking_code || ""}
+        isDeleting={deleteMutation.isPending}
+      />
     </div>
   );
 }
