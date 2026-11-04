@@ -15,6 +15,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.models.application_definition import ApplicationDefinition
+from app.models.evidence import EvidenceLink
 from app.models.submission import Submission
 from app.models.submission_entity import SubmissionEntity
 from app.schemas.submission import (
@@ -25,6 +26,40 @@ from app.schemas.submission import (
 from app.services.definition_service import definition_service
 
 router = APIRouter(prefix="/submissions", tags=["Submissions"])
+
+
+def _build_entity_response(entity: SubmissionEntity, slot_map: dict) -> dict:
+    """Helper formatting slot entity with blueprint regulatory guidance and evidence links."""
+    slot_bp = slot_map.get(entity.slot_id, {})
+    return {
+        "id": entity.id,
+        "submission_id": entity.submission_id,
+        "slot_id": entity.slot_id,
+        "slot_title": entity.slot_title,
+        "fulfillment_mode": entity.fulfillment_mode,
+        "status": entity.status,
+        "form_values": entity.form_values or {},
+        "category": slot_bp.get("category"),
+        "chapter": slot_bp.get("chapter"),
+        "is_mandatory": slot_bp.get("is_mandatory", True),
+        "guidance": slot_bp.get("guidance"),
+        "evidence_links": [
+            {
+                "id": link.id,
+                "submission_id": link.submission_id,
+                "evidence_document_id": link.evidence_document_id,
+                "submission_entity_id": link.submission_entity_id,
+                "dossier_chapter": link.dossier_chapter,
+                "created_at": link.created_at,
+                "document_title": link.document.document_title if link.document else None,
+                "original_filename": link.document.original_filename if link.document else None,
+                "file_size_bytes": link.document.file_size_bytes if link.document else None,
+                "page_count": link.document.page_count if link.document else None,
+            }
+            for link in (entity.evidence_links or [])
+        ],
+        "updated_at": entity.updated_at,
+    }
 
 
 def _build_summary_response(sub: Submission) -> SubmissionSummaryResponse:
@@ -170,26 +205,22 @@ async def create_submission(
         .where(Submission.id == submission_id)
         .options(
             selectinload(Submission.application_definition),
-            selectinload(Submission.entities),
+            selectinload(Submission.entities)
+            .selectinload(SubmissionEntity.evidence_links)
+            .selectinload(EvidenceLink.document),
             selectinload(Submission.validation_issues),
         )
     )
     reloaded = (await db.execute(stmt)).scalar_one()
     summary = _build_summary_response(reloaded)
 
+    blueprint_slots = (reloaded.application_definition.schema_payload or {}).get("slots", [])
+    slot_map = {s["slot_id"]: s for s in blueprint_slots}
+
     return SubmissionDetailResponse(
         **summary.model_dump(),
         entities=[
-            {
-                "id": e.id,
-                "submission_id": e.submission_id,
-                "slot_id": e.slot_id,
-                "slot_title": e.slot_title,
-                "fulfillment_mode": e.fulfillment_mode,
-                "status": e.status,
-                "form_values": e.form_values,
-                "updated_at": e.updated_at,
-            }
+            _build_entity_response(e, slot_map)
             for e in reloaded.entities
         ],
     )
@@ -211,7 +242,9 @@ async def get_submission(
         .where(Submission.id == submission_id)
         .options(
             selectinload(Submission.application_definition),
-            selectinload(Submission.entities),
+            selectinload(Submission.entities)
+            .selectinload(SubmissionEntity.evidence_links)
+            .selectinload(EvidenceLink.document),
             selectinload(Submission.validation_issues),
         )
     )
@@ -224,19 +257,13 @@ async def get_submission(
         )
 
     summary = _build_summary_response(sub)
+    blueprint_slots = (sub.application_definition.schema_payload or {}).get("slots", [])
+    slot_map = {s["slot_id"]: s for s in blueprint_slots}
+
     return SubmissionDetailResponse(
         **summary.model_dump(),
         entities=[
-            {
-                "id": e.id,
-                "submission_id": e.submission_id,
-                "slot_id": e.slot_id,
-                "slot_title": e.slot_title,
-                "fulfillment_mode": e.fulfillment_mode,
-                "status": e.status,
-                "form_values": e.form_values,
-                "updated_at": e.updated_at,
-            }
+            _build_entity_response(e, slot_map)
             for e in sub.entities
         ],
     )

@@ -76,6 +76,11 @@ class SubmissionEntityResponse(BaseModel):
     fulfillment_mode: str
     status: str
     form_values: Optional[Dict[str, Any]] = None
+    category: Optional[str] = None
+    chapter: Optional[str] = None
+    is_mandatory: bool = True
+    guidance: Optional[Dict[str, Any]] = None
+    evidence_links: List[Dict[str, Any]] = Field(default_factory=list)
     updated_at: datetime
 
     class Config:

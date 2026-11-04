@@ -64,6 +64,18 @@ export interface EvidenceDocument {
   uploaded_at: string;
 }
 
+export interface SlotGuidance {
+  what_it_is?: string;
+  why_it_is_needed?: string;
+  official_citation?: string;
+  who_issues?: string;
+  validity_period?: string;
+  target_sugam_location?: string;
+  mandatory_inclusions?: string[];
+  critical_pitfalls?: string[];
+  pro_forma_available?: boolean;
+}
+
 export interface EvidenceLink {
   id: string;
   submission_id: string;
@@ -71,6 +83,10 @@ export interface EvidenceLink {
   submission_entity_id: string;
   dossier_chapter?: string;
   created_at: string;
+  document_title?: string;
+  original_filename?: string;
+  file_size_bytes?: number;
+  page_count?: number;
   evidence_document?: EvidenceDocument;
 }
 
@@ -81,6 +97,10 @@ export interface SubmissionEntity {
   slot_title: string;
   fulfillment_mode: FulfillmentMode;
   status: SlotStatus;
+  category?: string;
+  chapter?: string;
+  is_mandatory?: boolean;
+  guidance?: SlotGuidance;
   form_values?: Record<string, unknown>;
   updated_at: string;
   evidence_links?: EvidenceLink[];
