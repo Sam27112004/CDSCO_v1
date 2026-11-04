@@ -29,7 +29,7 @@ interface PathwayOption {
   isImport: boolean;
   slotsCount: number;
   isAvailable: boolean;
-  phaseNote?: string;
+  statusNote?: string;
 }
 
 const PATHWAY_OPTIONS: PathwayOption[] = [
@@ -62,7 +62,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     isImport: false,
     slotsCount: 48,
     isAvailable: false,
-    phaseNote: "Phase 2 Blueprint",
+    statusNote: "Work in Progress",
   },
   {
     code: "MD-3",
@@ -73,7 +73,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     isImport: false,
     slotsCount: 32,
     isAvailable: false,
-    phaseNote: "Phase 2 Blueprint",
+    statusNote: "Work in Progress",
   },
   {
     code: "MD-4",
@@ -84,7 +84,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
     isImport: false,
     slotsCount: 32,
     isAvailable: false,
-    phaseNote: "Phase 2 Blueprint",
+    statusNote: "Work in Progress",
   },
 ];
 
@@ -419,13 +419,9 @@ export default function SetupWizardPage() {
                             <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
                               {pathway.slotsCount} Checklist Slots
                             </span>
-                            {isAvailable ? (
-                              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-200">
-                                Active Blueprint
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
-                                Phase 2 Scheduled
+                            {!isAvailable && (
+                              <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600 border border-slate-200">
+                                Work in Progress
                               </span>
                             )}
                           </div>
@@ -435,11 +431,6 @@ export default function SetupWizardPage() {
                           <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500">
                             <span className="font-semibold text-slate-700">Authority:</span>
                             <span>{pathway.authority}</span>
-                            {!isAvailable && (
-                              <span className="text-amber-700 font-semibold ml-2">
-                                • Statutory blueprint scheduled for Phase 2
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
