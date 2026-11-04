@@ -117,3 +117,79 @@ async def test_delete_submission_not_found(async_client: AsyncClient):
     random_id = uuid.uuid4()
     response = await async_client.delete(f"/api/v1/submissions/{random_id}")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_submission_fields_and_context(async_client: AsyncClient):
+    """Verifies PATCH /api/v1/submissions/{id} updates scalar fields and deeply merges regulatory_context."""
+    # 1. Create initial MD-14 submission
+    create_payload = {
+        "pathway_code": "MD-14",
+        "filing_modality": "FRESH",
+        "device_category": "MEDICAL_DEVICE",
+        "risk_class": "CLASS_B",
+        "device_family_name": "Initial Device Name",
+        "regulatory_context": {
+            "is_sterile": False,
+            "portal_fields": {
+                "generic_name": "Infusion Pump",
+                "brand_name": "FlowSafe 100",
+            },
+        },
+    }
+    create_res = await async_client.post("/api/v1/submissions", json=create_payload)
+    assert create_res.status_code == 201
+    sub_id = create_res.json()["id"]
+
+    # 2. Patch submission with updated fields and nested portal_fields
+    patch_payload = {
+        "device_family_name": "Updated Volumetric Infusion Pump System",
+        "filing_modality": "ENDORSEMENT",
+        "risk_class": "CLASS_C",
+        "regulatory_context": {
+            "is_sterile": True,
+            "contains_software": True,
+            "portal_fields": {
+                "brand_name": "FlowSafe 200 Pro",
+                "shelf_life_months": 36,
+                "bharatkosh_challan_no": "BK20261104998",
+            },
+        },
+    }
+    patch_res = await async_client.patch(f"/api/v1/submissions/{sub_id}", json=patch_payload)
+    assert patch_res.status_code == 200
+    data = patch_res.json()
+
+    # 3. Assert scalar updates
+    assert data["device_family_name"] == "Updated Volumetric Infusion Pump System"
+    assert data["filing_modality"] == "ENDORSEMENT"
+    assert data["risk_class"] == "CLASS_C"
+
+    # 4. Assert regulatory_context deep merge
+    ctx = data["regulatory_context"]
+    assert ctx["is_sterile"] is True
+    assert ctx["contains_software"] is True
+    assert ctx["device_family_name"] == "Updated Volumetric Infusion Pump System"
+
+    # Preserved initial generic_name, updated brand_name, added shelf_life_months & bharatkosh
+    portal = ctx["portal_fields"]
+    assert portal["generic_name"] == "Infusion Pump"
+    assert portal["brand_name"] == "FlowSafe 200 Pro"
+    assert portal["shelf_life_months"] == 36
+    assert portal["bharatkosh_challan_no"] == "BK20261104998"
+
+    # Cleanup
+    del_res = await async_client.delete(f"/api/v1/submissions/{sub_id}")
+    assert del_res.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_update_submission_not_found(async_client: AsyncClient):
+    """Verifies 404 when patching non-existent submission."""
+    random_id = uuid.uuid4()
+    response = await async_client.patch(
+        f"/api/v1/submissions/{random_id}",
+        json={"device_family_name": "Non existent"},
+    )
+    assert response.status_code == 404
+    assert f"Submission '{random_id}' not found" in response.json()["detail"]

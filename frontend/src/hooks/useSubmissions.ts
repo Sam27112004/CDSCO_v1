@@ -58,3 +58,28 @@ export function useDeleteSubmission() {
     },
   });
 }
+
+export interface UpdateSubmissionInput {
+  id: string;
+  device_family_name?: string;
+  filing_modality?: FilingModality;
+  risk_class?: RiskClass;
+  status?: string;
+  regulatory_context?: Partial<RegulatoryContext> & Record<string, unknown>;
+  applicant_profile_id?: string;
+  manufacturer_profile_id?: string;
+  site_profile_id?: string;
+}
+
+export function useUpdateSubmission() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Submission, Error, UpdateSubmissionInput>({
+    mutationFn: ({ id, ...patchData }) =>
+      apiClient.patch<Submission>(`/submissions/${id}`, patchData),
+    onSuccess: (updatedSub) => {
+      queryClient.invalidateQueries({ queryKey: ["submissions"] });
+      queryClient.invalidateQueries({ queryKey: ["submission", updatedSub.id] });
+    },
+  });
+}

@@ -12,6 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path as UrlPath, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.core.database import get_db
 from app.models.application_definition import ApplicationDefinition
@@ -22,6 +23,7 @@ from app.schemas.submission import (
     SubmissionCreate,
     SubmissionDetailResponse,
     SubmissionSummaryResponse,
+    SubmissionUpdate,
 )
 from app.services.definition_service import definition_service
 
@@ -266,6 +268,89 @@ async def get_submission(
         entities=[
             _build_entity_response(e, slot_map)
             for e in sub.entities
+        ],
+    )
+
+
+def _deep_merge_dict(target: dict, source: dict) -> dict:
+    """Recursively merges source dict into target dict in-place."""
+    for key, value in source.items():
+        if isinstance(value, dict) and key in target and isinstance(target[key], dict):
+            _deep_merge_dict(target[key], value)
+        else:
+            target[key] = value
+    return target
+
+
+@router.patch(
+    "/{submission_id}",
+    response_model=SubmissionDetailResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update submission workspace fields and regulatory context",
+)
+async def update_submission(
+    payload: SubmissionUpdate,
+    submission_id: uuid.UUID = UrlPath(..., description="Target submission identifier"),
+    db: AsyncSession = Depends(get_db),
+) -> SubmissionDetailResponse:
+    """Updates fields or merges regulatory context / portal web-form values on a submission."""
+    sub = await db.get(Submission, submission_id)
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Submission '{submission_id}' not found.",
+        )
+
+    # 1. Update basic scalar attributes
+    if payload.filing_modality is not None:
+        sub.filing_modality = payload.filing_modality
+    if payload.risk_class is not None:
+        sub.risk_class = payload.risk_class
+    if payload.status is not None:
+        sub.status = payload.status
+    if payload.applicant_profile_id is not None:
+        sub.applicant_profile_id = payload.applicant_profile_id
+    if payload.manufacturer_profile_id is not None:
+        sub.manufacturer_profile_id = payload.manufacturer_profile_id
+    if payload.site_profile_id is not None:
+        sub.site_profile_id = payload.site_profile_id
+
+    # 2. Merge regulatory_context
+    updated_context = dict(sub.regulatory_context or {})
+    if payload.regulatory_context is not None:
+        _deep_merge_dict(updated_context, payload.regulatory_context)
+    if payload.device_family_name is not None:
+        updated_context["device_family_name"] = payload.device_family_name
+
+    sub.regulatory_context = updated_context
+    flag_modified(sub, "regulatory_context")
+
+    await db.commit()
+
+    # 3. Reload eagerly with relationships
+    stmt = (
+        select(Submission)
+        .where(Submission.id == submission_id)
+        .options(
+            selectinload(Submission.application_definition),
+            selectinload(Submission.entities)
+            .selectinload(SubmissionEntity.evidence_links)
+            .selectinload(EvidenceLink.document),
+            selectinload(Submission.validation_issues),
+        )
+    )
+    result = await db.execute(stmt)
+    reloaded = result.scalar_one()
+
+    summary = _build_summary_response(reloaded)
+    blueprint_slots = (reloaded.application_definition.schema_payload or {}).get("slots", [])
+    slot_map = {s["slot_id"]: s for s in blueprint_slots}
+
+    return SubmissionDetailResponse(
+        **summary.model_dump(),
+        entities=[
+            _build_entity_response(e, slot_map)
+            for e in reloaded.entities
         ],
     )
 

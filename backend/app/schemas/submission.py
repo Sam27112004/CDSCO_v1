@@ -41,6 +41,35 @@ class SubmissionCreate(BaseModel):
     site_profile_id: Optional[uuid.UUID] = None
 
 
+class SubmissionUpdate(BaseModel):
+    """Payload for partial updates to an active submission workspace and regulatory context."""
+
+    device_family_name: Optional[str] = Field(
+        default=None,
+        description="Updated commercial or generic device family title",
+        example="Bio-Resorbable Coronary Stent System",
+    )
+    filing_modality: Optional[str] = Field(
+        default=None,
+        description="Updated filing modality: FRESH, RENEWAL, POST_APPROVAL_CHANGE, ENDORSEMENT",
+    )
+    risk_class: Optional[str] = Field(
+        default=None,
+        description="Updated risk classification: CLASS_A, CLASS_B, CLASS_C, CLASS_D",
+    )
+    status: Optional[str] = Field(
+        default=None,
+        description="Updated submission workflow status",
+    )
+    regulatory_context: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Dynamic portal form inputs and regulatory predicate flags",
+    )
+    applicant_profile_id: Optional[uuid.UUID] = None
+    manufacturer_profile_id: Optional[uuid.UUID] = None
+    site_profile_id: Optional[uuid.UUID] = None
+
+
 class SubmissionSummaryResponse(BaseModel):
     """High-level summary of a submission workspace for portfolio dashboards."""
 

@@ -105,6 +105,13 @@ class ApiClient {
     });
   }
 
+  public async patch<T>(endpoint: string, body?: unknown): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: "PATCH",
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    });
+  }
+
   public async delete<T>(endpoint: string): Promise<T> {
     return this.request<T>(endpoint, { method: "DELETE" });
   }
