@@ -8,9 +8,9 @@
 
 ## Current Status Snapshot
 
-* **Current Active Phase:** Phase 1 (Platform Core, Data Ingestion, and Workspace Shell)
-* **Last Completed Sub-Task:** Task 1.4.4: Build `GET /api/v1/evidence/{document_id}/stream` with HTTP byte-range support (2026-11-02 20:40 IST | RFC 7233 partial content 206 streaming, open/suffix range support, 416 range boundary enforcement, HEAD probe handling for PDF.js, and 11 API tests)
-* **Next Active Sub-Task:** **Task 1.5.1: Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.**
+* **Current Active Phase:** Phase 2 (Document Generation & Dossier Assembly – Engine 1 & 2)
+* **Last Completed Sub-Task:** Task 1.5.7: Integrate PDF.js viewer modal allowing in-browser document verification without downloading (Commit: `bbd3fc7` | RFC 7233 byte-range stream viewer, SHA-256 cryptographic verification chip, fullscreen toggle, zero extra native dependencies).
+* **Next Active Sub-Task:** **Task 2.1.1: Author official CDSCO Jinja2 HTML/CSS templates adhering to statutory margins (`covering_letter.html`, `essential_principles_checklist.html`, `declaration_of_conformity.html`, `non_commercial_undertaking.html`, `tr6_fee_challan_summary.html`).**
 
 ---
 
