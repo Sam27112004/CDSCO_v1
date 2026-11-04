@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.evidence import router as evidence_router
+from app.api.v1.profiles import router as profiles_router
 from app.api.v1.submissions import router as submissions_router
 from app.core.config import settings
 from app.core.database import get_db
@@ -11,6 +12,7 @@ api_router = APIRouter()
 
 # Mount feature routers
 api_router.include_router(submissions_router)
+api_router.include_router(profiles_router)
 api_router.include_router(evidence_router)
 
 

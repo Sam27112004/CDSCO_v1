@@ -9,10 +9,11 @@ import {
 } from "@/types/regulatory";
 
 export interface CreateSubmissionInput {
-  application_definition_id: string;
+  pathway_code: string;
   filing_modality: FilingModality;
   device_category: DeviceCategory;
   risk_class: RiskClass;
+  device_family_name?: string;
   regulatory_context: RegulatoryContext;
   applicant_profile_id?: string;
   manufacturer_profile_id?: string;

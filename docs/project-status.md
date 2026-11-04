@@ -52,7 +52,7 @@
 - [x] **1.5.1:** Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.
 - [x] **1.5.2:** Configure TanStack React Query v5 for server-side state synchronization.
 - [x] **1.5.3:** Build Portfolio Dashboard view (`/`) showing active submissions and readiness progress.
-- [ ] **1.5.4:** Build Setup Wizard view (`/submissions/new`) capturing Pathway, Modality, Class, and Profiles.
+- [x] **1.5.4:** Build Setup Wizard view (`/submissions/new`) capturing Pathway, Modality, Class, and Profiles.
 - [ ] **1.5.5:** Build Split-Screen Workspace (`/submissions/[id]`):
   - Left Pane: 36-48 Slot Checklist Tree with color-coded badges (Muted, Amber, Blue, Green, Red).
   - Center Pane: Entity Workspace Controller rendering 8-point regulatory guidance card.
