@@ -50,7 +50,7 @@
 
 ### Task 1.5: Frontend Workspace Shell (Next.js 14 / TypeScript)
 - [x] **1.5.1:** Initialize Next.js 14 App Router project with Tailwind CSS and Lucide Icons.
-- [ ] **1.5.2:** Configure TanStack React Query v5 for server-side state synchronization.
+- [x] **1.5.2:** Configure TanStack React Query v5 for server-side state synchronization.
 - [ ] **1.5.3:** Build Portfolio Dashboard view (`/`) showing active submissions and readiness progress.
 - [ ] **1.5.4:** Build Setup Wizard view (`/submissions/new`) capturing Pathway, Modality, Class, and Profiles.
 - [ ] **1.5.5:** Build Split-Screen Workspace (`/submissions/[id]`):

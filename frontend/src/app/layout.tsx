@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { Navbar } from "@/components/layout/Navbar";
 
 const geistSans = localFont({
@@ -31,8 +32,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
+        <QueryProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+        </QueryProvider>
       </body>
     </html>
   );

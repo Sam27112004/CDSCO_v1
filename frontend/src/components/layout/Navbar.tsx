@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Shield, FileText, PlusCircle } from "lucide-react";
+import { useHealth } from "@/hooks/useHealth";
 
 export function Navbar() {
+  const { data: health, isLoading, isError } = useHealth();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -41,8 +46,22 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-            <span>CDSCO Portal Connected</span>
+            {isLoading ? (
+              <>
+                <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                <span className="text-slate-500">Connecting...</span>
+              </>
+            ) : isError || health?.status !== "healthy" ? (
+              <>
+                <span className="flex h-2 w-2 rounded-full bg-red-500" />
+                <span className="text-red-700">Service Degraded</span>
+              </>
+            ) : (
+              <>
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-emerald-700">Gateway v{health.version}</span>
+              </>
+            )}
           </div>
 
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-white">
@@ -53,4 +72,3 @@ export function Navbar() {
     </header>
   );
 }
-
