@@ -8,9 +8,9 @@
 
 ## Current Status Snapshot
 
-* **Current Active Phase:** Phase 2 (Document Generation & Dossier Assembly – Engine 1 & 2)
+* **Current Active Phase:** Phase 1 Verification & Testing Gate (Phase 2 Paused per User Request)
 * **Last Completed Sub-Task:** Task 1.5.7: Integrate PDF.js viewer modal allowing in-browser document verification without downloading (Commit: `bbd3fc7` | RFC 7233 byte-range stream viewer, SHA-256 cryptographic verification chip, fullscreen toggle, zero extra native dependencies).
-* **Next Active Sub-Task:** **Task 2.1.1: Author official CDSCO Jinja2 HTML/CSS templates adhering to statutory margins (`covering_letter.html`, `essential_principles_checklist.html`, `declaration_of_conformity.html`, `non_commercial_undertaking.html`, `tr6_fee_challan_summary.html`).**
+* **Next Active Sub-Task:** Phase 1 User Acceptance Testing & Verification (Task 2.1.1 paused until user explicitly signs off on Phase 1).
 
 ---
 
