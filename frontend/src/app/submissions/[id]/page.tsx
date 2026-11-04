@@ -11,11 +11,14 @@ import {
   ChevronRight,
   Sparkles,
   Trash2,
+  Layers,
+  FileText,
 } from "lucide-react";
 import { useSubmission, useDeleteSubmission } from "@/hooks/useSubmissions";
 import { ChecklistTree } from "@/components/workspace/ChecklistTree";
 import { GuidanceCard } from "@/components/workspace/GuidanceCard";
 import { SlotActionArea } from "@/components/workspace/SlotActionArea";
+import { PortalFieldsTab } from "@/components/workspace/PortalFieldsTab";
 import {
   PathwayBadge,
   RiskBadge,
@@ -30,6 +33,7 @@ export default function SubmissionWorkspacePage() {
   const { data: submission, isLoading, isError, error, refetch, isFetching } = useSubmission(submissionId);
   const deleteMutation = useDeleteSubmission();
 
+  const [activeWorkspaceTab, setActiveWorkspaceTab] = useState<"CHECKLIST" | "PORTAL_FIELDS">("CHECKLIST");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteSubmission = async () => {
@@ -190,10 +194,75 @@ export default function SubmissionWorkspacePage() {
         </div>
       </header>
 
-      {/* Main 3-Panel Split Workspace */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* LEFT PANE: 36-48 Slot Checklist Tree */}
-        <aside className="w-80 lg:w-96 shrink-0 h-full overflow-hidden">
+      {/* Workspace View Mode Tab Switcher */}
+      <nav className="shrink-0 border-b border-slate-200 bg-white px-4">
+        <div className="flex gap-6">
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab("CHECKLIST")}
+            className={`flex items-center gap-2 border-b-2 py-3 text-xs font-bold transition-colors ${
+              activeWorkspaceTab === "CHECKLIST"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800"
+            }`}
+          >
+            <Layers className="h-4 w-4" />
+            <span>Statutory Document Checklist</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                activeWorkspaceTab === "CHECKLIST"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {totalSlots} Slots
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveWorkspaceTab("PORTAL_FIELDS")}
+            className={`flex items-center gap-2 border-b-2 py-3 text-xs font-bold transition-colors ${
+              activeWorkspaceTab === "PORTAL_FIELDS"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800"
+            }`}
+          >
+            <FileText className="h-4 w-4" />
+            <span>CDSCO Portal Form Fields & Specifications</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                activeWorkspaceTab === "PORTAL_FIELDS"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              Web Form
+            </span>
+          </button>
+        </div>
+      </nav>
+
+      {/* Main Workspace Body: Portal Fields View OR Checklist Split View */}
+      {activeWorkspaceTab === "PORTAL_FIELDS" ? (
+        <div className="flex-1 overflow-y-auto bg-slate-50 p-6 lg:p-8">
+          <div className="mx-auto max-w-6xl">
+            <PortalFieldsTab
+              submission={submission}
+              pathwayCode={pathwayCode}
+              deviceCategory={submission.device_category}
+              onNavigateToSlot={(slotId) => {
+                setActiveSlotId(slotId);
+                setActiveWorkspaceTab("CHECKLIST");
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        /* Main 3-Panel Split Workspace */
+        <div className="flex flex-1 overflow-hidden">
+          {/* LEFT PANE: 36-48 Slot Checklist Tree */}
+          <aside className="w-80 lg:w-96 shrink-0 h-full overflow-hidden">
           <ChecklistTree
             entities={entities}
             activeSlotId={activeEntity?.slot_id || null}
@@ -292,6 +361,7 @@ export default function SubmissionWorkspacePage() {
           </div>
         </aside>
       </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <DeleteSubmissionModal

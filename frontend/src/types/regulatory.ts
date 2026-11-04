@@ -113,7 +113,95 @@ export interface RegulatoryContext {
   contains_software?: boolean;
   contains_medicinal_substance?: boolean;
   contains_animal_tissue?: boolean;
+  portal_fields?: CDSCOApplicationFields;
   [key: string]: unknown;
+}
+
+export interface ModelVariant {
+  model_number: string;
+  model_name: string;
+  dimension_spec: string;
+  pack_size: string;
+  accessories_included?: string;
+}
+
+export interface CDSCOApplicationFields {
+  // Application & Treasury
+  filing_modality?: string;
+  bharatkosh_challan_no?: string;
+  payment_date?: string;
+  fee_amount_inr?: number;
+  bank_reference_no?: string;
+
+  // Legal Representation (Import MD-14)
+  indian_agent_name?: string;
+  wholesale_licence_no?: string;
+  wholesale_licence_validity?: string;
+  poa_execution_date?: string;
+  foreign_mfr_name?: string;
+  foreign_mfr_country?: string;
+  foreign_site_address?: string;
+
+  // Domestic Premises (MD-7 & MD-3)
+  domestic_mfr_name?: string;
+  mfg_premises_address?: string;
+  cleanroom_area_sqm?: number;
+  production_incharge_name?: string;
+  qa_incharge_name?: string;
+  inhouse_lab_available?: boolean;
+
+  // Core Device Identity
+  generic_name?: string;
+  brand_name?: string;
+  intended_use?: string;
+  intended_patient_population?: string;
+  anatomical_site?: string;
+  material_of_construction?: string;
+  shelf_life_months?: number;
+  storage_temperature_min?: number;
+  storage_temperature_max?: number;
+  storage_conditions_text?: string;
+  is_single_use?: boolean;
+  reuse_cycles_max?: number;
+
+  // Model Variant Matrix
+  model_variants?: ModelVariant[];
+
+  // Technology Predicates (Conditional)
+  is_sterile?: boolean;
+  sterilization_method?: string;
+  sterility_assurance_level?: string;
+  sterilization_facility_address?: string;
+  packaging_barrier_system?: string;
+
+  contains_software?: boolean;
+  software_version?: string;
+  software_safety_class?: string;
+  target_operating_system?: string;
+  cloud_hosted?: boolean;
+  cybersecurity_standard_applied?: string;
+
+  contains_medicinal_substance?: boolean;
+  drug_inn_name?: string;
+  drug_pharmacopoeial_grade?: string;
+  drug_quantity_per_device?: string;
+  drug_intended_action?: string;
+  drug_source_manufacturer?: string;
+
+  contains_animal_tissue?: boolean;
+  animal_species?: string;
+  tissue_type_harvested?: string;
+  tse_bse_risk_category?: string;
+  geographical_origin_country?: string;
+  viral_inactivation_method?: string;
+
+  // Modality Predicate: IVD
+  target_analyte?: string;
+  ivd_test_principle?: string;
+  specimen_matrix?: string[];
+  calibrator_traceability?: string;
+  open_vial_stability_days?: number;
+  compatible_instruments?: string;
 }
 
 export interface Submission {
