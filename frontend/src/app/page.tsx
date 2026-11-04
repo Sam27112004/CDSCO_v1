@@ -368,16 +368,18 @@ export default function PortfolioDashboardPage() {
 
                           <button
                             type="button"
-                            onClick={() =>
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSubmissionToDelete({
                                 id: sub.id,
                                 tracking_code: sub.tracking_code,
-                              })
-                            }
-                            className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors"
+                              });
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50/50 px-2.5 py-1.5 text-xs font-semibold text-red-600 shadow-xs hover:bg-red-100 hover:text-red-700 transition-colors"
                             title={`Delete submission ${sub.tracking_code}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </td>
