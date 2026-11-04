@@ -8,9 +8,9 @@
 
 ## Current Status Snapshot
 
-* **Current Active Phase:** Phase 1 Verification & Testing Gate (Phase 2 Paused per User Request)
-* **Last Completed Sub-Task:** Task 1.5.7: Integrate PDF.js viewer modal allowing in-browser document verification without downloading (Commit: `bbd3fc7` | RFC 7233 byte-range stream viewer, SHA-256 cryptographic verification chip, fullscreen toggle, zero extra native dependencies).
-* **Next Active Sub-Task:** Phase 1 User Acceptance Testing & Verification (Task 2.1.1 paused until user explicitly signs off on Phase 1).
+* **Current Active Phase:** Phase 1 Portal Web-Form Fields & Submission Management (Phase 1 Extension)
+* **Last Completed Sub-Task:** Task 1.5.8: Research and author formal CDSCO portal web-form field specifications mapping dynamic field sets by pathway (Form MD-14 vs MD-7) and context constraints (Sterility, Software, Drug, Tissue, IVD) with connected statutory slot relationships (Document: `docs/technical_reference/08_CDSCO_PORTAL_WEBFORM_FIELDS_SPECIFICATION.md`).
+* **Next Active Sub-Task:** Task 1.5.9: Implement Submission Deletion (`DELETE /api/v1/submissions/{id}`) in frontend UI across Dashboard table and Workspace header with confirmation modal.
 
 ---
 
@@ -58,6 +58,10 @@
   - Center Pane: Entity Workspace Controller rendering 8-point regulatory guidance card.
 - [x] **1.5.6:** Build `FileUploadDropzone` supporting drag-and-drop PDF uploads with progress indicators.
 - [x] **1.5.7:** Integrate PDF.js viewer modal allowing in-browser document verification without downloading.
+- [x] **1.5.8:** Research and author formal CDSCO portal web-form field specifications mapping dynamic field sets by pathway (Form MD-14 vs MD-7) and context constraints (Sterility, Software, Drug, Tissue, IVD) with connected statutory slot relationships.
+- [ ] **1.5.9:** Implement Submission Deletion (`DELETE /api/v1/submissions/{id}`) in frontend UI across Dashboard table and Workspace header with confirmation modal.
+- [ ] **1.5.10:** Build backend `PATCH /api/v1/submissions/{id}` endpoint and Pydantic schema to persist updated application fields in `regulatory_context`.
+- [ ] **1.5.11:** Build `PortalFieldsTab` in Next.js workspace with pathway-conditional field sets, connected statutory requirement badges (linking fields to checklist slots), and real-time persistence.
 
 ---
 
