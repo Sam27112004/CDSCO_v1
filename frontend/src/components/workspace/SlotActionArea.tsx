@@ -3,17 +3,18 @@
 import React from "react";
 import {
   FileText,
-  UploadCloud,
   FileCheck2,
   Trash2,
   AlertCircle,
 } from "lucide-react";
 import { SubmissionEntity } from "@/types/regulatory";
 import { useUnlinkEvidence } from "@/hooks/useEvidence";
+import { FileUploadDropzone } from "./FileUploadDropzone";
 
 interface SlotActionAreaProps {
   submissionId: string;
   entity: SubmissionEntity;
+  onPreviewDocument?: (documentId: string) => void;
 }
 
 export function SlotActionArea({
@@ -38,7 +39,7 @@ export function SlotActionArea({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-6">
       {/* Action Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div>
@@ -67,18 +68,19 @@ export function SlotActionArea({
       </div>
 
       {/* Attached Documents List */}
-      {hasDocuments ? (
+      {hasDocuments && (
         <div className="space-y-3">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block">
-            Attached Documents in Vault
+            Attached Documents in Vault ({links.length})
           </span>
           <div className="space-y-2">
             {links.map((link) => {
               const doc = link.evidence_document;
               const title = link.document_title || doc?.document_title || "Statutory Evidence";
               const filename = link.original_filename || doc?.original_filename || "document.pdf";
-              const sizeKB = doc?.file_size_bytes ? Math.round(doc.file_size_bytes / 1024) : 0;
-              const pages = doc?.page_count || 1;
+              const sizeBytes = link.file_size_bytes || doc?.file_size_bytes || 0;
+              const sizeKB = sizeBytes > 0 ? Math.round(sizeBytes / 1024) : 0;
+              const pages = link.page_count || doc?.page_count || 1;
 
               return (
                 <div
@@ -117,18 +119,18 @@ export function SlotActionArea({
             })}
           </div>
         </div>
-      ) : (
-        /* Empty Slot Action Prompt */
-        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-6 text-center">
-          <UploadCloud className="mx-auto h-8 w-8 text-slate-400 mb-2" />
-          <h4 className="text-xs font-bold text-slate-800">
-            No document attached to slot {entity.slot_id}
-          </h4>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            Upload a compliant PDF, Word document, or high-resolution image scan satisfying this statutory requirement.
-          </p>
-        </div>
       )}
+
+      {/* File Upload & Ingestion Dropzone */}
+      <div className="space-y-2 pt-2 border-t border-slate-100">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-600 block">
+          {hasDocuments ? "Attach Additional Statutory File" : "Upload Statutory Evidence File"}
+        </span>
+        <FileUploadDropzone
+          submissionId={submissionId}
+          entity={entity}
+        />
+      </div>
     </div>
   );
 }

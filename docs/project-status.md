@@ -56,7 +56,7 @@
 - [x] **1.5.5:** Build Split-Screen Workspace (`/submissions/[id]`):
   - Left Pane: 36-48 Slot Checklist Tree with color-coded badges (Muted, Amber, Blue, Green, Red).
   - Center Pane: Entity Workspace Controller rendering 8-point regulatory guidance card.
-- [ ] **1.5.6:** Build `FileUploadDropzone` supporting drag-and-drop PDF uploads with progress indicators.
+- [x] **1.5.6:** Build `FileUploadDropzone` supporting drag-and-drop PDF uploads with progress indicators.
 - [ ] **1.5.7:** Integrate PDF.js viewer modal allowing in-browser document verification without downloading.
 
 ---
