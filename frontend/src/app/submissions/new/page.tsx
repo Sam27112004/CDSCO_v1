@@ -11,6 +11,8 @@ import {
   Info,
   Check,
   Sparkles,
+  AlertCircle,
+  PenLine,
 } from "lucide-react";
 import { useCreateSubmission } from "@/hooks/useSubmissions";
 import { useProfiles } from "@/hooks/useProfiles";
@@ -100,13 +102,25 @@ export default function SetupWizardPage() {
   const [selectedPathway, setSelectedPathway] = useState<string>("MD-14");
   const [modality, setModality] = useState<FilingModality>("FRESH");
   const [deviceFamilyName, setDeviceFamilyName] = useState<string>("");
+  const [deviceTitleError, setDeviceTitleError] = useState<boolean>(false);
   const [deviceCategory, setDeviceCategory] = useState<DeviceCategory>("MEDICAL_DEVICE");
   const [riskClass, setRiskClass] = useState<RiskClass>("CLASS_C");
 
-  // Organizational Profiles State
+  // Profile Binding Mode: Select Saved vs Enter Manually
+  const [profileMode, setProfileMode] = useState<"SAVED" | "MANUAL">("SAVED");
+
+  // Organizational Profiles State (Saved IDs)
   const [agentProfileId, setAgentProfileId] = useState<string>("");
   const [mfgProfileId, setMfgProfileId] = useState<string>("");
   const [siteProfileId, setSiteProfileId] = useState<string>("");
+
+  // Manual Profile Filling State
+  const [manualAgentName, setManualAgentName] = useState<string>("");
+  const [manualAgentLicence, setManualAgentLicence] = useState<string>("");
+  const [manualMfgName, setManualMfgName] = useState<string>("");
+  const [manualMfgCountry, setManualMfgCountry] = useState<string>("United States");
+  const [manualSiteAddress, setManualSiteAddress] = useState<string>("");
+
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   // Regulatory Context Predicates
@@ -139,16 +153,33 @@ export default function SetupWizardPage() {
     [profiles]
   );
 
-  // Auto-select first profile when data loads
+  // Auto-select verified default profiles whenever profiles load or pathway changes
   React.useEffect(() => {
     if (activePathway.isImport) {
-      if (!agentProfileId && agentProfiles.length > 0) setAgentProfileId(agentProfiles[0].id);
-      if (!mfgProfileId && foreignMfgProfiles.length > 0) setMfgProfileId(foreignMfgProfiles[0].id);
+      if (agentProfiles.length > 0 && (!agentProfileId || !agentProfiles.some((p) => p.id === agentProfileId))) {
+        setAgentProfileId(agentProfiles[0].id);
+      }
+      if (foreignMfgProfiles.length > 0 && (!mfgProfileId || !foreignMfgProfiles.some((p) => p.id === mfgProfileId))) {
+        setMfgProfileId(foreignMfgProfiles[0].id);
+      }
     } else {
-      if (!mfgProfileId && domesticMfgProfiles.length > 0) setMfgProfileId(domesticMfgProfiles[0].id);
+      if (domesticMfgProfiles.length > 0 && (!mfgProfileId || !domesticMfgProfiles.some((p) => p.id === mfgProfileId))) {
+        setMfgProfileId(domesticMfgProfiles[0].id);
+      }
     }
-    if (!siteProfileId && siteProfiles.length > 0) setSiteProfileId(siteProfiles[0].id);
-  }, [profiles, activePathway.isImport, agentProfiles, foreignMfgProfiles, domesticMfgProfiles, siteProfiles, agentProfileId, mfgProfileId, siteProfileId]);
+    if (siteProfiles.length > 0 && (!siteProfileId || !siteProfiles.some((p) => p.id === siteProfileId))) {
+      setSiteProfileId(siteProfiles[0].id);
+    }
+  }, [
+    activePathway.isImport,
+    agentProfiles,
+    foreignMfgProfiles,
+    domesticMfgProfiles,
+    siteProfiles,
+    agentProfileId,
+    mfgProfileId,
+    siteProfileId,
+  ]);
 
   // Handle pathway change with Smart Statutory Constraints (TC-UR01-01)
   const handlePathwaySelect = (pathway: PathwayOption) => {
@@ -167,23 +198,46 @@ export default function SetupWizardPage() {
   // Submit Handler
   const handleLaunchWorkspace = async () => {
     setSubmissionError(null);
+
+    // Validate Device Family Title
+    if (!deviceFamilyName.trim()) {
+      setDeviceTitleError(true);
+      setCurrentStep(1);
+      setSubmissionError("Device Family Title is required to establish statutory product identity.");
+      return;
+    }
+
     try {
+      const manualPortalFields =
+        profileMode === "MANUAL"
+          ? {
+              indian_agent_name: manualAgentName.trim() || undefined,
+              wholesale_licence_no: manualAgentLicence.trim() || undefined,
+              foreign_mfr_name: manualMfgName.trim() || undefined,
+              foreign_mfr_country: manualMfgCountry.trim() || undefined,
+              foreign_site_address: manualSiteAddress.trim() || undefined,
+              domestic_mfr_name: manualMfgName.trim() || undefined,
+              mfg_premises_address: manualSiteAddress.trim() || undefined,
+            }
+          : {};
+
       const payload = {
         pathway_code: selectedPathway,
         filing_modality: modality,
         device_category: deviceCategory,
         risk_class: riskClass,
-        device_family_name: deviceFamilyName.trim() || undefined,
+        device_family_name: deviceFamilyName.trim(),
         regulatory_context: {
-          device_family_name: deviceFamilyName.trim() || undefined,
+          device_family_name: deviceFamilyName.trim(),
           is_sterile: isSterile,
           contains_software: containsSoftware,
           contains_medicinal_substance: containsDrug,
           contains_animal_tissue: containsAnimalTissue,
+          portal_fields: manualPortalFields,
         },
-        applicant_profile_id: agentProfileId || undefined,
-        manufacturer_profile_id: mfgProfileId || undefined,
-        site_profile_id: siteProfileId || undefined,
+        applicant_profile_id: profileMode === "SAVED" ? (agentProfileId || undefined) : undefined,
+        manufacturer_profile_id: profileMode === "SAVED" ? (mfgProfileId || undefined) : undefined,
+        site_profile_id: profileMode === "SAVED" ? (siteProfileId || undefined) : undefined,
       };
 
       const result = await createSubmission.mutateAsync(payload);
@@ -321,18 +375,31 @@ export default function SetupWizardPage() {
           {/* Device Family Input */}
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <label className="block text-sm font-semibold text-slate-900">
-              Device Family Title
+              Device Family Title <span className="text-red-500">*</span>
             </label>
             <p className="mt-0.5 text-xs text-slate-500">
-              Enter the statutory medical device name as approved on the Foreign Free Sale Certificate or Quality Manual.
+              Enter the statutory medical device name as approved on the Foreign Free Sale Certificate or Quality Manual. This is required to establish statutory product identity under MDR 2017.
             </p>
             <input
               type="text"
               value={deviceFamilyName}
-              onChange={(e) => setDeviceFamilyName(e.target.value)}
+              onChange={(e) => {
+                setDeviceFamilyName(e.target.value);
+                if (e.target.value.trim()) setDeviceTitleError(false);
+              }}
               placeholder="e.g. Orthopedic Pedicle Screw Spinal Fixation System"
-              className="mt-3 w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className={`mt-3 w-full rounded-lg border px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 ${
+                deviceTitleError
+                  ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50/30"
+                  : "border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+              }`}
             />
+            {deviceTitleError && (
+              <p className="mt-2 text-xs font-semibold text-red-600 flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4" />
+                <span>Device Family Title is required to establish statutory product identity.</span>
+              </p>
+            )}
           </div>
 
           {/* Filing Modality Selector */}
@@ -445,7 +512,14 @@ export default function SetupWizardPage() {
           <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
-              onClick={() => setCurrentStep(2)}
+              onClick={() => {
+                if (!deviceFamilyName.trim()) {
+                  setDeviceTitleError(true);
+                  return;
+                }
+                setDeviceTitleError(false);
+                setCurrentStep(2);
+              }}
               className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-700 transition-colors"
             >
               <span>Continue to Legal Profiles</span>
@@ -455,134 +529,314 @@ export default function SetupWizardPage() {
         </div>
       )}
 
-      {/* STEP 2: Bind Reusable Organizational Profiles */}
+      {/* STEP 2: Bind Reusable Organizational Profiles OR Enter Manually */}
       {currentStep === 2 && (
         <div className="space-y-6">
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-xs">
             <div className="flex items-center gap-2 mb-1">
               <Building2 className="h-5 w-5 text-blue-600" />
               <h2 className="text-base font-bold text-slate-900">
-                Bind Reusable Organizational Profiles
+                Legal Entity & Manufacturing Site Identification
               </h2>
             </div>
             <p className="text-xs text-slate-500 mb-6">
-              Select pre-saved verified profiles to auto-populate administrative details, ISO certificates, and legal entities.
+              Choose whether to select pre-saved verified organization profiles or fill in legal entity and plant details directly for this filing.
             </p>
 
-            {/* Import vs Domestic Profile Requirements */}
-            {activePathway.isImport ? (
-              <div className="space-y-5">
-                {/* 1. Authorized Indian Agent */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Authorized Indian Agent (Under MDR 2017 Rule 34)
-                  </label>
-                  <select
-                    value={agentProfileId}
-                    onChange={(e) => setAgentProfileId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">Select Indian Agent Profile...</option>
-                    {agentProfiles.map((p) => {
-                      const lic = (p.data_payload?.licence_number as string) || "Valid";
-                      return (
-                        <option key={p.id} value={p.id}>
-                          {p.name} (Licence: {lic})
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <p className="mt-1 text-[11px] text-slate-500">
-                    Must hold valid Wholesale Drug Licence (Form 20B/21B) or Medical Device Registration (Form MD-42).
-                  </p>
-                </div>
+            {/* Profile Selection Mode Toggle */}
+            <div className="flex rounded-lg bg-slate-100 p-1 mb-6 max-w-md border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setProfileMode("SAVED")}
+                className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition-all ${
+                  profileMode === "SAVED"
+                    ? "bg-white text-blue-700 shadow-xs ring-1 ring-slate-200"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                Select Saved Profiles (Default)
+              </button>
+              <button
+                type="button"
+                onClick={() => setProfileMode("MANUAL")}
+                className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition-all ${
+                  profileMode === "MANUAL"
+                    ? "bg-white text-blue-700 shadow-xs ring-1 ring-slate-200"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                Fill In Details Manually
+              </button>
+            </div>
 
-                {/* 2. Foreign Manufacturer */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Foreign Manufacturer (Legal Manufacturer)
-                  </label>
-                  <select
-                    value={mfgProfileId}
-                    onChange={(e) => setMfgProfileId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">Select Foreign Manufacturer Profile...</option>
-                    {foreignMfgProfiles.map((p) => {
-                      const country = (p.data_payload?.country as string) || "Foreign";
-                      return (
-                        <option key={p.id} value={p.id}>
-                          {p.name} ({country})
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
+            {profileMode === "SAVED" ? (
+              /* SAVED PROFILES DROPDOWN MODE */
+              activePathway.isImport ? (
+                <div className="space-y-5">
+                  {/* 1. Authorized Indian Agent */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Authorized Indian Agent (Under MDR 2017 Rule 34) <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Pre-selected Verified Default
+                      </span>
+                    </div>
+                    <select
+                      value={agentProfileId}
+                      onChange={(e) => setAgentProfileId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {agentProfiles.length === 0 ? (
+                        <option value="">No registered Indian Agent profiles found</option>
+                      ) : (
+                        agentProfiles.map((p, idx) => {
+                          const lic = (p.data_payload?.licence_number as string) || (p.data_payload?.wholesale_licence as string) || "Valid";
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.name} (Licence: {lic}){idx === 0 ? " — Primary Default" : ""}
+                            </option>
+                          );
+                        })
+                      )}
+                    </select>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Must hold valid Wholesale Drug Licence (Form 20B/21B) or Medical Device Registration (Form MD-42).
+                    </p>
+                  </div>
 
-                {/* 3. Manufacturing Site */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Primary Manufacturing Site
-                  </label>
-                  <select
-                    value={siteProfileId}
-                    onChange={(e) => setSiteProfileId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">Select Manufacturing Site...</option>
-                    {siteProfiles.map((p) => {
-                      const cleanroom = (p.data_payload?.cleanroom_classification as string) || "Certified";
-                      return (
-                        <option key={p.id} value={p.id}>
-                          {p.name} ({cleanroom})
-                        </option>
-                      );
-                    })}
-                  </select>
+                  {/* 2. Foreign Manufacturer */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Foreign Manufacturer (Legal Manufacturer) <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Pre-selected Verified Default
+                      </span>
+                    </div>
+                    <select
+                      value={mfgProfileId}
+                      onChange={(e) => setMfgProfileId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {foreignMfgProfiles.length === 0 ? (
+                        <option value="">No registered Foreign Manufacturer profiles found</option>
+                      ) : (
+                        foreignMfgProfiles.map((p, idx) => {
+                          const country = (p.data_payload?.country as string) || "Foreign";
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.name} ({country}){idx === 0 ? " — Primary Default" : ""}
+                            </option>
+                          );
+                        })
+                      )}
+                    </select>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Corporate manufacturer as named on the Foreign Free Sale Certificate.
+                    </p>
+                  </div>
+
+                  {/* 3. Manufacturing Site */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Primary Manufacturing Site <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Pre-selected Verified Default
+                      </span>
+                    </div>
+                    <select
+                      value={siteProfileId}
+                      onChange={(e) => setSiteProfileId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {siteProfiles.length === 0 ? (
+                        <option value="">No registered Manufacturing Site profiles found</option>
+                      ) : (
+                        siteProfiles.map((p, idx) => {
+                          const cleanroom = (p.data_payload?.cleanroom_classification as string) || "Certified Cleanroom";
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.name} ({cleanroom}){idx === 0 ? " — Primary Default" : ""}
+                            </option>
+                          );
+                        })
+                      )}
+                    </select>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Physical production plant matching ISO 13485 accredited scope.
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-5">
+                  {/* Domestic Manufacturer */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Domestic Indian Manufacturer <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Pre-selected Verified Default
+                      </span>
+                    </div>
+                    <select
+                      value={mfgProfileId}
+                      onChange={(e) => setMfgProfileId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {domesticMfgProfiles.length === 0 ? (
+                        <option value="">No registered Domestic Manufacturer profiles found</option>
+                      ) : (
+                        domesticMfgProfiles.map((p, idx) => {
+                          const lic = (p.data_payload?.licence_number as string) || "Active";
+                          return (
+                            <option key={p.id} value={p.id}>
+                              {p.name} (Licence: {lic}){idx === 0 ? " — Primary Default" : ""}
+                            </option>
+                          );
+                        })
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Manufacturing Site */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Licensed Manufacturing Plant / Site <span className="text-red-500">*</span>
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Pre-selected Verified Default
+                      </span>
+                    </div>
+                    <select
+                      value={siteProfileId}
+                      onChange={(e) => setSiteProfileId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {siteProfiles.length === 0 ? (
+                        <option value="">No registered Manufacturing Site profiles found</option>
+                      ) : (
+                        siteProfiles.map((p, idx) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}{idx === 0 ? " — Primary Default" : ""}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+              )
             ) : (
-              <div className="space-y-5">
-                {/* Domestic Manufacturer */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Domestic Indian Manufacturer
-                  </label>
-                  <select
-                    value={mfgProfileId}
-                    onChange={(e) => setMfgProfileId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">Select Domestic Manufacturer Profile...</option>
-                    {domesticMfgProfiles.map((p) => {
-                      const lic = (p.data_payload?.licence_number as string) || "Active";
-                      return (
-                        <option key={p.id} value={p.id}>
-                          {p.name} (Licence: {lic})
-                        </option>
-                      );
-                    })}
-                  </select>
+              /* MANUAL FILLING / DIRECT TEXT ENTRY MODE */
+              <div className="space-y-5 rounded-xl border border-slate-200 bg-slate-50/50 p-5">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-700">
+                  <PenLine className="h-4 w-4" />
+                  <span>Direct Text Entry for Filing Entities</span>
                 </div>
 
-                {/* Manufacturing Site */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Licensed Manufacturing Plant / Site
-                  </label>
-                  <select
-                    value={siteProfileId}
-                    onChange={(e) => setSiteProfileId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option value="">Select Manufacturing Campus...</option>
-                    {siteProfiles.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {activePathway.isImport ? (
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Authorized Indian Agent Legal Name
+                      </label>
+                      <input
+                        type="text"
+                        value={manualAgentName}
+                        onChange={(e) => setManualAgentName(e.target.value)}
+                        placeholder="e.g. MedTech India Solutions Pvt Ltd"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Wholesale Licence Number (Form 20B/21B or MD-42)
+                        </label>
+                        <input
+                          type="text"
+                          value={manualAgentLicence}
+                          onChange={(e) => setManualAgentLicence(e.target.value)}
+                          placeholder="e.g. DL-20B/21B-4491"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold text-slate-700 mb-1">
+                          Country of Legal Manufacturer
+                        </label>
+                        <input
+                          type="text"
+                          value={manualMfgCountry}
+                          onChange={(e) => setManualMfgCountry(e.target.value)}
+                          placeholder="e.g. Germany, USA, Japan"
+                          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Foreign Legal Manufacturer Name
+                      </label>
+                      <input
+                        type="text"
+                        value={manualMfgName}
+                        onChange={(e) => setManualMfgName(e.target.value)}
+                        placeholder="e.g. SpineCraft Medical GmbH"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Actual Manufacturing Facility Physical Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={manualSiteAddress}
+                        onChange={(e) => setManualSiteAddress(e.target.value)}
+                        placeholder="Full factory street address, city, state, postal code, and country."
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 text-xs">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Domestic Manufacturing Entity Name
+                      </label>
+                      <input
+                        type="text"
+                        value={manualMfgName}
+                        onChange={(e) => setManualMfgName(e.target.value)}
+                        placeholder="e.g. Apex BioMedical Devices India Ltd"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Manufacturing Facility Physical Premises Address
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={manualSiteAddress}
+                        onChange={(e) => setManualSiteAddress(e.target.value)}
+                        placeholder="Plot number, industrial estate, city, district, state, pin code."
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

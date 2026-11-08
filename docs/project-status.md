@@ -9,7 +9,7 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 1 Complete (All 22 Scoped Sub-Tasks Verified) - Gate Review Ahead of Phase 2
-* **Last Completed Sub-Task:** Task 1.5.11: Build `PortalFieldsTab` in Next.js workspace with pathway-conditional field sets, connected statutory requirement badges (linking fields to checklist slots), and real-time persistence.
+* **Last Completed Sub-Task:** Task 1.5.12: Enforce mandatory Device Family Title in Setup Wizard, fix Legal Profile default pre-selection, and provide dual-mode profile selection (Pre-Saved Verified Profiles vs Direct Manual Text Entry).
 * **Next Active Sub-Task:** Phase 1 User Acceptance Testing & Demonstration Gate (Engine 1 & Engine 2 in Phase 2 queued upon sign-off).
 
 ---
@@ -62,6 +62,7 @@
 - [x] **1.5.9:** Implement Submission Deletion (`DELETE /api/v1/submissions/{id}`) in frontend UI across Dashboard table and Workspace header with confirmation modal.
 - [x] **1.5.10:** Build backend `PATCH /api/v1/submissions/{id}` endpoint and Pydantic schema to persist updated application fields in `regulatory_context`.
 - [x] **1.5.11:** Build `PortalFieldsTab` in Next.js workspace with pathway-conditional field sets, connected statutory requirement badges (linking fields to checklist slots), and real-time persistence.
+- [x] **1.5.12:** Wizard Enhancement: Enforce mandatory Device Family Title, resolve Legal Profiles auto-selection, and add dual-mode direct text entry ("filling option") alongside saved profile selection.
 
 ---
 
