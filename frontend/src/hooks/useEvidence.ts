@@ -59,7 +59,7 @@ export function useLinkEvidence() {
       return apiClient.post<EvidenceLink>(
         `/submissions/${submissionId}/evidence/link`,
         {
-          evidence_document_id: evidenceDocumentId,
+          document_id: evidenceDocumentId,
           submission_entity_id: submissionEntityId,
           dossier_chapter: dossierChapter,
         }
