@@ -15,7 +15,7 @@ import {
   PenLine,
 } from "lucide-react";
 import { useCreateSubmission } from "@/hooks/useSubmissions";
-import { useProfiles } from "@/hooks/useProfiles";
+import { useProfiles, useCreateProfile } from "@/hooks/useProfiles";
 import {
   DeviceCategory,
   FilingModality,
@@ -93,6 +93,7 @@ const PATHWAY_OPTIONS: PathwayOption[] = [
 export default function SetupWizardPage() {
   const router = useRouter();
   const createSubmission = useCreateSubmission();
+  const createProfile = useCreateProfile();
   const { data: profiles } = useProfiles();
 
   // Wizard Step (1, 2, 3)
@@ -120,6 +121,7 @@ export default function SetupWizardPage() {
   const [manualMfgName, setManualMfgName] = useState<string>("");
   const [manualMfgCountry, setManualMfgCountry] = useState<string>("United States");
   const [manualSiteAddress, setManualSiteAddress] = useState<string>("");
+  const [saveAsProfile, setSaveAsProfile] = useState<boolean>(true);
 
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
@@ -208,6 +210,77 @@ export default function SetupWizardPage() {
     }
 
     try {
+      let resolvedApplicantId: string | undefined = profileMode === "SAVED" ? (agentProfileId || undefined) : undefined;
+      let resolvedMfgId: string | undefined = profileMode === "SAVED" ? (mfgProfileId || undefined) : undefined;
+      let resolvedSiteId: string | undefined = profileMode === "SAVED" ? (siteProfileId || undefined) : undefined;
+
+      // If user filled manual details and opted to save them into organizational directory
+      if (profileMode === "MANUAL" && saveAsProfile) {
+        if (activePathway.isImport) {
+          if (manualAgentName.trim()) {
+            try {
+              const agent = await createProfile.mutateAsync({
+                profile_type: "INDIAN_AGENT",
+                name: manualAgentName.trim(),
+                data_payload: {
+                  wholesale_licence: manualAgentLicence.trim() || undefined,
+                },
+              });
+              resolvedApplicantId = agent.id;
+            } catch (err) {
+              console.warn("Could not save manual agent profile:", err);
+            }
+          }
+
+          if (manualMfgName.trim()) {
+            try {
+              const mfg = await createProfile.mutateAsync({
+                profile_type: "FOREIGN_MANUFACTURER",
+                name: manualMfgName.trim(),
+                data_payload: {
+                  country: manualMfgCountry.trim() || undefined,
+                  address: manualSiteAddress.trim() || undefined,
+                },
+              });
+              resolvedMfgId = mfg.id;
+            } catch (err) {
+              console.warn("Could not save manual manufacturer profile:", err);
+            }
+          }
+        } else {
+          if (manualMfgName.trim()) {
+            try {
+              const mfg = await createProfile.mutateAsync({
+                profile_type: "DOMESTIC_MANUFACTURER",
+                name: manualMfgName.trim(),
+                data_payload: {
+                  address: manualSiteAddress.trim() || undefined,
+                },
+              });
+              resolvedMfgId = mfg.id;
+            } catch (err) {
+              console.warn("Could not save manual domestic manufacturer profile:", err);
+            }
+          }
+        }
+
+        if (manualSiteAddress.trim()) {
+          try {
+            const site = await createProfile.mutateAsync({
+              profile_type: "MANUFACTURING_SITE",
+              name: `${manualMfgName.trim() || "Manufacturing"} Facility`,
+              data_payload: {
+                address: manualSiteAddress.trim(),
+                country: activePathway.isImport ? manualMfgCountry.trim() : "India",
+              },
+            });
+            resolvedSiteId = site.id;
+          } catch (err) {
+            console.warn("Could not save manual site profile:", err);
+          }
+        }
+      }
+
       const manualPortalFields =
         profileMode === "MANUAL"
           ? {
@@ -235,9 +308,9 @@ export default function SetupWizardPage() {
           contains_animal_tissue: containsAnimalTissue,
           portal_fields: manualPortalFields,
         },
-        applicant_profile_id: profileMode === "SAVED" ? (agentProfileId || undefined) : undefined,
-        manufacturer_profile_id: profileMode === "SAVED" ? (mfgProfileId || undefined) : undefined,
-        site_profile_id: profileMode === "SAVED" ? (siteProfileId || undefined) : undefined,
+        applicant_profile_id: resolvedApplicantId,
+        manufacturer_profile_id: resolvedMfgId,
+        site_profile_id: resolvedSiteId,
       };
 
       const result = await createSubmission.mutateAsync(payload);
@@ -579,8 +652,8 @@ export default function SetupWizardPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Authorized Indian Agent (Under MDR 2017 Rule 34) <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Pre-selected Verified Default
+                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Saved Enterprise Profile
                       </span>
                     </div>
                     <select
@@ -591,11 +664,11 @@ export default function SetupWizardPage() {
                       {agentProfiles.length === 0 ? (
                         <option value="">No registered Indian Agent profiles found</option>
                       ) : (
-                        agentProfiles.map((p, idx) => {
+                        agentProfiles.map((p) => {
                           const lic = (p.data_payload?.licence_number as string) || (p.data_payload?.wholesale_licence as string) || "Valid";
                           return (
                             <option key={p.id} value={p.id}>
-                              {p.name} (Licence: {lic}){idx === 0 ? " — Primary Default" : ""}
+                              {p.name} (Licence: {lic})
                             </option>
                           );
                         })
@@ -612,8 +685,8 @@ export default function SetupWizardPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Foreign Manufacturer (Legal Manufacturer) <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Pre-selected Verified Default
+                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Saved Enterprise Profile
                       </span>
                     </div>
                     <select
@@ -624,11 +697,11 @@ export default function SetupWizardPage() {
                       {foreignMfgProfiles.length === 0 ? (
                         <option value="">No registered Foreign Manufacturer profiles found</option>
                       ) : (
-                        foreignMfgProfiles.map((p, idx) => {
+                        foreignMfgProfiles.map((p) => {
                           const country = (p.data_payload?.country as string) || "Foreign";
                           return (
                             <option key={p.id} value={p.id}>
-                              {p.name} ({country}){idx === 0 ? " — Primary Default" : ""}
+                              {p.name} ({country})
                             </option>
                           );
                         })
@@ -645,8 +718,8 @@ export default function SetupWizardPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Primary Manufacturing Site <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Pre-selected Verified Default
+                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Saved Enterprise Profile
                       </span>
                     </div>
                     <select
@@ -657,11 +730,11 @@ export default function SetupWizardPage() {
                       {siteProfiles.length === 0 ? (
                         <option value="">No registered Manufacturing Site profiles found</option>
                       ) : (
-                        siteProfiles.map((p, idx) => {
+                        siteProfiles.map((p) => {
                           const cleanroom = (p.data_payload?.cleanroom_classification as string) || "Certified Cleanroom";
                           return (
                             <option key={p.id} value={p.id}>
-                              {p.name} ({cleanroom}){idx === 0 ? " — Primary Default" : ""}
+                              {p.name} ({cleanroom})
                             </option>
                           );
                         })
@@ -680,8 +753,8 @@ export default function SetupWizardPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Domestic Indian Manufacturer <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Pre-selected Verified Default
+                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Saved Enterprise Profile
                       </span>
                     </div>
                     <select
@@ -692,11 +765,11 @@ export default function SetupWizardPage() {
                       {domesticMfgProfiles.length === 0 ? (
                         <option value="">No registered Domestic Manufacturer profiles found</option>
                       ) : (
-                        domesticMfgProfiles.map((p, idx) => {
+                        domesticMfgProfiles.map((p) => {
                           const lic = (p.data_payload?.licence_number as string) || "Active";
                           return (
                             <option key={p.id} value={p.id}>
-                              {p.name} (Licence: {lic}){idx === 0 ? " — Primary Default" : ""}
+                              {p.name} (Licence: {lic})
                             </option>
                           );
                         })
@@ -710,8 +783,8 @@ export default function SetupWizardPage() {
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
                         Licensed Manufacturing Plant / Site <span className="text-red-500">*</span>
                       </label>
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        Pre-selected Verified Default
+                      <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        Saved Enterprise Profile
                       </span>
                     </div>
                     <select
@@ -722,9 +795,9 @@ export default function SetupWizardPage() {
                       {siteProfiles.length === 0 ? (
                         <option value="">No registered Manufacturing Site profiles found</option>
                       ) : (
-                        siteProfiles.map((p, idx) => (
+                        siteProfiles.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {p.name}{idx === 0 ? " — Primary Default" : ""}
+                            {p.name}
                           </option>
                         ))
                       )}
@@ -837,6 +910,23 @@ export default function SetupWizardPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Save to Organization Profiles Directory Option */}
+                <div className="flex items-start gap-2.5 pt-3 border-t border-slate-200 mt-4 bg-white/70 p-3 rounded-lg border border-slate-200">
+                  <input
+                    type="checkbox"
+                    id="saveAsProfile"
+                    checked={saveAsProfile}
+                    onChange={(e) => setSaveAsProfile(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <label htmlFor="saveAsProfile" className="text-xs text-slate-700 cursor-pointer">
+                    <span className="font-semibold text-slate-900">Save entered entities into organization directory</span>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Automatically registers these entities in your saved profiles so you can quickly re-select them in future submissions without re-typing.
+                    </p>
+                  </label>
+                </div>
               </div>
             )}
           </div>
