@@ -137,23 +137,54 @@ export default function SetupWizardPage() {
     [selectedPathway]
   );
 
-  // Filter profiles by type
-  const agentProfiles = useMemo(
-    () => profiles?.filter((p) => p.profile_type === "INDIAN_AGENT") || [],
-    [profiles]
-  );
-  const foreignMfgProfiles = useMemo(
-    () => profiles?.filter((p) => p.profile_type === "FOREIGN_MANUFACTURER") || [],
-    [profiles]
-  );
-  const domesticMfgProfiles = useMemo(
-    () => profiles?.filter((p) => p.profile_type === "DOMESTIC_MANUFACTURER") || [],
-    [profiles]
-  );
-  const siteProfiles = useMemo(
-    () => profiles?.filter((p) => p.profile_type === "MANUFACTURING_SITE") || [],
-    [profiles]
-  );
+  // Filter profiles by type with client-side deduplication guard
+  const agentProfiles = useMemo(() => {
+    if (!profiles) return [];
+    const list = profiles.filter((p) => p.profile_type === "INDIAN_AGENT");
+    const seen = new Set<string>();
+    return list.filter((p) => {
+      const key = p.name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [profiles]);
+
+  const foreignMfgProfiles = useMemo(() => {
+    if (!profiles) return [];
+    const list = profiles.filter((p) => p.profile_type === "FOREIGN_MANUFACTURER");
+    const seen = new Set<string>();
+    return list.filter((p) => {
+      const key = p.name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [profiles]);
+
+  const domesticMfgProfiles = useMemo(() => {
+    if (!profiles) return [];
+    const list = profiles.filter((p) => p.profile_type === "DOMESTIC_MANUFACTURER");
+    const seen = new Set<string>();
+    return list.filter((p) => {
+      const key = p.name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [profiles]);
+
+  const siteProfiles = useMemo(() => {
+    if (!profiles) return [];
+    const list = profiles.filter((p) => p.profile_type === "MANUFACTURING_SITE");
+    const seen = new Set<string>();
+    return list.filter((p) => {
+      const key = p.name.trim().toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [profiles]);
 
   // Auto-select verified default profiles whenever profiles load or pathway changes
   React.useEffect(() => {

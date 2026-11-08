@@ -4,11 +4,12 @@ Manages reusable organizational entities: Authorized Indian Agents, Foreign Manu
 Domestic Manufacturers, and Manufacturing Sites.
 """
 
+from datetime import datetime, timezone
 from typing import List, Optional
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -16,6 +17,9 @@ from app.models.profile import Profile
 from app.schemas.profile import ProfileCreate, ProfileResponse
 
 router = APIRouter(prefix="/profiles", tags=["Organizational Profiles"])
+
+# Maximum number of saved profiles to retain per entity category (rolling LRU buffer)
+MAX_PROFILES_PER_TYPE = 6
 
 DEFAULT_PROFILES = [
     {
@@ -94,7 +98,7 @@ async def list_profiles(
     stmt = select(Profile)
     if profile_type:
         stmt = stmt.where(Profile.profile_type == profile_type)
-    stmt = stmt.order_by(Profile.name.asc())
+    stmt = stmt.order_by(Profile.updated_at.desc(), Profile.name.asc())
 
     result = await db.execute(stmt)
     records = result.scalars().all()
@@ -104,12 +108,15 @@ async def list_profiles(
         count_stmt = select(Profile)
         existing = (await db.execute(count_stmt)).scalars().first()
         if not existing:
+            now = datetime.now(timezone.utc)
             for item in DEFAULT_PROFILES:
                 p = Profile(
                     id=uuid.uuid4(),
                     profile_type=item["profile_type"],
                     name=item["name"],
                     data_payload=item["data_payload"],
+                    created_at=now,
+                    updated_at=now,
                 )
                 db.add(p)
             await db.commit()
@@ -129,14 +136,54 @@ async def create_profile(
     payload: ProfileCreate,
     db: AsyncSession = Depends(get_db),
 ) -> ProfileResponse:
-    """Creates a new organizational or site profile."""
-    profile = Profile(
-        id=uuid.uuid4(),
-        profile_type=payload.profile_type,
-        name=payload.name,
-        data_payload=payload.data_payload,
+    """Creates or updates an organizational profile with deduplication and capacity pruning."""
+    normalized_name = payload.name.strip()
+    now = datetime.now(timezone.utc)
+
+    # 1. Deduplication check: case-insensitive name match within same profile_type
+    stmt = (
+        select(Profile)
+        .where(
+            Profile.profile_type == payload.profile_type,
+            func.lower(func.trim(Profile.name)) == func.lower(normalized_name),
+        )
+        .limit(1)
     )
-    db.add(profile)
-    await db.commit()
-    await db.refresh(profile)
+    existing = (await db.execute(stmt)).scalars().first()
+
+    if existing:
+        # Update existing record (LRU touch & payload merge)
+        merged_payload = {**(existing.data_payload or {}), **(payload.data_payload or {})}
+        existing.data_payload = merged_payload
+        existing.updated_at = now
+        await db.commit()
+        await db.refresh(existing)
+        profile = existing
+    else:
+        profile = Profile(
+            id=uuid.uuid4(),
+            profile_type=payload.profile_type,
+            name=normalized_name,
+            data_payload=payload.data_payload or {},
+            created_at=now,
+            updated_at=now,
+        )
+        db.add(profile)
+        await db.commit()
+        await db.refresh(profile)
+
+    # 2. Rolling Capacity Pruning: enforce MAX_PROFILES_PER_TYPE (LRU eviction)
+    all_stmt = (
+        select(Profile)
+        .where(Profile.profile_type == payload.profile_type)
+        .order_by(Profile.updated_at.desc(), Profile.created_at.desc())
+    )
+    all_profiles = (await db.execute(all_stmt)).scalars().all()
+
+    if len(all_profiles) > MAX_PROFILES_PER_TYPE:
+        stale_profiles = all_profiles[MAX_PROFILES_PER_TYPE:]
+        for stale in stale_profiles:
+            await db.delete(stale)
+        await db.commit()
+
     return profile
