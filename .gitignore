@@ -39,3 +39,7 @@ dist/
 .idea/
 *.swp
 *.swo
+
+# Personal & Presentation Reference Docs
+PROJECT_MASTER_EXPLAINER.md
+/docs/personal/
