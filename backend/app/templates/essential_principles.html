@@ -1,0 +1,359 @@
+{% extends "_base_statutory.html" %}
+
+{% block document_title %}Essential Principles Checklist - {{ context.device.brand_name | default("Medical Device") }}{% endblock %}
+
+{% block extra_styles %}
+  .ep-badge-yes {
+    display: inline-block;
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    padding: 1.5pt 5pt;
+    border-radius: 2pt;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .ep-badge-na {
+    display: inline-block;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 1.5pt 5pt;
+    border-radius: 2pt;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .summary-strip {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0 12pt 0;
+  }
+
+  .summary-strip td {
+    border: 1px solid #cbd5e0;
+    background-color: #f8fafc;
+    padding: 5pt 8pt;
+    font-size: 8.5pt;
+    text-align: center;
+    width: 33.33%;
+  }
+
+  .ep-matrix {
+    table-layout: fixed;
+    width: 100%;
+    word-wrap: break-word;
+  }
+
+  .ep-matrix th,
+  .ep-matrix td {
+    font-size: 8.5pt;
+    padding: 5pt 6pt;
+  }
+
+  .std-list {
+    margin: 0;
+    padding-left: 11pt;
+  }
+
+  .std-list li {
+    margin-bottom: 2pt;
+    font-size: 8pt;
+  }
+
+  .justification-note {
+    font-style: italic;
+    color: #334155;
+    font-size: 8pt;
+  }
+{% endblock %}
+
+{% block content %}
+{% set app_code = context.submission.application_code | default("MD-14") %}
+
+{# Fallback 15 Statutory Clauses of Fourth Schedule Appendix II (MDR 2017) if user passes empty clauses #}
+{% set is_sterile = context.device.is_sterile | default(false) %}
+{% set contains_software = context.device.contains_software | default(false) %}
+{% set contains_drug = context.device.contains_medicinal_substance | default(false) %}
+{% set contains_tissue = context.device.contains_animal_tissue | default(false) %}
+
+{% set default_clauses = [
+  {
+    "clause_id": "EP_01",
+    "clause_number": "1",
+    "title": "General Safety and Performance Principles (Health, Safety & Clinical Benefit)",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 13485:2016", "ISO 14971:2019"],
+    "evidence_document_titles": ["Risk Management Report", "ISO 13485:2016 QMS Certificate"]
+  },
+  {
+    "clause_id": "EP_02",
+    "clause_number": "2",
+    "title": "Design and Construction to Conform with Safety Principles (State of the Art Risk Control)",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 14971:2019"],
+    "evidence_document_titles": ["Risk Management File & FMEA Matrix", "Design Verification Summary"]
+  },
+  {
+    "clause_id": "EP_03",
+    "clause_number": "3",
+    "title": "Suitability for Intended Purpose and Specified Performance",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 13485:2016"],
+    "evidence_document_titles": ["Product Technical Specifications", "Bench Performance Verification Report"]
+  },
+  {
+    "clause_id": "EP_04",
+    "clause_number": "4",
+    "title": "Long-Term Safety and Maintenance of Characteristics Over Device Lifetime",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ASTM F1980", "ISO 11607-1"],
+    "evidence_document_titles": ["Accelerated & Real-Time Shelf-Life Stability Study"]
+  },
+  {
+    "clause_id": "EP_05",
+    "clause_number": "5",
+    "title": "Maintenance of Performance During Transport and Storage Conditions",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ASTM D4169", "ISTA 3A"],
+    "evidence_document_titles": ["Packaging & Transit Simulation Validation Report"]
+  },
+  {
+    "clause_id": "EP_06",
+    "clause_number": "6",
+    "title": "Acceptable Benefit-Risk Profile Under Normal Conditions of Use",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 14971:2019", "MEDDEV 2.7/1 Rev 4"],
+    "evidence_document_titles": ["Clinical Evaluation Report (CER)", "Risk-Benefit Analysis Summary"]
+  },
+  {
+    "clause_id": "EP_07",
+    "clause_number": "7",
+    "title": "Chemical, Physical and Biological Properties (Biocompatibility & Toxicity)",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 10993-1:2018", "ISO 10993-5", "ISO 10993-10"],
+    "evidence_document_titles": ["Biocompatibility Evaluation & GLP Test Reports"]
+  },
+  {
+    "clause_id": "EP_08",
+    "clause_number": "8",
+    "title": "Infection and Microbial Contamination (Sterility & Cleanroom Control)",
+    "applicable": is_sterile,
+    "justification": "" if is_sterile else "Device is supplied non-sterile per product specification and validated intended use.",
+    "cited_standards": ["ISO 11135:2014", "ISO 11607-1:2019"] if is_sterile else [],
+    "evidence_document_titles": ["Sterilization Validation & Packaging Integrity Report"] if is_sterile else []
+  },
+  {
+    "clause_id": "EP_09",
+    "clause_number": "9",
+    "title": "Devices Incorporating a Medicinal Substance or Biological Tissue of Animal Origin",
+    "applicable": (contains_drug or contains_tissue),
+    "justification": "" if (contains_drug or contains_tissue) else "Device contains neither medicinal/pharmaceutical substances nor tissues of animal/human origin.",
+    "cited_standards": ["ISO 22442-1"] if contains_tissue else [],
+    "evidence_document_titles": ["Medicinal Substance / TSE-BSE Safety Dossier"] if (contains_drug or contains_tissue) else []
+  },
+  {
+    "clause_id": "EP_10",
+    "clause_number": "10",
+    "title": "Construction and Environmental Compatibility Properties",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 14971:2019"],
+    "evidence_document_titles": ["Device Design & Manufacturing Compatibility File"]
+  },
+  {
+    "clause_id": "EP_11",
+    "clause_number": "11",
+    "title": "Protection Against Mechanical, Thermal and Vibration Risks",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 14971:2019"],
+    "evidence_document_titles": ["Mechanical Strength & Fatigue Verification Report"]
+  },
+  {
+    "clause_id": "EP_12",
+    "clause_number": "12",
+    "title": "Devices Incorporating Software or Connected Active Energy Systems (SaMD / Electrical)",
+    "applicable": contains_software,
+    "justification": "" if contains_software else "Device is passive/non-programmable and contains no embedded software, firmware, or active energy source.",
+    "cited_standards": ["IEC 62304:2006", "IEC 60601-1"] if contains_software else [],
+    "evidence_document_titles": ["Software Lifecycle & Cybersecurity Validation Report"] if contains_software else []
+  },
+  {
+    "clause_id": "EP_13",
+    "clause_number": "13",
+    "title": "Information Supplied by the Manufacturer (Labels & Instructions for Use)",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 15223-1:2021", "MDR 2017 Sixth Schedule"],
+    "evidence_document_titles": ["Primary/Secondary Artwork Labels", "Instructions for Use (IFU)"]
+  },
+  {
+    "clause_id": "EP_14",
+    "clause_number": "14",
+    "title": "Clinical Evaluation and Post-Market Clinical Evidence",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["MDR 2017 Fourth Schedule", "IMDRF MDCE WG/N56"],
+    "evidence_document_titles": ["Clinical Evaluation Report (CER)", "Post-Marketing Surveillance Plan"]
+  },
+  {
+    "clause_id": "EP_15",
+    "clause_number": "15",
+    "title": "Installation, Calibration, Maintenance and Residual Risk Disclosure",
+    "applicable": true,
+    "justification": "",
+    "cited_standards": ["ISO 13485:2016", "IEC 62366-1"],
+    "evidence_document_titles": ["User Manual / Service & Calibration Protocol"]
+  }
+] %}
+
+{% set active_clauses = form_data.clauses if (form_data and form_data.clauses and form_data.clauses | length > 0) else default_clauses %}
+{% set applicable_count = active_clauses | selectattr("applicable", "equalto", true) | list | length %}
+{% set na_count = (active_clauses | length) - applicable_count %}
+
+<h1 class="doc-heading">
+  Essential Principles Checklist for Demonstrating Conformity to Safety and Performance
+</h1>
+<p class="text-center" style="font-size: 8.5pt; color: #475569; margin-top: -6pt; margin-bottom: 12pt;">
+  Pursuant to Rule 6 &amp; Fourth Schedule Appendix II of the Medical Devices Rules, 2017 (CDSCO Form {{ app_code }})
+</p>
+
+<!-- Device & Regulatory Identity Block -->
+<table class="kv-table">
+  <tr>
+    <th>Device Family / Trade Name</th>
+    <td><strong>{{ context.device.brand_name | default("Medical Device Family") }}</strong></td>
+  </tr>
+  <tr>
+    <th>Generic Name &amp; Risk Class</th>
+    <td>{{ context.device.generic_name | default("Medical Device") }} | <strong>{{ context.device.risk_class | default("CLASS_C") | replace("_", " ") | title }}</strong></td>
+  </tr>
+  <tr>
+    <th>Legal Manufacturer</th>
+    <td>{{ context.manufacturer.legal_name | default(context.applicant.legal_name, true) | default("Legal Manufacturer") }}{% if context.manufacturer.country %} ({{ context.manufacturer.country }}){% endif %}</td>
+  </tr>
+  <tr>
+    <th>Applicant / Authorized Indian Agent</th>
+    <td>{{ context.applicant.legal_name | default("Applicant Organization") }}</td>
+  </tr>
+  <tr>
+    <th>Submission Reference &amp; Date</th>
+    <td><span class="mono">{{ context.submission.tracking_code | default("DRAFT-FILING") }}</span> | Assessment Date: {{ context.submission.submission_date | default("Current Date") }}</td>
+  </tr>
+</table>
+
+<!-- Summary Metrics Strip -->
+<table class="summary-strip">
+  <tr>
+    <td><strong>Total Statutory Clauses</strong><br />{{ active_clauses | length }} Principles</td>
+    <td><strong>Applicable Principles</strong><br /><span style="color: #047857; font-weight: 700;">{{ applicable_count }} Complied</span></td>
+    <td><strong>Not Applicable (Justified)</strong><br /><span style="color: #475569; font-weight: 700;">{{ na_count }} Waived</span></td>
+  </tr>
+</table>
+
+<!-- Main Clause-by-Clause Compliance Matrix -->
+<h2 class="section-heading">Clause-by-Clause Conformity Matrix (Fourth Schedule Appendix II)</h2>
+<table class="data-table ep-matrix">
+  <thead>
+    <tr>
+      <th style="width: 7%; text-align: center;">Clause</th>
+      <th style="width: 28%;">Essential Principle Requirement</th>
+      <th style="width: 10%; text-align: center;">Applicable?</th>
+      <th style="width: 23%;">Harmonized Standards Cited</th>
+      <th style="width: 32%;">Supporting Dossier Evidence / Justification</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for clause in active_clauses %}
+    <tr>
+      <td class="text-center font-bold">{{ clause.clause_number | default(loop.index) }}</td>
+      <td>
+        <strong>{{ clause.title }}</strong>
+        {% if clause.description %}
+        <br /><span style="font-size: 7.5pt; color: #475569;">{{ clause.description }}</span>
+        {% endif %}
+      </td>
+      <td class="text-center">
+        {% if clause.applicable %}
+        <span class="ep-badge-yes">Yes</span>
+        {% else %}
+        <span class="ep-badge-na">N/A</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if clause.applicable %}
+          {% if clause.cited_standards and clause.cited_standards | length > 0 %}
+            <ul class="std-list">
+              {% for std in clause.cited_standards %}
+              <li>{{ std }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span style="color: #64748b;">Internal Design / MDR 2017 Standards</span>
+          {% endif %}
+        {% else %}
+          <span style="color: #64748b;">Not Applicable</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if clause.applicable %}
+          {% if clause.evidence_document_titles and clause.evidence_document_titles | length > 0 %}
+            <ul class="std-list">
+              {% for doc in clause.evidence_document_titles %}
+              <li>{{ doc }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <span style="color: #64748b;">Cross-referenced in Device Master File</span>
+          {% endif %}
+        {% else %}
+          <div class="justification-note">
+            <strong>Justification:</strong> {{ clause.justification | default("Not applicable based on intended use and device technology.", true) }}
+          </div>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Statutory Sign-Off Declaration -->
+<div class="signature-block">
+  <h2 class="section-heading">Manufacturer &amp; Regulatory Conformity Sign-Off</h2>
+  <p>
+    We hereby certify that the medical device family <strong>{{ context.device.brand_name | default("Medical Device") }}</strong>
+    conforms to all applicable Essential Principles of Safety and Performance specified in Appendix II of the Fourth Schedule
+    under the Medical Devices Rules, 2017. Complete laboratory validation reports and technical documentation supporting every
+    affirmative clause above are maintained and attached within the submitted Device Master File (Part III).
+  </p>
+
+  <table class="signature-table">
+    <tr>
+      <td style="width: 60%;">
+        <div class="signatory-line">
+          <strong>{{ context.manufacturer.signatory_name | default(context.applicant.signatory_name, true) | default("Authorized Regulatory Signatory") }}</strong><br />
+          {{ context.manufacturer.signatory_designation | default(context.applicant.signatory_designation, true) | default("Head of Quality & Regulatory Affairs") }}<br />
+          For <strong>{{ context.manufacturer.legal_name | default(context.applicant.legal_name, true) | default("Legal Manufacturer") }}</strong><br />
+          <span style="font-size: 8.5pt; color: #475569;">Date: {{ context.submission.submission_date | default("Current Date") }}</span>
+        </div>
+      </td>
+      <td style="width: 40%; text-align: right;">
+        <div class="seal-box">
+          Quality &amp; Regulatory<br />Authorized Stamp / Signature
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endblock %}
