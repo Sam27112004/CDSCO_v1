@@ -1,0 +1,253 @@
+{% extends "_base_statutory.html" %}
+
+{% block document_title %}Statutory Covering Letter - Form {{ context.submission.application_code | default("MD-14") }}{% endblock %}
+
+{% block content %}
+{% set app_code = context.submission.application_code | default("MD-14") %}
+{% set is_import = app_code in ["MD-14", "MD-16"] %}
+{% set is_sla = app_code in ["MD-3", "MD-4"] %}
+{% set modality = context.submission.filing_modality | default("FRESH") %}
+
+<!-- Reference & Date Header -->
+<div class="ref-date-row">
+  <table class="ref-date-table">
+    <tr>
+      <td>
+        <strong>Ref. No.:</strong>
+        <span class="mono">{{ form_data.reference_portal_id | default(context.submission.tracking_code, true) | default("DRAFT-FILING", true) }}</span>
+        {% if context.submission.tracking_code and form_data.reference_portal_id %}
+        <br /><span style="font-size: 8.5pt; color: #64748b;">Dossier Tracking ID: {{ context.submission.tracking_code }}</span>
+        {% endif %}
+      </td>
+      <td class="text-right">
+        <strong>Date:</strong> {{ context.submission.submission_date | default("Current Date") }}
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Addressee Block -->
+<div class="addressee-block">
+  To,<br />
+  {% if is_sla %}
+  <strong>The State Licensing Authority (SLA),</strong><br />
+  Food and Drug Administration / State Drugs Control Department,<br />
+  State Licensing Office (Medical Devices Division).
+  {% else %}
+  <strong>The Drugs Controller General (India) / Central Licensing Authority (CLA),</strong><br />
+  Central Drugs Standard Control Organisation (CDSCO),<br />
+  Directorate General of Health Services, Ministry of Health &amp; Family Welfare,<br />
+  FDA Bhawan, Kotla Road, New Delhi &ndash; 110002, India.
+  {% endif %}
+</div>
+
+<!-- Subject Line -->
+<div class="subject-box">
+  Subject:
+  {% if form_data.subject_line %}
+    {{ form_data.subject_line }}
+  {% else %}
+    {% if is_import %}
+      Application for Grant of {{ modality | replace("_", " ") | title }} Import Licence in Form {{ app_code }} for "{{ context.device.brand_name | default("Medical Device") }}" ({{ context.device.risk_class | default("CLASS_C") | replace("_", " ") | title }}) under Rule {{ "40" if app_code == "MD-16" else "34" }} of the Medical Devices Rules, 2017.
+    {% else %}
+      Application for Grant of {{ modality | replace("_", " ") | title }} Manufacturing Licence in Form {{ app_code }} for "{{ context.device.brand_name | default("Medical Device") }}" ({{ context.device.risk_class | default("CLASS_C") | replace("_", " ") | title }}) under Rule {{ "31" if app_code == "MD-12" else "20" }} of the Medical Devices Rules, 2017.
+    {% endif %}
+  {% endif %}
+</div>
+
+<p>Respected Sir / Madam,</p>
+
+{% if is_import %}
+<p>
+  We, <strong>{{ context.applicant.legal_name | default("Authorized Indian Agent") }}</strong>{% if context.applicant.constitution_type %} ({{ context.applicant.constitution_type }}){% endif %},
+  having our registered premises at <strong>{{ context.applicant.registered_address | default("Registered Premises Address") }}</strong>,
+  and holding valid Wholesale Drug Licence / Medical Device Registration Certificate No.
+  <strong>{{ context.applicant.wholesale_licence_number | default("On File") }}</strong>,
+  are acting as the duly authorized Indian Agent under Rule 34 of the Medical Devices Rules, 2017 on behalf of the overseas legal manufacturer
+  <strong>{{ context.manufacturer.legal_name | default("Foreign Manufacturer") }}</strong>
+  ({{ context.manufacturer.country | default("Country of Origin") }}).
+</p>
+<p>
+  We hereby submit this online application on the CDSCO Medical Devices Portal for grant of
+  {% if app_code == "MD-16" %}Test Import Licence in Form MD-16{% else %}Import Licence in Form MD-14{% endif %}
+  ({{ modality | replace("_", " ") | title }} Filing) for importing and marketing the medical device family detailed below in India.
+</p>
+{% else %}
+<p>
+  We, <strong>{{ context.applicant.legal_name | default("Manufacturing Applicant") }}</strong>{% if context.applicant.constitution_type %} ({{ context.applicant.constitution_type }}){% endif %},
+  having our registered office at <strong>{{ context.applicant.registered_address | default("Registered Office Address") }}</strong>
+  and manufacturing facility located at <strong>{{ context.manufacturer.site_address | default(context.applicant.registered_address, true) }}</strong>,
+  hereby submit this online application for grant of
+  {% if app_code == "MD-12" %}Test Manufacturing Licence in Form MD-12{% else %}Manufacturing Licence in Form {{ app_code }}{% endif %}
+  ({{ modality | replace("_", " ") | title }} Filing) under the provisions of the Medical Devices Rules, 2017.
+</p>
+{% endif %}
+
+<!-- Filing & Fee Summary Table -->
+<h2 class="section-heading">1. Summary of Regulatory Filing &amp; Fee Payment</h2>
+<table class="kv-table">
+  <tr>
+    <th>Statutory Application Form &amp; Modality</th>
+    <td>Form {{ app_code }} &mdash; {{ modality | replace("_", " ") | title }} Application</td>
+  </tr>
+  <tr>
+    <th>Device Family / Brand Name</th>
+    <td><strong>{{ context.device.brand_name | default("Medical Device Family") }}</strong></td>
+  </tr>
+  <tr>
+    <th>Generic Device Name &amp; Category</th>
+    <td>{{ context.device.generic_name | default(context.device.brand_name, true) }} ({{ context.device.device_type | default("MEDICAL_DEVICE") | replace("_", " ") | title }})</td>
+  </tr>
+  <tr>
+    <th>Assigned Risk Classification</th>
+    <td><strong>{{ context.device.risk_class | default("CLASS_C") | replace("_", " ") | title }}</strong> (per First Schedule, MDR 2017)</td>
+  </tr>
+  <tr>
+    <th>Sterility &amp; Shelf Life</th>
+    <td>
+      {% if context.device.is_sterile %}
+        Sterile ({{ context.device.sterilization_method | default("Validated Sterilization") }})
+      {% else %}
+        Non-Sterile
+      {% endif %}
+      {% if context.device.shelf_life_months %} | Shelf Life: {{ context.device.shelf_life_months }} Months{% endif %}
+    </td>
+  </tr>
+  {% if context.device.intended_use %}
+  <tr>
+    <th>Intended Medical Purpose</th>
+    <td>{{ context.device.intended_use }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <th>Legal Manufacturer</th>
+    <td>{{ context.manufacturer.legal_name | default(context.applicant.legal_name, true) }}{% if context.manufacturer.country %} ({{ context.manufacturer.country }}){% endif %}</td>
+  </tr>
+  <tr>
+    <th>Actual Manufacturing Site Address</th>
+    <td>
+      {% if context.manufacturer.site_name %}{{ context.manufacturer.site_name }}, {% endif %}{{ context.manufacturer.site_address | default("Site Address on File") }}
+      {% if context.manufacturer.site_registration_number %}<br /><span style="font-size: 8.5pt; color: #475569;">Site Registration No.: {{ context.manufacturer.site_registration_number }}</span>{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th>BharatKosh Treasury Fee Payment</th>
+    <td>
+      Challan / Transaction ID: <span class="mono">{{ context.submission.bharatkosh_challan_id | default("Pending Entry") }}</span>
+      {% if form_data.payment_date or context.submission.payment_date %}
+        (Dated: {{ form_data.payment_date | default(context.submission.payment_date) }})
+      {% endif %}
+      {% if context.submission.fee_paid_inr %}
+        <br />Amount Remitted: <strong>INR {{ context.submission.fee_paid_inr }}</strong> (per Second Schedule, MDR 2017)
+      {% endif %}
+    </td>
+  </tr>
+</table>
+
+<!-- Applied Models Schedule -->
+<h2 class="section-heading">2. Schedule of Applied Device Models &amp; Accessories</h2>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width: 8%;">S. No.</th>
+      <th style="width: 24%;">Model / Catalogue No.</th>
+      <th style="width: 44%;">Technical Specification / Size</th>
+      <th style="width: 24%;">Accessories / Variants</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if form_data.device_model_table and form_data.device_model_table | length > 0 %}
+      {% for item in form_data.device_model_table %}
+      <tr>
+        <td class="text-center">{{ loop.index }}</td>
+        <td class="mono">{{ item.model_number | default("-") }}</td>
+        <td>{{ item.specification | default("-") }}</td>
+        <td>{{ item.accessories | default("Not specified", true) }}</td>
+      </tr>
+      {% endfor %}
+    {% elif context.device.model_variants and context.device.model_variants | length > 0 %}
+      {% for variant in context.device.model_variants %}
+      <tr>
+        <td class="text-center">{{ loop.index }}</td>
+        <td class="mono">{{ variant }}</td>
+        <td>{{ context.device.generic_name | default(context.device.brand_name, true) }} &ndash; Standard Variant</td>
+        <td>Standard Accessories as per IFU</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td class="text-center">1</td>
+        <td class="mono">Standard Family Configuration</td>
+        <td>{{ context.device.brand_name | default("Applied Medical Device") }} ({{ context.device.generic_name | default("Medical Device") }})</td>
+        <td>As detailed in Device Master File Section 2.0</td>
+      </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<!-- Enclosures Checklist -->
+<h2 class="section-heading">3. List of Statutory Enclosures Uploaded</h2>
+<ol class="statutory-list">
+  {% if form_data.enclosures_list and form_data.enclosures_list | length > 0 %}
+    {% for doc in form_data.enclosures_list %}
+    <li>{{ doc }}</li>
+    {% endfor %}
+  {% elif is_import %}
+    <li>Executed Form {{ app_code }} Application Pro-Forma along with Treasury Fee Challan (BharatKosh).</li>
+    <li>Apostilled / Consularized Power of Attorney (PoA) &amp; Undertaking per Fourth Schedule Part I.</li>
+    <li>Copy of Valid Wholesale Licence (Form 20B/21B) or Form MD-42 Registration of Authorized Indian Agent.</li>
+    <li>Free Sale Certificate (FSC) from Country of Origin and Reference GHTF Countries (as applicable).</li>
+    <li>ISO 13485:2016 Quality Management System Certificate, CE Certificate, and Declaration of Conformity.</li>
+    <li>Plant Master File (Fourth Schedule Part II) &amp; Device Master File (Fourth Schedule Part III).</li>
+    <li>Device Labelling Artwork (Primary, Secondary, Shipper) &amp; Instructions for Use (IFU) per Sixth Schedule.</li>
+  {% else %}
+    <li>Executed Form {{ app_code }} Application Pro-Forma along with Treasury Fee Challan (BharatKosh).</li>
+    <li>Firm Constitution Documents (MoA/AoA/Board Resolution) and Premises Ownership / Tenancy Deed.</li>
+    <li>ISO 13485:2016 QMS Certificate, Quality Manual, and Fifth Schedule Undertaking.</li>
+    <li>Competent Technical Staff Appointment &amp; Qualification Records under Rule 26.</li>
+    <li>Plant Master File (Fourth Schedule Part II) &amp; Device Master File (Fourth Schedule Part III).</li>
+    <li>Device Labelling Artwork &amp; Instructions for Use (IFU) per Sixth Schedule.</li>
+  {% endif %}
+</ol>
+
+<!-- Formal Declaration & Request -->
+<h2 class="section-heading">4. Statutory Declaration</h2>
+{% if form_data.custom_declarations %}
+<p>{{ form_data.custom_declarations }}</p>
+{% endif %}
+<p>
+  We solemnly declare that the information furnished above and the supporting documents uploaded in the electronic dossier are true, accurate, and complete to the best of our knowledge and belief, and that no material fact has been concealed. We undertake to submit any additional technical clarifications or samples requested by the Licensing Authority during evaluation.
+</p>
+<p>
+  We kindly request your good office to evaluate our application and grant the {{ modality | replace("_", " ") | title }} Licence in Form {{ app_code }} at your earliest convenience.
+</p>
+
+<!-- Signatory & Seal Block -->
+<div class="signature-block">
+  <p>Thanking you,</p>
+  <p>Yours faithfully,</p>
+
+  <table class="signature-table">
+    <tr>
+      <td style="width: 60%;">
+        <div class="signatory-line">
+          <strong>{{ context.applicant.signatory_name | default("Authorized Signatory") }}</strong><br />
+          {{ context.applicant.signatory_designation | default("Director / Regulatory Affairs Lead") }}<br />
+          For <strong>{{ context.applicant.legal_name | default("Applicant Organization") }}</strong>
+          {% if context.applicant.contact_email or context.applicant.contact_phone %}
+          <br /><span style="font-size: 8.5pt; color: #475569;">
+            {% if context.applicant.contact_email %}{{ context.applicant.contact_email }}{% endif %}
+            {% if context.applicant.contact_phone %} | {{ context.applicant.contact_phone }}{% endif %}
+          </span>
+          {% endif %}
+        </div>
+      </td>
+      <td style="width: 40%; text-align: right;">
+        <div class="seal-box">
+          Authorized Signatory<br />&amp; Company Seal / Digital Stamp
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endblock %}

@@ -8,9 +8,9 @@
 
 ## Current Status Snapshot
 
-* **Current Active Phase:** Phase 1 Complete (All 22 Scoped Sub-Tasks Verified) - Gate Review Ahead of Phase 2
-* **Last Completed Sub-Task:** Task 1.5.12: Enforce mandatory Device Family Title, implement entity profile deduplication and LRU rolling capacity buffer (capped at 6 entries per category), and provide dual-mode profile selection (Directory vs Direct Entry).
-* **Next Active Sub-Task:** Phase 1 User Acceptance Testing & Demonstration Gate (Engine 1 & Engine 2 in Phase 2 queued upon sign-off).
+* **Current Active Phase:** Phase 2: Document Generation & Dossier Assembly (Engine 1 & 2)
+* **Last Completed Sub-Task:** Task 2.1.1a: Author `_base_statutory.html` A4 print CSS layout and `covering_letter.html` Jinja2 template (Slot 1.0) with full CLA/SLA pathway routing and unit tests (2026-11-12).
+* **Next Active Sub-Task:** Task 2.1.1b: Author `essential_principles.html` Jinja2 template (Slot 10.8 / 8.8 - Fourth Schedule Appendix II Essential Principles Checklist).
 
 ---
 
@@ -69,12 +69,11 @@
 ## Phase 2: Document Generation & Dossier Assembly (Engine 1 & 2)
 
 ### Task 2.1: Engine 1 – Statutory Jinja2 Templates & Pro-Formas
-- [ ] **2.1.1:** Author official CDSCO Jinja2 HTML/CSS templates adhering to statutory margins:
-  - `covering_letter.html` (Slot 1.0)
-  - `essential_principles_checklist.html` (Slot 10.10)
-  - `declaration_of_conformity.html` (Slot 10.8)
-  - `non_commercial_undertaking.html` (Slot 10.13)
-  - `tr6_fee_challan_summary.html` (Slot 2.0)
+- [x] **2.1.1a:** Author shared statutory A4 print CSS layout (`_base_statutory.html`) and `covering_letter.html` Jinja2 template (Slot 1.0 - Import & Domestic routes).
+- [ ] **2.1.1b:** Author `essential_principles.html` Jinja2 template (Slot 10.8 MD-14 / Slot 8.8 MD-7 - 15 Clauses of Fourth Schedule Appendix II).
+- [ ] **2.1.1c:** Author `declaration_of_conformity.html` Jinja2 template (Slot 8.3 MD-14 / Slot 7.3 MD-7).
+- [ ] **2.1.1d:** Author `non_commercial_undertaking.html` and `fifth_schedule_undertaking.html` Jinja2 templates (Slot 10.13 / Slot 7.1).
+- [ ] **2.1.1e:** Author `tr6_fee_challan_summary.html` Jinja2 template (Slot 2.0 - Second Schedule BharatKosh Fee Summary).
 - [ ] **2.1.2:** Author docxtpl Microsoft Word (`.docx`) template for legal stamp-paper pro-forma:
   - `power_of_attorney_proforma.docx` (Slot 4.0)
 

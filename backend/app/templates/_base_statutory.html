@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block document_title %}CDSCO Statutory Document{% endblock %}</title>
+  <style>
+    /* =========================================================================
+       CDSCO Statutory Print Stylesheet (MDR 2017 / WeasyPrint A4 Paged Media)
+       Matches Section 10.4 of DEF-CDSCO-001 Specification
+       ========================================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 20mm 15mm 20mm 15mm;
+      @top-right {
+        content: "CDSCO Form {{ context.submission.application_code | default('MD-14') }} Statutory Filing | {{ context.submission.tracking_code | default('') }}";
+        font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+        font-size: 8pt;
+        color: #718096;
+      }
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+        font-size: 9pt;
+        color: #4a5568;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+      font-size: 10pt;
+      line-height: 1.45;
+      color: #1a202c;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Letterhead Banner */
+    .letterhead {
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 10pt;
+      margin-bottom: 14pt;
+    }
+
+    .letterhead-company {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.4pt;
+      margin: 0 0 3pt 0;
+    }
+
+    .letterhead-meta {
+      font-size: 8.5pt;
+      color: #475569;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    /* Reference & Date Row */
+    .ref-date-row {
+      width: 100%;
+      margin-bottom: 14pt;
+      font-size: 9.5pt;
+    }
+
+    .ref-date-table {
+      width: 100%;
+      border: none;
+      margin: 0;
+    }
+
+    .ref-date-table td {
+      border: none;
+      padding: 0;
+      font-size: 9.5pt;
+      vertical-align: top;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .mono {
+      font-family: "Liberation Mono", "Courier New", Courier, monospace;
+      font-size: 9pt;
+    }
+
+    /* Headings & Sections */
+    h1.doc-heading {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0f172a;
+      text-align: center;
+      text-transform: uppercase;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 6pt;
+      margin: 0 0 12pt 0;
+    }
+
+    h2.section-heading {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 14pt 0 6pt 0;
+      border-left: 3pt solid #1e3a8a;
+      padding-left: 6pt;
+    }
+
+    p {
+      margin: 0 0 8pt 0;
+      text-align: justify;
+    }
+
+    .addressee-block {
+      margin-bottom: 14pt;
+      line-height: 1.4;
+      font-size: 10pt;
+    }
+
+    .subject-box {
+      background-color: #f8fafc;
+      border-left: 3pt solid #0f172a;
+      padding: 8pt 10pt;
+      margin: 12pt 0;
+      font-weight: 700;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+
+    /* Tables */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8pt;
+      margin-bottom: 12pt;
+    }
+
+    table.data-table thead {
+      display: table-header-group;
+    }
+
+    table.data-table tr {
+      page-break-inside: avoid;
+    }
+
+    table.data-table th,
+    table.data-table td {
+      border: 1px solid #cbd5e0;
+      padding: 5.5pt 7.5pt;
+      font-size: 9pt;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background-color: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    table.kv-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8pt 0 12pt 0;
+    }
+
+    table.kv-table tr {
+      page-break-inside: avoid;
+    }
+
+    table.kv-table th,
+    table.kv-table td {
+      border: 1px solid #cbd5e0;
+      padding: 5pt 8pt;
+      font-size: 9pt;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    table.kv-table th {
+      width: 34%;
+      background-color: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    ol.statutory-list,
+    ul.statutory-list {
+      margin: 6pt 0 12pt 0;
+      padding-left: 18pt;
+    }
+
+    ol.statutory-list li,
+    ul.statutory-list li {
+      margin-bottom: 3.5pt;
+      line-height: 1.4;
+      font-size: 9.5pt;
+    }
+
+    /* Signature Block */
+    .signature-block {
+      page-break-inside: avoid;
+      margin-top: 24pt;
+    }
+
+    .signature-table {
+      width: 100%;
+      border: none;
+      margin-top: 10pt;
+    }
+
+    .signature-table td {
+      border: none;
+      padding: 0;
+      vertical-align: bottom;
+      font-size: 9.5pt;
+    }
+
+    .seal-box {
+      display: inline-block;
+      border: 1px dashed #94a3b8;
+      padding: 16pt 22pt;
+      color: #64748b;
+      font-size: 8pt;
+      text-align: center;
+      margin-top: 4pt;
+    }
+
+    .signatory-line {
+      margin-top: 32pt;
+      border-top: 1px solid #334155;
+      width: 200pt;
+      padding-top: 4pt;
+    }
+
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+  {% block letterhead %}
+  <div class="letterhead">
+    <div class="letterhead-company">
+      {{ context.applicant.legal_name | default("Applicant Organization") }}
+    </div>
+    <p class="letterhead-meta">
+      <strong>Registered Office:</strong> {{ context.applicant.registered_address | default("Address on File") }}<br />
+      {% if context.applicant.wholesale_licence_number %}
+      <strong>Licence / Registration No.:</strong> {{ context.applicant.wholesale_licence_number }}
+      {% endif %}
+      {% if context.applicant.cin %}
+      | <strong>CIN:</strong> {{ context.applicant.cin }}
+      {% endif %}
+      {% if context.applicant.contact_email or context.applicant.contact_phone %}
+      <br />
+      {% if context.applicant.contact_email %}<strong>Email:</strong> {{ context.applicant.contact_email }}{% endif %}
+      {% if context.applicant.contact_phone %} | <strong>Phone:</strong> {{ context.applicant.contact_phone }}{% endif %}
+      {% endif %}
+    </p>
+  </div>
+  {% endblock %}
+
+  {% block content %}{% endblock %}
+</body>
+</html>
