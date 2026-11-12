@@ -9,8 +9,8 @@
 ## Current Status Snapshot
 
 * **Current Active Phase:** Phase 2: Document Generation & Dossier Assembly (Engine 1 & 2)
-* **Last Completed Sub-Task:** Task 2.1.1b: Author `essential_principles.html` Jinja2 template (Slot 10.8 / 8.8 - 15 Clauses of Fourth Schedule Appendix II) with predicate-driven defaults and unit tests (2026-11-12).
-* **Next Active Sub-Task:** Task 2.1.1c: Author `declaration_of_conformity.html` Jinja2 template (Slot 8.3 MD-14 / Slot 7.3 MD-7).
+* **Last Completed Sub-Task:** Task 2.1.1c: Author `declaration_of_conformity.html` Jinja2 template (Slot 8.3 MD-14) on Legal Manufacturer letterhead with Sole Responsibility statement, Notified Body details, applied standards, and unit tests (2026-11-12).
+* **Next Active Sub-Task:** Task 2.1.1d: Author `non_commercial_undertaking.html` and `fifth_schedule_undertaking.html` Jinja2 templates (Slot 10.13 / Slot 7.1).
 
 ---
 
@@ -71,7 +71,7 @@
 ### Task 2.1: Engine 1 – Statutory Jinja2 Templates & Pro-Formas
 - [x] **2.1.1a:** Author shared statutory A4 print CSS layout (`_base_statutory.html`) and `covering_letter.html` Jinja2 template (Slot 1.0 - Import & Domestic routes).
 - [x] **2.1.1b:** Author `essential_principles.html` Jinja2 template (Slot 10.8 MD-14 / Slot 8.8 MD-7 - 15 Clauses of Fourth Schedule Appendix II).
-- [ ] **2.1.1c:** Author `declaration_of_conformity.html` Jinja2 template (Slot 8.3 MD-14 / Slot 7.3 MD-7).
+- [x] **2.1.1c:** Author `declaration_of_conformity.html` Jinja2 template (Slot 8.3 MD-14 - Manufacturer Sole Responsibility DoC).
 - [ ] **2.1.1d:** Author `non_commercial_undertaking.html` and `fifth_schedule_undertaking.html` Jinja2 templates (Slot 10.13 / Slot 7.1).
 - [ ] **2.1.1e:** Author `tr6_fee_challan_summary.html` Jinja2 template (Slot 2.0 - Second Schedule BharatKosh Fee Summary).
 - [ ] **2.1.2:** Author docxtpl Microsoft Word (`.docx`) template for legal stamp-paper pro-forma:

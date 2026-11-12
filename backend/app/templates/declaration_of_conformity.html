@@ -1,0 +1,262 @@
+{% extends "_base_statutory.html" %}
+
+{% block document_title %}Declaration of Conformity - {{ context.device.brand_name | default("Medical Device") }}{% endblock %}
+
+{% block extra_styles %}
+  .sole-resp-box {
+    background-color: #f8fafc;
+    border: 1px solid #94a3b8;
+    border-left: 3.5pt solid #1e3a8a;
+    padding: 9pt 11pt;
+    margin: 10pt 0 14pt 0;
+    font-size: 9.5pt;
+    line-height: 1.45;
+  }
+
+  .doc-meta-banner {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10pt;
+  }
+
+  .doc-meta-banner td {
+    border: 1px solid #cbd5e0;
+    background-color: #f8fafc;
+    padding: 5pt 8pt;
+    font-size: 8.5pt;
+  }
+{% endblock %}
+
+{% block letterhead %}
+{# Declaration of Conformity must appear on the Legal Manufacturer's letterhead #}
+<div class="letterhead">
+  <div class="letterhead-company">
+    {{ context.manufacturer.legal_name | default(context.applicant.legal_name, true) | default("Legal Manufacturer Organization") }}
+  </div>
+  <p class="letterhead-meta">
+    <strong>Manufacturing Facility / Legal Address:</strong> {{ context.manufacturer.site_address | default(context.applicant.registered_address, true) | default("Address on File") }}
+    {% if context.manufacturer.country %} ({{ context.manufacturer.country }}){% endif %}
+    {% if form_data.manufacturer_srn or context.manufacturer.site_registration_number %}
+      <br /><strong>Establishment Registration / SRN:</strong> {{ form_data.manufacturer_srn | default(context.manufacturer.site_registration_number) }}
+    {% endif %}
+  </p>
+</div>
+{% endblock %}
+
+{% block content %}
+{% set app_code = context.submission.application_code | default("MD-14") %}
+{% set is_import = app_code in ["MD-14", "MD-16"] %}
+{% set mfg_name = context.manufacturer.legal_name | default(context.applicant.legal_name, true) | default("Legal Manufacturer") %}
+{% set is_sterile = context.device.is_sterile | default(false) %}
+{% set contains_software = context.device.contains_software | default(false) %}
+
+<h1 class="doc-heading">Declaration of Conformity</h1>
+<p class="text-center" style="font-size: 8.5pt; color: #475569; margin-top: -6pt; margin-bottom: 10pt;">
+  Issued in accordance with Rule 34(4) &amp; Fourth Schedule Part I of the Medical Devices Rules, 2017 (India) and ISO/IEC 17050-1
+</p>
+
+<!-- Document Control Strip -->
+<table class="doc-meta-banner">
+  <tr>
+    <td style="width: 34%;"><strong>DoC Reference No.:</strong> <span class="mono">{{ form_data.doc_number | default(context.submission.tracking_code, true) | default("DOC-DRAFT", true) }}</span></td>
+    <td style="width: 33%;"><strong>Target Filing Route:</strong> CDSCO Form {{ app_code }}</td>
+    <td style="width: 33%;"><strong>Date of Issue:</strong> {{ form_data.issue_date | default(context.submission.submission_date, true) | default("Current Date", true) }}</td>
+  </tr>
+</table>
+
+<!-- Mandatory Sole Responsibility Statement -->
+<div class="sole-resp-box">
+  <strong>Statement of Sole Legal Responsibility:</strong><br />
+  This Declaration of Conformity is issued under the <strong>sole responsibility</strong> of the Legal Manufacturer,
+  <strong>{{ mfg_name }}</strong>. We hereby solemnly declare that the medical device family identified below conforms
+  to all applicable provisions of the <strong>Medical Devices Rules, 2017</strong> (Ministry of Health and Family Welfare, Government of India),
+  including the Essential Principles of Safety and Performance (Fourth Schedule Appendix II) and Fifth Schedule Quality Management System requirements.
+</div>
+
+<!-- Section 1: Legal Entities -->
+<h2 class="section-heading">1. Manufacturer &amp; Regulatory Representative Identification</h2>
+<table class="kv-table">
+  <tr>
+    <th>Legal Manufacturer Name &amp; Address</th>
+    <td>
+      <strong>{{ mfg_name }}</strong><br />
+      {{ context.manufacturer.site_address | default(context.applicant.registered_address, true) | default("Address on File") }}
+      {% if context.manufacturer.country %}, {{ context.manufacturer.country }}{% endif %}
+    </td>
+  </tr>
+  {% if context.manufacturer.site_name %}
+  <tr>
+    <th>Actual Manufacturing Plant Site</th>
+    <td>{{ context.manufacturer.site_name }} &ndash; {{ context.manufacturer.site_address | default("On File") }}</td>
+  </tr>
+  {% endif %}
+  {% if is_import %}
+  <tr>
+    <th>Authorized Indian Agent (Rule 34)</th>
+    <td>
+      <strong>{{ context.applicant.legal_name | default("Authorized Indian Agent") }}</strong><br />
+      {{ context.applicant.registered_address | default("Registered Premises in India") }}
+      {% if context.applicant.wholesale_licence_number %}
+      <br /><span style="font-size: 8.5pt; color: #475569;">Wholesale Licence / MD-42 No.: {{ context.applicant.wholesale_licence_number }}</span>
+      {% endif %}
+    </td>
+  </tr>
+  {% endif %}
+</table>
+
+<!-- Section 2: Device Identification & Product Codes -->
+<h2 class="section-heading">2. Medical Device Identification &amp; Applied Models</h2>
+<table class="kv-table">
+  <tr>
+    <th>Device Trade / Brand Name</th>
+    <td><strong>{{ context.device.brand_name | default("Applied Medical Device") }}</strong></td>
+  </tr>
+  <tr>
+    <th>Generic Name &amp; Device Category</th>
+    <td>{{ context.device.generic_name | default(context.device.brand_name, true) }} ({{ context.device.device_type | default("MEDICAL_DEVICE") | replace("_", " ") | title }})</td>
+  </tr>
+  <tr>
+    <th>Risk Classification (MDR 2017)</th>
+    <td><strong>{{ context.device.risk_class | default("CLASS_C") | replace("_", " ") | title }}</strong> (Pursuant to Rule 4 &amp; First Schedule)</td>
+  </tr>
+  {% if form_data.gmdn_code or form_data.basic_udi_di %}
+  <tr>
+    <th>Global Identifiers (GMDN / Basic UDI-DI)</th>
+    <td>
+      {% if form_data.gmdn_code %}GMDN Code: <span class="mono">{{ form_data.gmdn_code }}</span>{% endif %}
+      {% if form_data.gmdn_code and form_data.basic_udi_di %} | {% endif %}
+      {% if form_data.basic_udi_di %}Basic UDI-DI: <span class="mono">{{ form_data.basic_udi_di }}</span>{% endif %}
+    </td>
+  </tr>
+  {% endif %}
+  {% if context.device.intended_use %}
+  <tr>
+    <th>Intended Purpose / Clinical Indication</th>
+    <td>{{ context.device.intended_use }}</td>
+  </tr>
+  {% endif %}
+</table>
+
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width: 10%; text-align: center;">S. No.</th>
+      <th style="width: 30%;">Product / Catalogue Code</th>
+      <th style="width: 60%;">Model Variant Description / Technical Configuration</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if form_data.applied_models and form_data.applied_models | length > 0 %}
+      {% for m in form_data.applied_models %}
+      <tr>
+        <td class="text-center">{{ loop.index }}</td>
+        <td class="mono">{{ m.code | default(m.model_number, true) | default("-") }}</td>
+        <td>{{ m.description | default(m.specification, true) | default("Standard Device Variant") }}</td>
+      </tr>
+      {% endfor %}
+    {% elif context.device.model_variants and context.device.model_variants | length > 0 %}
+      {% for variant in context.device.model_variants %}
+      <tr>
+        <td class="text-center">{{ loop.index }}</td>
+        <td class="mono">{{ variant }}</td>
+        <td>{{ context.device.generic_name | default(context.device.brand_name, true) }} &ndash; Licensed Model Variant</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr>
+        <td class="text-center">1</td>
+        <td class="mono">Full Product Family</td>
+        <td>{{ context.device.brand_name | default("Applied Medical Device") }} (All configurations listed in Form {{ app_code }} Schedule)</td>
+      </tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<!-- Section 3: Conformity Assessment & QMS Certification -->
+<h2 class="section-heading">3. Conformity Assessment Route &amp; Quality Certification</h2>
+<table class="kv-table">
+  <tr>
+    <th>Quality Management System (QMS)</th>
+    <td>
+      ISO 13485:2016 (Certificate No.: <span class="mono">{{ form_data.iso_13485_cert_no | default("On File in Slot 8.1") }}</span>{% if form_data.iso_13485_valid_until %}, Valid Until: {{ form_data.iso_13485_valid_until }}{% endif %})
+    </td>
+  </tr>
+  <tr>
+    <th>Conformity Assessment Procedure</th>
+    <td>{{ form_data.conformity_route | default("Full Quality Assurance & Technical Documentation Review per MDR 2017 Fourth Schedule", true) }}</td>
+  </tr>
+  {% if form_data.notified_body_name or form_data.ce_certificate_no %}
+  <tr>
+    <th>Notified Body / Auditing Organization</th>
+    <td>
+      {{ form_data.notified_body_name | default("Accredited Notified Body") }}
+      {% if form_data.notified_body_id %}(ID: <span class="mono">{{ form_data.notified_body_id }}</span>){% endif %}
+      {% if form_data.ce_certificate_no %}<br />Certificate Reference: <span class="mono">{{ form_data.ce_certificate_no }}</span>{% endif %}
+    </td>
+  </tr>
+  {% endif %}
+</table>
+
+<!-- Section 4: Harmonized Standards Applied -->
+{% set default_standards = [
+  {"code": "ISO 13485:2016", "title": "Medical devices — Quality management systems — Requirements for regulatory purposes"},
+  {"code": "ISO 14971:2019", "title": "Medical devices — Application of risk management to medical devices"},
+  {"code": "ISO 10993-1:2018", "title": "Biological evaluation of medical devices — Evaluation and testing within a risk management process"},
+  {"code": "ISO 15223-1:2021", "title": "Medical devices — Symbols to be used with information to be supplied by the manufacturer"}
+] %}
+{% if is_sterile %}
+  {% set _ = default_standards.append({"code": "ISO 11135 / ISO 11137", "title": "Sterilization of health care products — Validation and routine control"}) %}
+  {% set _ = default_standards.append({"code": "ISO 11607-1:2019", "title": "Packaging for terminally sterilized medical devices"}) %}
+{% endif %}
+{% if contains_software %}
+  {% set _ = default_standards.append({"code": "IEC 62304:2006+A1:2015", "title": "Medical device software — Software life cycle processes"}) %}
+  {% set _ = default_standards.append({"code": "IEC 60601-1", "title": "Medical electrical equipment — General requirements for basic safety and essential performance"}) %}
+{% endif %}
+
+{% set standards_list = form_data.harmonized_standards if (form_data and form_data.harmonized_standards and form_data.harmonized_standards | length > 0) else default_standards %}
+
+<h2 class="section-heading">4. Harmonized International &amp; National Standards Applied</h2>
+<table class="data-table">
+  <thead>
+    <tr>
+      <th style="width: 28%;">Standard Reference</th>
+      <th style="width: 72%;">Standard Title / Regulatory Scope</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for std in standards_list %}
+    <tr>
+      <td class="mono font-bold">{{ std.code | default(std) }}</td>
+      <td>{{ std.title | default("Applied for demonstrating conformity with MDR 2017 Essential Principles") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Section 5: Authorized Signatory -->
+<div class="signature-block">
+  <h2 class="section-heading">5. Authorization &amp; Corporate Sign-Off</h2>
+  <p>
+    Signed for and on behalf of <strong>{{ mfg_name }}</strong> at
+    <strong>{{ form_data.place_of_issue | default(context.manufacturer.country, true) | default("Manufacturer Headquarters", true) }}</strong>
+    on <strong>{{ form_data.issue_date | default(context.submission.submission_date, true) | default("Current Date", true) }}</strong>.
+  </p>
+
+  <table class="signature-table">
+    <tr>
+      <td style="width: 60%;">
+        <div class="signatory-line">
+          <strong>{{ context.manufacturer.signatory_name | default(context.applicant.signatory_name, true) | default("Authorized Regulatory Officer") }}</strong><br />
+          {{ context.manufacturer.signatory_designation | default(context.applicant.signatory_designation, true) | default("Head of Quality Assurance & Regulatory Affairs") }}<br />
+          For <strong>{{ mfg_name }}</strong>
+        </div>
+      </td>
+      <td style="width: 40%; text-align: right;">
+        <div class="seal-box">
+          Legal Manufacturer<br />Official Stamp &amp; Signature
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endblock %}
