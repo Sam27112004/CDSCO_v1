@@ -107,6 +107,16 @@
 
 ## Phase 3: Regulatory Intelligence, SUGAM Co-Pilot & Production
 
+### Task 3.0: Multi-Pathway Blueprint Expansion (Remaining MD & IVD Forms)
+- [ ] **3.0.1:** Author declarative JSON schema blueprint fixtures in `backend/app/fixtures/blueprints/` from official CDSCO checklists in `md/` and `ivd/`:
+  - Form MD-8 (Loan Licence Class C & D — `md/ReportChecklist_5.pdf`)
+  - Form MD-3 (Manufacturing Licence Class A & B — `md/ReportChecklist_2.pdf`)
+  - Form MD-4 (Loan Licence Class A & B — `md/ReportChecklist_3.pdf`)
+  - Form MD-12 & MD-16 (Test Manufacture & Import Licences — MDR 2017 Rules 31 & 40)
+  - IVD Appendix III specialized blueprints (`ivd/ReportChecklistIVD_*.pdf`)
+- [ ] **3.0.2:** Register new blueprints in `DefinitionService`, extend `PortalFieldsTab` with pathway-conditional fields, and enable `isAvailable: true` in `PATHWAY_OPTIONS` (`frontend/src/app/submissions/new/page.tsx`).
+- [ ] **3.0.3:** Verify via integration tests (`pytest`) that all newly unlocked forms execute on Engine 1, Engine 2, and the Validation Engine without core engine code changes.
+
 ### Task 3.1: Continuous Pre-Submission Validation Engine
 - [ ] **3.1.1:** Build `ValidationService` evaluating multi-tier statutory rules (Blockers, Errors, Warnings, Info).
 - [ ] **3.1.2:** Build `GET /api/v1/submissions/{id}/validation-report` endpoint.

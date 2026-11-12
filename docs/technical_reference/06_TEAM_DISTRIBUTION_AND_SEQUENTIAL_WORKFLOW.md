@@ -217,6 +217,14 @@ Team 3 inherits the complete document and assembly platform. Team 3 builds the d
 ### 5.2 Team 3 Detailed Work Breakdown Structure (WBS)
 
 ```text
+[ ] Task 3.0: Multi-Pathway Blueprint Expansion (Remaining MD & IVD Forms)
+    [ ] 3.0.1: Author declarative JSON schema blueprint fixtures in backend/app/fixtures/blueprints/ from md/ and ivd/:
+               - Form MD-8 (md/ReportChecklist_5.pdf), Form MD-3 (md/ReportChecklist_2.pdf), Form MD-4 (md/ReportChecklist_3.pdf)
+               - Form MD-12 & Form MD-16 (Test Licences per MDR 2017 Rules 31 & 40)
+               - IVD Appendix III specialized blueprints (ivd/ReportChecklistIVD_*.pdf)
+    [ ] 3.0.2: Register blueprints in DefinitionService, extend PortalFieldsTab fields, and enable isAvailable: true in Setup Wizard.
+    [ ] 3.0.3: Verify all expanded forms run across Engine 1, Engine 2, and Validation Engine without core engine code changes.
+
 [ ] Task 3.1: Continuous Pre-Submission Validation Engine
     [ ] 3.1.1: Build ValidationService evaluating multi-tier statutory rules across active submission state:
                - TIER 1 (BLOCKER): Are any mandatory active slots still MISSING or INVALID?
